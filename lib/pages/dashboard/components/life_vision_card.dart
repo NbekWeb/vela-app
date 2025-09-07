@@ -5,8 +5,14 @@ import '../../../shared/widgets/svg_icon.dart';
 class LifeVisionCard extends StatelessWidget {
   final double? height;
   final VoidCallback onEdit;
+  final String? content;
 
-  const LifeVisionCard({super.key, this.height, required this.onEdit});
+  const LifeVisionCard({
+    super.key, 
+    this.height, 
+    required this.onEdit,
+    this.content,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +48,7 @@ class LifeVisionCard extends StatelessWidget {
           // Content
           Expanded(
             child: Text(
-              'I feel most authentic when I embrace my true self. I am focused on pursuing my passions.',
+              content ?? 'I feel most authentic when I embrace my true self. I am focused on pursuing my passions.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.9),

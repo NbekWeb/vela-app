@@ -58,57 +58,61 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
 
   Future<void> _requestIOSNotificationPermission() async {
     try {
-      print('iOS: Starting Firebase notification permission request...');
-      
+     
       // Request permission using Firebase Messaging for iOS 15+
-      NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      NotificationSettings settings = await FirebaseMessaging.instance
+          .requestPermission(alert: true, badge: true, sound: true);
 
-      print('iOS: Permission request result: ${settings.authorizationStatus}');
-
+   
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {
-        print('iOS: Permission granted ✅');
-        
-        // Wait for APNS token to be set before getting FCM token
-        print('iOS: Waiting for APNS token...');
-        
-        // Try to get FCM token with multiple attempts
-        String? deviceToken;
-        int attempts = 0;
-        const maxAttempts = 10;
-        
-        while (deviceToken == null && attempts < maxAttempts) {
-          attempts++;
-          print('iOS: Attempt $attempts to get FCM token...');
-          
+        String? apnsToken;
+        int apnsAttempts = 0;
+        const maxApnsAttempts = 10;
+
+        while (apnsToken == null && apnsAttempts < maxApnsAttempts) {
+          apnsAttempts++;
+
           try {
-            // Wait a bit before each attempt
-            if (attempts > 1) {
-              await Future.delayed(Duration(seconds: attempts));
-            }
-            
-            deviceToken = await FirebaseMessaging.instance.getToken();
-            if (deviceToken != null) {
-              print('iOS: FCM token obtained on attempt $attempts!');
-              break;
-            }
+            await Future.delayed(Duration(seconds: 2));
+            apnsToken = await FirebaseMessaging.instance.getAPNSToken();
           } catch (e) {
-            print('iOS: Attempt $attempts failed: $e');
           }
         }
-        
-        if (deviceToken != null) {
-          print('iOS: Real FCM token obtained successfully!');
-          await _sendDeviceTokenToAPI(deviceToken);
+
+
+        // Now try to get FCM token only if APNS token is available
+        if (apnsToken != null) {
+         
+          String? deviceToken;
+          int attempts = 0;
+          const maxAttempts = 5;
+
+          while (deviceToken == null && attempts < maxAttempts) {
+            attempts++;
+
+            try {
+              if (attempts > 1) {
+                await Future.delayed(Duration(seconds: 2));
+              }
+
+              deviceToken = await FirebaseMessaging.instance.getToken();
+              if (deviceToken != null) {
+                break;
+              }
+            } catch (e) {
+              print('iOS: FCM attempt $attempts failed: $e');
+            }
+          }
+
+          if (deviceToken != null) {
+            await _sendDeviceTokenToAPI(deviceToken);
+          } else {
+            print('iOS: Could not get FCM token after $maxAttempts attempts');
+            // Don't send anything if no token
+          }
         } else {
-          print('iOS: Could not get FCM token after $maxAttempts attempts');
-          // Use mock token as fallback
-          String mockToken = _generateMockDeviceToken();
-          await _sendDeviceTokenToAPI(mockToken);
+          print('iOS: APNS token not available, skipping FCM token');
         }
       } else {
         print('iOS: Permission denied ❌');
@@ -117,9 +121,7 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
       }
     } catch (e) {
       print('iOS: Error in notification permission: $e');
-      // Send mock token as fallback
-      String mockToken = _generateMockDeviceToken();
-      await _sendDeviceTokenToAPI(mockToken);
+      // Don't send anything if error
     }
   }
 
@@ -157,39 +159,30 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
 
   Future<void> _requestAndroidNotificationPermission() async {
     try {
-      print('Android: Starting notification permission request...');
-      
+
       PermissionStatus currentStatus = await Permission.notification.status;
-      
+
       if (currentStatus == PermissionStatus.permanentlyDenied) {
-        print('Android: Permission permanently denied, opening settings...');
         await openAppSettings();
         currentStatus = await Permission.notification.status;
       } else {
-        print('Android: Requesting permission...');
         currentStatus = await Permission.notification.request();
       }
 
-      print('Android: Permission status: $currentStatus');
 
       if (currentStatus.isGranted || currentStatus.isLimited) {
-        print('Android: Permission granted, getting FCM token...');
-        
         // Get real FCM token for Android
         try {
           String? deviceToken = await FirebaseMessaging.instance.getToken();
           if (deviceToken != null) {
-            print('Android: Real FCM token obtained: ${deviceToken.substring(0, 20)}...');
             await _sendDeviceTokenToAPI(deviceToken);
           } else {
-            print('Android: FCM token is null, using mock token');
-            String mockToken = _generateMockDeviceToken();
-            await _sendDeviceTokenToAPI(mockToken);
+            print('Android: FCM token is null');
+            // Don't send anything if no token
           }
         } catch (e) {
           print('Android: Error getting FCM token: $e');
-          String mockToken = _generateMockDeviceToken();
-          await _sendDeviceTokenToAPI(mockToken);
+          // Don't send anything if error
         }
       } else {
         print('Android: Permission denied');
@@ -198,14 +191,6 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
       print('Android: Error in notification permission: $e');
       // Silent error handling
     }
-  }
-
-
-
-  String _generateMockDeviceToken() {
-    // Generate a mock device token for demonstration
-    // In real app, you'd get this from Firebase
-    return 'mock_device_token_${DateTime.now().millisecondsSinceEpoch}';
   }
 
   Future<void> _sendDeviceTokenToAPI(String deviceToken) async {
@@ -218,16 +203,13 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
         'platform': platform,
       };
 
-      print('Sending device token to API: ${deviceToken.substring(0, 20)}...');
-      
       await ApiService.request(
         url: 'auth/create-device-token/',
         method: 'POST',
         data: data,
         open: true,
       );
-      
-      print('Device token sent successfully to API!');
+
     } catch (e) {
       print('Error sending device token to API: $e');
       // Silent error handling

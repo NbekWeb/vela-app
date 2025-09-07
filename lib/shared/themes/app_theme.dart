@@ -13,6 +13,7 @@ class AppTheme {
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
+    fontFamily: 'Satoshi', // Default font family
     colorScheme: ColorScheme.fromSeed(
       seedColor: primaryColor,
       brightness: Brightness.light,
@@ -26,6 +27,7 @@ class AppTheme {
         color: Colors.black87,
         fontSize: 20,
         fontWeight: FontWeight.w600,
+        fontFamily: 'Satoshi',
       ),
       iconTheme: IconThemeData(color: Colors.black87),
       systemOverlayStyle: SystemUiOverlayStyle(
@@ -115,6 +117,7 @@ class AppTheme {
 
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
+    fontFamily: 'Satoshi', // Default font family
     colorScheme: ColorScheme.fromSeed(
       seedColor: primaryColor,
       brightness: Brightness.dark,
@@ -128,6 +131,7 @@ class AppTheme {
         color: Colors.black87,
         fontSize: 20,
         fontWeight: FontWeight.w600,
+        fontFamily: 'Satoshi',
       ),
       iconTheme: IconThemeData(color: Colors.black87),
       systemOverlayStyle: SystemUiOverlayStyle(

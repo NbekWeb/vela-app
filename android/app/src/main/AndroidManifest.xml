@@ -10,7 +10,15 @@
         <!-- Google Sign-In Configuration -->
         <meta-data
             android:name="com.google.android.gms.client_id"
-            android:value="1060421858309-4t78lh49hpi1u4d0b20ks80ahv38gn5q.apps.googleusercontent.com" />
+            android:value="354237870385-u79i4r9edeto84ghdgv5ka48ahpd52i0.apps.googleusercontent.com" />
+        
+        <!-- Facebook Configuration -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
         
         <activity
             android:name=".MainActivity"

@@ -9,8 +9,31 @@ import 'components/profile_picture_section.dart';
 import 'components/profile_content_sections.dart';
 import 'components/neuroplasticity_button.dart';
 
-class DashboardProfilePage extends StatelessWidget {
-  const DashboardProfilePage({super.key});
+class DashboardProfilePage extends StatefulWidget {
+  final VoidCallback? onBackPressed;
+
+  const DashboardProfilePage({this.onBackPressed, super.key});
+
+  @override
+  State<DashboardProfilePage> createState() => _DashboardProfilePageState();
+}
+
+class _DashboardProfilePageState extends State<DashboardProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    // Load user details when profile page mounts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authStore = Provider.of<AuthStore>(context, listen: false);
+      authStore.getUserDetails();
+      _loadProfileData();
+    });
+  }
+
+  Future<void> _loadProfileData() async {
+    final authStore = Provider.of<AuthStore>(context, listen: false);
+    await authStore.getProfileDataWithLifeVisions();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +67,7 @@ class DashboardProfilePage extends StatelessWidget {
                     child: Column(
                       children: [
                         // Header
-                        const ProfileHeader(),
+                        ProfileHeader(onBackPressed: widget.onBackPressed),
 
                         const SizedBox(height: 30),
 
@@ -52,6 +75,8 @@ class DashboardProfilePage extends StatelessWidget {
                         const ProfilePictureSection(),
 
                         const SizedBox(height: 40),
+
+                        // User details section
 
                         // Content sections
                         const ProfileContentSections(),
@@ -75,6 +100,4 @@ class DashboardProfilePage extends StatelessWidget {
       },
     );
   }
-
-
 }

@@ -4,13 +4,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../shared/widgets/stars_animation.dart';
 import '../../shared/widgets/full_width_track_shape.dart';
+import '../../shared/widgets/info_dashboard_modal.dart';
 import '../../core/stores/check_in_store.dart';
 import '../../core/stores/auth_store.dart';
 // import '../generator/generator_page.dart';
 import '../generator/direct_ritual_page.dart';
+import 'main.dart';
 
 class DashboardCheckInPage extends StatefulWidget {
-  const DashboardCheckInPage({super.key});
+  final VoidCallback? onBackPressed;
+  
+  const DashboardCheckInPage({this.onBackPressed, super.key});
 
   @override
   State<DashboardCheckInPage> createState() => _DashboardCheckInPageState();
@@ -168,9 +172,25 @@ class _DashboardCheckInPageState extends State<DashboardCheckInPage> {
                                   color: Colors.white,
                                   size: 24,
                                 ),
-                                onPressed: () => Navigator.of(
-                                  context,
-                                ).pushReplacementNamed('/dashboard'),
+                                onPressed: () {
+                                  if (widget.onBackPressed != null) {
+                                    widget.onBackPressed!();
+                                  } else {
+                                    // Check if there's a previous page to go back to
+                                    final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+                                    if (dashboardState != null) {
+                                      // If previous index is the same as current (no previous page), go to home
+                                      if (dashboardState.previousIndex == dashboardState.selectedIndex) {
+                                        dashboardState.navigateToHome();
+                                      } else {
+                                        // Go back to previous page
+                                        dashboardState.navigateBack();
+                                      }
+                                    } else {
+                                      Navigator.of(context).pushReplacementNamed('/dashboard');
+                                    }
+                                  }
+                                },
                               ),
                             ),
                           ),
@@ -186,15 +206,26 @@ class _DashboardCheckInPageState extends State<DashboardCheckInPage> {
                             ),
                           ),
                           // Info icon on the right, size 24x24
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: const BoxDecoration(shape: BoxShape.circle),
-                            child: const Center(
-                              child: Icon(
-                                Icons.info_outline,
-                                color: Colors.white,
-                                size: 24,
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (BuildContext context) {
+                                  return const InfoDashboardModal();
+                                },
+                              );
+                            },
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: const BoxDecoration(shape: BoxShape.circle),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.info_outline,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
                               ),
                             ),
                           ),

@@ -17,6 +17,7 @@ import 'pages/auth/starter_page.dart';
 import 'pages/auth/onboarding_page_1.dart';
 import 'pages/auth/onboarding_page_2.dart';
 import 'pages/auth/onboarding_page_3.dart';
+import 'pages/auth/onboarding_page_4.dart';
 import 'pages/plan_page.dart';
 import 'pages/generator/generator_page.dart';
 import 'pages/vault_page.dart';
@@ -24,6 +25,7 @@ import 'pages/dashboard/my_meditations_page.dart';
 import 'pages/dashboard/archive_page.dart';
 import 'core/utils/video_loader.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 // Global navigator key for API service
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -31,14 +33,19 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 // Global variable to store meditation ID for audio player
 String? globalMeditationId;
 
+// Global variable to navigate to profile tab
+bool shouldNavigateToProfile = false;
+
 // Global secure storage instance
 final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp();
+  // Initialize Firebase only for mobile platforms (not web)
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+  }
 
   // Initialize stores
   final authStore = AuthStore();
@@ -49,8 +56,8 @@ void main() async {
   await authStore.initialize();
   await meditationStore.initialize();
 
-  // Preload videos in background
-  VideoLoader.initializeVideos();
+  // Preload videos before app starts
+  await VideoLoader.initializeVideos();
 
   // Check if user is authenticated using the store method
   String initialRoute = '/loading';
@@ -125,6 +132,7 @@ class MyApp extends StatelessWidget {
                 '/onboarding-1': (context) => const OnboardingPage1(),
                 '/onboarding-2': (context) => const OnboardingPage2(),
                 '/onboarding-3': (context) => const OnboardingPage3(),
+                '/onboarding-4': (context) => const OnboardingPage4(),
                 '/login': (context) => const LoginPage(),
                 '/register': (context) => const RegisterPage(),
                 '/plan': (context) => const PlanPage(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
@@ -10,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui'; // Added for ImageFilter
 import '../../../shared/widgets/stars_animation.dart';
 import '../../../shared/widgets/personalized_meditation_modal.dart';
+import '../../../shared/widgets/full_width_track_shape.dart';
 import '../../../core/stores/meditation_store.dart';
 import '../../../core/stores/like_store.dart';
 import '../../../core/services/api_service.dart';
@@ -47,6 +49,8 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
   Duration _position = Duration.zero;
   bool _isLiked = false;
   bool _isMuted = false;
+  bool _isDragging = false;
+  bool _wasPlayingBeforeDrag = false;
   String? fileUrl;
 
   @override
@@ -62,19 +66,17 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
   Future<void> _configureAudioSession() async {
     try {
       if (Platform.isIOS) {
-        debugPrint('Configuring iOS audio session...');
+        // iOS audio session configuration
       } else if (Platform.isAndroid) {
-        debugPrint('Configuring Android audio session...');
+        // Android audio session configuration
       }
     } catch (e) {
-      debugPrint('Error configuring audio session: $e');
+      // Error configuring audio session
     }
   }
 
   Future<void> _loadAndPlayMeditation() async {
     try {
-      debugPrint('Loading meditation audio...');
-
       final meditationStore = Provider.of<MeditationStore>(
         context,
         listen: false,
@@ -83,38 +85,34 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
 
       // First try to get fileUrl from store
       fileUrl = meditationStore.fileUrl;
-      debugPrint('Got fileUrl from store: $fileUrl');
 
       // If not in store, try secure storage
       if (fileUrl == null || fileUrl!.isEmpty) {
-        debugPrint('FileUrl is null in store, checking secure storage...');
         const storage = FlutterSecureStorage();
         final storedFile = await storage.read(key: 'file');
         if (storedFile != null && storedFile.isNotEmpty) {
           fileUrl = storedFile;
-          debugPrint('Got fileUrl from secure storage: $fileUrl');
-        } else {
-          debugPrint('FileUrl not found in secure storage either');
         }
       }
 
       // If still null, wait a bit and retry store
       if (fileUrl == null || fileUrl!.isEmpty) {
-        debugPrint(
-          'FileUrl is still null, waiting a bit and retrying store...',
-        );
         await Future.delayed(const Duration(milliseconds: 500));
         fileUrl = meditationStore.fileUrl;
-        debugPrint('Retried fileUrl from store: $fileUrl');
       }
 
       // Dispose previous audio player safely
       if (_audioPlayer != null) {
         try {
           await _audioPlayer!.stop();
+        } catch (e) {
+          // Ignore stop errors
+        }
+        
+        try {
           await _audioPlayer!.dispose();
         } catch (e) {
-          debugPrint('Error disposing previous audio player: $e');
+          // Ignore dispose errors
         }
         _audioPlayer = null;
       }
@@ -124,7 +122,7 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         try {
           _waveformController!.dispose();
         } catch (e) {
-          debugPrint('Error disposing previous waveform controller: $e');
+          // Ignore dispose errors
         }
         _waveformController = null;
       }
@@ -140,26 +138,19 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
           await _audioPlayer!.setVolume(1.0);
           // Android emulator uchun qo'shimcha ovoz kuchaytirish
           await _audioPlayer!.setVolume(1.5);
-          debugPrint('Android audio session configured successfully');
         } catch (e) {
-          debugPrint('Error configuring Android audio session: $e');
+          // Error configuring Android audio session
         }
       }
 
       if (fileUrl != null && fileUrl!.isNotEmpty && _audioPlayer != null) {
-        debugPrint('Setting audio URL: $fileUrl');
         try {
           await _audioPlayer!.setUrl(fileUrl!);
-          debugPrint('Audio URL set successfully');
         } catch (e) {
-          debugPrint('Error setting audio URL: $e');
           return;
         }
 
         _audioPlayer!.playerStateStream.listen((state) {
-          debugPrint(
-            'Player state: ${state.processingState} - playing: ${state.playing}',
-          );
           if (mounted) {
             setState(() {
               _isPlaying = state.playing;
@@ -170,7 +161,6 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         });
 
         _audioPlayer!.durationStream.listen((duration) {
-          debugPrint('Duration: $duration');
           if (mounted) {
             setState(() {
               _duration = duration ?? const Duration(minutes: 3, seconds: 29);
@@ -190,18 +180,13 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
           _isAudioReady = true;
         });
 
-        debugPrint('Audio player initialized successfully');
         await _prepareWaveform();
       } else {
-        debugPrint(
-          'No fileUrl available from store: ${meditationStore.fileUrl}',
-        );
         setState(() {
           _isAudioReady = true;
         });
       }
     } catch (e) {
-      debugPrint('Error in _loadAndPlayMeditation: $e');
       setState(() {
         _isAudioReady = true;
       });
@@ -224,23 +209,36 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         }
       }
     } catch (e) {
-      debugPrint('Error preparing waveform: $e');
+      // Error preparing waveform
     }
   }
 
   @override
   void dispose() {
-    try {
-      _audioPlayer?.stop();
-      _audioPlayer?.dispose();
-    } catch (e) {
-      debugPrint('Error disposing audio player: $e');
+    // Safely dispose audio player
+    if (_audioPlayer != null) {
+      try {
+        _audioPlayer!.stop();
+      } catch (e) {
+        // Ignore stop errors
+      }
+      
+      try {
+        _audioPlayer!.dispose();
+      } catch (e) {
+        // Ignore dispose errors
+      }
+      _audioPlayer = null;
     }
 
-    try {
-      _waveformController?.dispose();
-    } catch (e) {
-      debugPrint('Error disposing waveform controller: $e');
+    // Safely dispose waveform controller
+    if (_waveformController != null) {
+      try {
+        _waveformController!.dispose();
+      } catch (e) {
+        // Ignore dispose errors
+      }
+      _waveformController = null;
     }
 
     super.dispose();
@@ -259,9 +257,12 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
           try {
             _waveformController!.pausePlayer();
           } catch (e) {
-            debugPrint('Error pausing waveform: $e');
+            // Error pausing waveform
           }
         }
+        setState(() {
+          _isPlaying = false;
+        });
       } else {
         if (!_isAudioReady) {
           await _audioPlayer!.setUrl(fileUrl!);
@@ -276,12 +277,15 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
           try {
             _waveformController!.startPlayer();
           } catch (e) {
-            debugPrint('Error starting waveform: $e');
+            // Error starting waveform
           }
         }
+        setState(() {
+          _isPlaying = true;
+        });
       }
     } catch (e) {
-      debugPrint('Error toggling play/pause: $e');
+      // Error toggling play/pause
     }
   }
 
@@ -585,7 +589,19 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
 
   void _resetMeditation() {
     context.read<MeditationStore>().completeReset();
-    Navigator.pushReplacementNamed(context, '/generator');
+    // Clear navigation stack to prevent back navigation to auth pages
+    Navigator.pushNamedAndRemoveUntil(
+      context, 
+      '/generator',
+      (route) {
+        // Keep only generator and dashboard routes, remove auth pages
+        return route.settings.name == '/generator' || 
+               route.settings.name == '/dashboard' ||
+               route.settings.name == '/my-meditations' ||
+               route.settings.name == '/archive' ||
+               route.settings.name == '/vault';
+      }
+    );
   }
 
   void _saveToVault() async {
@@ -596,21 +612,66 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
       if (isFirst) {
         // First time - go to vault and remove first flag
         await prefs.remove('first');
-        Navigator.pushReplacementNamed(context, '/vault');
+        // Clear navigation stack to prevent back navigation to auth pages
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/vault',
+          (route) {
+            // Keep only vault and dashboard routes, remove auth pages
+            return route.settings.name == '/vault' || 
+                   route.settings.name == '/dashboard' ||
+                   route.settings.name == '/my-meditations' ||
+                   route.settings.name == '/archive' ||
+                   route.settings.name == '/generator';
+          }
+        );
       } else {
         // Not first time - go to dashboard
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        // Clear navigation stack to prevent back navigation to auth pages
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/dashboard',
+          (route) {
+            // Keep only dashboard and its sub-routes, remove auth pages
+            return route.settings.name == '/dashboard' || 
+                   route.settings.name == '/my-meditations' ||
+                   route.settings.name == '/archive' ||
+                   route.settings.name == '/vault' ||
+                   route.settings.name == '/generator';
+          }
+        );
       }
     } catch (e) {
-      // Error handling - default to dashboard
-      print('Error checking first flag: $e');
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      // Error handling - default to dashboard with cleared stack
+      Navigator.pushNamedAndRemoveUntil(
+        context, 
+        '/dashboard',
+        (route) {
+          // Keep only dashboard and its sub-routes, remove auth pages
+          return route.settings.name == '/dashboard' || 
+                 route.settings.name == '/my-meditations' ||
+                 route.settings.name == '/archive' ||
+                 route.settings.name == '/vault' ||
+                 route.settings.name == '/generator';
+        }
+      );
     }
   }
 
   void _handleBack() {
-    // Navigate to home page
-    Navigator.pushReplacementNamed(context, '/dashboard');
+    // Navigate to home page with cleared navigation stack
+    Navigator.pushNamedAndRemoveUntil(
+      context, 
+      '/dashboard',
+      (route) {
+        // Keep only dashboard and its sub-routes, remove auth pages
+        return route.settings.name == '/dashboard' || 
+               route.settings.name == '/my-meditations' ||
+               route.settings.name == '/archive' ||
+               route.settings.name == '/vault' ||
+               route.settings.name == '/generator';
+      }
+    );
   }
 
   void _showPersonalizedMeditationInfo() {
@@ -621,6 +682,13 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         return const PersonalizedMeditationModal();
       },
     );
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$minutes:$seconds';
   }
 
   @override
@@ -658,39 +726,149 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
                             },
                           ),
                           const SizedBox(height: 0),
-                          MeditationActionBar(
-                            isMuted: _isMuted,
-                            isLiked: _isLiked,
-                            onMuteToggle: _toggleMute,
-                            onLikeToggle: _toggleLike,
-                            onDelete: _deleteMeditation,
-                            onEdit: _editMeditation,
-                            onShare: _shareMeditation,
+                          Consumer<MeditationStore>(
+                            builder: (context, meditationStore, child) {
+                              // Check if this meditation is user's own meditation
+                              final myMeditations = meditationStore.myMeditations;
+                              final isUserMeditation = myMeditations?.any((meditation) => 
+                                meditation['id']?.toString() == widget.meditationId
+                              ) ?? false;
+                              
+                              return MeditationActionBar(
+                                isMuted: _isMuted,
+                                isLiked: _isLiked,
+                                onMuteToggle: _toggleMute,
+                                onLikeToggle: _toggleLike,
+                                onDelete: isUserMeditation ? _deleteMeditation : null,
+                                onEdit: isUserMeditation ? _editMeditation : null,
+                                onShare: _shareMeditation,
+                                showLikeText: !isUserMeditation, // Show text only for library meditations
+                              );
+                            },
                           ),
                           const SizedBox(height: 24),
                           Material(
                             color: Colors.transparent,
                             child: Column(
                               children: [
-                                Slider(
-                                  value: _position.inSeconds.toDouble().clamp(
-                                    0,
-                                    _duration.inSeconds.toDouble(),
+                                // Time display
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _formatDuration(_position),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Satoshi',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        _formatDuration(_duration),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Satoshi',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  min: 0,
-                                  max: _duration.inSeconds.toDouble(),
-                                  onChanged: (value) async {
-                                    final newPosition = Duration(
-                                      seconds: value.toInt(),
-                                    );
-                                    await _audioPlayer?.seek(newPosition);
-                                    setState(() {
-                                      _position = newPosition;
-                                    });
-                                  },
-                                  activeColor: Colors.white,
-                                  inactiveColor: Colors.white.withOpacity(0.3),
                                 ),
+                                const SizedBox(height: 8),
+                                // Improved Slider
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  child: SliderTheme(
+                                    data: SliderTheme.of(context).copyWith(
+                                      trackHeight: 6,
+                                      activeTrackColor: const Color(0xFFC9DFF4),
+                                      inactiveTrackColor: Colors.white.withOpacity(0.3),
+                                      thumbColor: _isDragging ? const Color(0xFFC9DFF4) : Colors.white,
+                                      overlayColor: Colors.white.withOpacity(0.2),
+                                      thumbShape: const RoundSliderThumbShape(
+                                        enabledThumbRadius: 8,
+                                        disabledThumbRadius: 8,
+                                        elevation: 4,
+                                      ),
+                                      overlayShape: const RoundSliderOverlayShape(
+                                        overlayRadius: 20,
+                                      ),
+                                      trackShape: const AudioSliderTrackShape(),
+                                    ),
+                                    child: Slider(
+                                      value: _position.inSeconds.toDouble().clamp(
+                                        0,
+                                        _duration.inSeconds.toDouble(),
+                                      ),
+                                      min: 0,
+                                      max: _duration.inSeconds.toDouble(),
+                                      onChanged: (value) async {
+                                        // If this is the first change during drag, pause audio
+                                        if (!_isDragging && _isPlaying) {
+                                          print('DEBUG: First drag detected, pausing audio');
+                                          await _audioPlayer?.pause();
+                                          setState(() {
+                                            _isDragging = true;
+                                            _wasPlayingBeforeDrag = true;
+                                          });
+                                        }
+                                        
+                                        final newPosition = Duration(
+                                          seconds: value.toInt(),
+                                        );
+                                        await _audioPlayer?.seek(newPosition);
+                                        setState(() {
+                                          _position = newPosition;
+                                        });
+                                      },
+                                      onChangeStart: (value) {
+                                        print('DEBUG: Slider onChangeStart - isPlaying: $_isPlaying');
+                                        setState(() {
+                                          _isDragging = true;
+                                          _wasPlayingBeforeDrag = _isPlaying;
+                                        });
+                                        // Pause audio while seeking
+                                        if (_isPlaying) {
+                                          print('DEBUG: Pausing audio during seek');
+                                          _audioPlayer?.pause();
+                                        }
+                                      },
+                                      onChangeEnd: (value) async {
+                                        print('DEBUG: Slider onChangeEnd - wasPlayingBeforeDrag: $_wasPlayingBeforeDrag');
+                                        setState(() {
+                                          _isDragging = false;
+                                        });
+                                        // Resume audio after seeking if it was playing before drag
+                                        if (_wasPlayingBeforeDrag) {
+                                          print('DEBUG: Resuming audio after seek');
+                                          await _audioPlayer?.play();
+                                          // The audio player state listener will update _isPlaying automatically
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Progress indicator
+                                if (_isDragging)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                    child: Text(
+                                      'Seeking to ${_formatDuration(_position)}',
+                                      style: const TextStyle(
+                                        color: Color(0xFFC9DFF4),
+                                        fontFamily: 'Satoshi',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
                               ],
                             ),
                           ),

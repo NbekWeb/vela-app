@@ -6,9 +6,10 @@ class MeditationActionBar extends StatelessWidget {
   final bool isLiked;
   final VoidCallback onMuteToggle;
   final VoidCallback onLikeToggle;
-  final VoidCallback onDelete;
-  final VoidCallback onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
   final VoidCallback onShare;
+  final bool showLikeText;
 
   const MeditationActionBar({
     super.key,
@@ -16,9 +17,10 @@ class MeditationActionBar extends StatelessWidget {
     required this.isLiked,
     required this.onMuteToggle,
     required this.onLikeToggle,
-    required this.onDelete,
-    required this.onEdit,
+    this.onDelete,
+    this.onEdit,
     required this.onShare,
+    this.showLikeText = true,
   });
 
   @override
@@ -37,56 +39,95 @@ class MeditationActionBar extends StatelessWidget {
             onPressed: onMuteToggle,
           ),
           SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-          // Delete button
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0x1AFFFFFF), // #FFFFFF1A
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.delete_outline,
-                color: Colors.white,
+          // Delete button - only show if onDelete is provided
+          if (onDelete != null)
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0x1AFFFFFF), // #FFFFFF1A
+                borderRadius: BorderRadius.circular(30),
               ),
-              onPressed: onDelete,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.white,
+                ),
+                onPressed: onDelete,
+              ),
             ),
-          ),
           SizedBox(width: MediaQuery.of(context).size.width * 0.02),
-          // Like button
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0x1AFFFFFF), // #FFFFFF1A
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: IconButton(
-              icon: Icon(
-                isLiked ? Icons.favorite : Icons.favorite_border,
-                color: Colors.white,
+          // Like button - conditional width based on showLikeText
+          if (showLikeText)
+            // Full width for library meditations
+            Expanded(
+              child: GestureDetector(
+                onTap: onLikeToggle,
+                child: Container(
+                  height: 60,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(60),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Resonating?',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Satoshi',
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              onPressed: onLikeToggle,
+            )
+          else
+            // Small width for my meditations (like edit/delete buttons)
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0x1AFFFFFF), // #FFFFFF1A
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: IconButton(
+                icon: Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_border,
+                  color: Colors.white,
+                ),
+                onPressed: onLikeToggle,
+              ),
             ),
-          ),
           SizedBox(width: MediaQuery.of(context).size.width * 0.02),
-          // Edit button
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0x1AFFFFFF), // #FFFFFF1A
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.edit_outlined,
-                color: Colors.white,
+          // Edit button - only show if onEdit is provided
+          if (onEdit != null)
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0x1AFFFFFF), // #FFFFFF1A
+                borderRadius: BorderRadius.circular(30),
               ),
-              onPressed: onEdit,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: Colors.white,
+                ),
+                onPressed: onEdit,
+              ),
             ),
-          ),
           SizedBox(width: MediaQuery.of(context).size.width * 0.02),
           // Right (share) icon
           IconButton(

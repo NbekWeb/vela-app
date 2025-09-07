@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../shared/widgets/stars_animation.dart';
+import '../../shared/widgets/info_dashboard_modal.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../vault/vault_ritual_card.dart';
 import '../vault/vault_stat_card.dart';
-import '../dashboard/my_meditations_page.dart';
-import '../dashboard/archive_page.dart';
+import '../dashboard/components/dashboard_audio_player.dart';
 import '../../core/stores/meditation_store.dart';
+import 'main.dart';
 
 class DashboardVaultPage extends StatefulWidget {
   final Function(String)? onAudioPlay;
+  final VoidCallback? onBackPressed;
 
-  const DashboardVaultPage({this.onAudioPlay, super.key});
+  const DashboardVaultPage({this.onAudioPlay, this.onBackPressed, super.key});
 
   @override
   State<DashboardVaultPage> createState() => _DashboardVaultPageState();
@@ -45,7 +47,7 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(
                     16.sp, // left
-                    8.sp, // top
+                    8, // top
                     16.sp, // right
                     0.sp, // bottom
                   ),
@@ -65,9 +67,25 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                               color: Colors.white,
                               size: 24,
                             ),
-                            onPressed: () => Navigator.of(
-                              context,
-                            ).pushReplacementNamed('/dashboard'),
+                            onPressed: () {
+                              if (widget.onBackPressed != null) {
+                                widget.onBackPressed!();
+                              } else {
+                                // Check if there's a previous page to go back to
+                                final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+                                if (dashboardState != null) {
+                                  // If previous index is the same as current (no previous page), go to home
+                                  if (dashboardState.previousIndex == dashboardState.selectedIndex) {
+                                    dashboardState.navigateToHome();
+                                  } else {
+                                    // Go back to previous page
+                                    dashboardState.navigateBack();
+                                  }
+                                } else {
+                                  Navigator.of(context).pushReplacementNamed('/dashboard');
+                                }
+                              }
+                            },
                           ),
                         ),
                       ),
@@ -75,7 +93,7 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                         offset: const Offset(
                           3,
                           0,
-                        ), // ← сдвиг вправо на 10 пикселей
+                        ), 
                         child: Image.asset(
                           'assets/img/logo.png',
                           width: 60,
@@ -83,15 +101,26 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                         ),
                       ),
                       // Info icon on the right, size 24x24
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: const BoxDecoration(shape: BoxShape.circle),
-                        child: const Center(
-                          child: Icon(
-                            Icons.info_outline,
-                            color: Colors.white,
-                            size: 24,
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            builder: (BuildContext context) {
+                              return const InfoDashboardModal();
+                            },
+                          );
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: const BoxDecoration(shape: BoxShape.circle),
+                          child: const Center(
+                            child: Icon(
+                              Icons.info_outline,
+                              color: Colors.white,
+                              size: 24,
+                            ),
                           ),
                         ),
                       ),
@@ -367,7 +396,20 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                                                 title: title,
                                                 description: description,
                                                 imageUrl: imageUrl,
-                                                onAudioPlay: widget.onAudioPlay,
+                                                onAudioPlay: (id) {
+                                                  // Navigate to audio player with proper parameters like in home page
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => DashboardAudioPlayer(
+                                                        meditationId: id,
+                                                        title: title,
+                                                        description: description,
+                                                        imageUrl: imageUrl,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             ),
                                           );

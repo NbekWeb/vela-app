@@ -9,6 +9,7 @@ import '../../shared/widgets/stars_animation.dart';
 import '../../core/stores/auth_store.dart';
 import '../../core/services/api_service.dart';
 import 'main.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class RemindersPage extends StatefulWidget {
   const RemindersPage({super.key});
@@ -31,7 +32,7 @@ class _RemindersPageState extends State<RemindersPage> {
   void _loadUserData() {
     final authStore = Provider.of<AuthStore>(context, listen: false);
     final user = authStore.user;
-    
+
     if (user != null) {
       setState(() {
         _dailyMeditationEnabled = user.userDeviceActive ?? false;
@@ -44,7 +45,52 @@ class _RemindersPageState extends State<RemindersPage> {
     }
   }
 
+  Future<void> _requestNotificationPermission() async {
+    try {
+      if (Platform.isIOS) {
+        NotificationSettings settings = await FirebaseMessaging.instance
+            .requestPermission(alert: true, badge: true, sound: true);
+
+        if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+            settings.authorizationStatus == AuthorizationStatus.provisional) {
+          await Future.delayed(const Duration(seconds: 2));
+        } else {
+          // Show dialog to guide user to settings
+          if (mounted) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Enable Notifications'),
+                  content: const Text(
+                    'To receive meditation reminders, please enable notifications:\n\n'
+                    '1. Go to Settings\n'
+                    '2. Tap "Notifications"\n'
+                    '3. Turn on "Allow Notifications"\n\n'
+                    'Then return to the app and try again.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        }
+      } else {
+        await FirebaseMessaging.instance.requestPermission();
+      }
+    } catch (e) {
+      print('DEBUG: Error in _requestNotificationPermission: $e');
+      // Silent error handling
+    }
+  }
+
   Future<void> _sendDeviceTokenToAPI(String deviceToken) async {
+    print('DEBUG: _sendDeviceTokenToAPI called with token: $deviceToken');
     try {
       String platform = Platform.isIOS ? 'ios' : 'android';
 
@@ -54,13 +100,15 @@ class _RemindersPageState extends State<RemindersPage> {
         'platform': platform,
       };
 
-      await ApiService.request(
+      print('🔵 API REQUEST: POST /auth/create-device-token/');
+      print('🔵 Request Data: $data');
+
+      final response = await ApiService.request(
         url: 'auth/create-device-token/',
         method: 'POST',
         data: data,
       );
     } catch (e) {
-      print('Error sending device token to API: $e');
       // Silent error handling
     }
   }
@@ -73,59 +121,163 @@ class _RemindersPageState extends State<RemindersPage> {
     try {
       final authStore = Provider.of<AuthStore>(context, listen: false);
       final user = authStore.user;
-      
+      print('DEBUG: User exists: ${user != null}');
       if (user != null) {
-        // If user is disabling notifications (changing from true to false)
-        if (!_dailyMeditationEnabled && (user.userDeviceActive ?? false)) {
+        print('DEBUG: Current user.userDeviceActive: ${user.userDeviceActive}');
+      }
+
+      if (user != null) {
+        print('DEBUG: Processing notification settings...');
+        print('DEBUG: _dailyMeditationEnabled: $_dailyMeditationEnabled');
+        print('DEBUG: user.userDeviceActive: ${user.userDeviceActive}');
+
+        // Always process based on current toggle state
+        if (_dailyMeditationEnabled) {
+          print('DEBUG: Enabling notifications...');
+
+          // Request notification permission first
+          await _requestNotificationPermission();
+
           try {
-            // Get device token from Firebase
-            String? deviceToken = await FirebaseMessaging.instance.getToken();
-            
-            // Delete device token
-            await ApiService.request(
-              url: 'auth/device-token/',
-              method: 'DELETE',
-              data: {
-                'device_token': deviceToken ?? '',
-              },
-            );
-          } catch (firebaseError) {
-            // If Firebase fails, try with empty token or mock token
-            print('Firebase error: $firebaseError');
-            await ApiService.request(
-              url: 'auth/device-token/',
-              method: 'DELETE',
-              data: {
-                'device_token': '',
-              },
-            );
-          }
-          
-          // Update local user data
-          final updatedUser = user.copyWith(userDeviceActive: false);
-          authStore.setUser(updatedUser);
-        }
-        // If user is enabling notifications (changing from false to true)
-        else if (_dailyMeditationEnabled && !(user.userDeviceActive ?? false)) {
-          try {
-            // Get device token from Firebase
-            String? deviceToken = await FirebaseMessaging.instance.getToken();
-            
-            if (deviceToken != null) {
-              // Register device token
-              await _sendDeviceTokenToAPI(deviceToken);
-            } else {
-              // If no token, use mock token for testing
-              await _sendDeviceTokenToAPI('mock_device_token_${DateTime.now().millisecondsSinceEpoch}');
+            // For iOS, first get APNS token, then FCM token
+            if (Platform.isIOS) {
+              print('DEBUG: Getting APNS token for iOS...');
+
+              // Request permission first
+              NotificationSettings settings = await FirebaseMessaging.instance
+                  .requestPermission(alert: true, badge: true, sound: true);
+              print(
+                'DEBUG: Notification permission status: ${settings.authorizationStatus}',
+              );
+
+              // Wait longer for APNS token to be set
+              print('DEBUG: Waiting for APNS token to be set...');
+              await Future.delayed(const Duration(seconds: 10));
+
+              // Try different approach - get FCM token directly
+              print('DEBUG: Trying to get FCM token directly...');
+              String? deviceToken;
+              int attempts = 0;
+              const maxAttempts = 10;
+
+              while (deviceToken == null && attempts < maxAttempts) {
+                attempts++;
+                print('DEBUG: FCM attempt $attempts...');
+
+                try {
+                  await Future.delayed(Duration(seconds: 3));
+                  deviceToken = await FirebaseMessaging.instance.getToken();
+                  print('DEBUG: FCM Token attempt $attempts: $deviceToken');
+                } catch (e) {
+                  print('DEBUG: FCM attempt $attempts failed: $e');
+                }
+              }
+
+              // Send FCM token to API if successful
+              if (deviceToken != null) {
+                print('DEBUG: Using FCM token for API call: $deviceToken');
+                await _sendDeviceTokenToAPI(deviceToken);
+              } else {
+                print('DEBUG: FCM token is null, cannot send to API');
+              }
+
+              // If FCM token failed, try APNS token
+              print('DEBUG: FCM token failed, trying APNS token...');
+              String? apnsToken;
+              int apnsAttempts = 0;
+              const maxApnsAttempts = 10;
+
+              while (apnsToken == null && apnsAttempts < maxApnsAttempts) {
+                apnsAttempts++;
+                print('DEBUG: APNS attempt $apnsAttempts...');
+
+                try {
+                  await Future.delayed(Duration(seconds: 3));
+                  apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+                  print('DEBUG: APNS Token attempt $apnsAttempts: $apnsToken');
+                } catch (e) {
+                  print('DEBUG: APNS attempt $apnsAttempts failed: $e');
+                }
+              }
+
+              // Send APNS token to API if FCM failed
+              if (apnsToken != null) {
+                print('DEBUG: Using APNS token for API call: $apnsToken');
+                await _sendDeviceTokenToAPI(apnsToken);
+              } else {
+                print('DEBUG: APNS token is null, cannot send to API');
+              }
+            }
+
+            // FCM token already handled above for iOS
+            if (!Platform.isIOS) {
+              // For Android, try to get FCM token
+              String? deviceToken;
+              int attempts = 0;
+              const maxAttempts = 5;
+
+              while (deviceToken == null && attempts < maxAttempts) {
+                attempts++;
+                print('DEBUG: Android FCM attempt $attempts...');
+
+                try {
+                  if (attempts > 1) {
+                    await Future.delayed(Duration(seconds: 2));
+                  }
+
+                  deviceToken = await FirebaseMessaging.instance.getToken();
+                  if (deviceToken != null) {
+                    print(
+                      'DEBUG: Android FCM token obtained on attempt $attempts!',
+                    );
+                    print('DEBUG: Android FCM Token: $deviceToken');
+                    break;
+                  }
+                } catch (e) {
+                  print('DEBUG: Android FCM attempt $attempts failed: $e');
+                }
+              }
+
+              if (deviceToken != null) {
+                await _sendDeviceTokenToAPI(deviceToken);
+              } else {
+                throw Exception(
+                  'Could not get FCM token after $maxAttempts attempts',
+                );
+              }
             }
           } catch (firebaseError) {
-            // If Firebase fails, use mock token
+            // If Firebase fails, show error
             print('Firebase error: $firebaseError');
-            await _sendDeviceTokenToAPI('mock_device_token_${DateTime.now().millisecondsSinceEpoch}');
+            throw Exception('Failed to get FCM token: $firebaseError');
           }
-          
-          // Update local user data
+
           final updatedUser = user.copyWith(userDeviceActive: true);
+          authStore.setUser(updatedUser);
+        } else {
+          try {
+            // Get device token from Firebase
+            String? deviceToken = await FirebaseMessaging.instance.getToken();
+            print('DEBUG: Device token for disabling: $deviceToken');
+
+            if (deviceToken != null && deviceToken.isNotEmpty) {
+              print('DEBUG: Making API call to disable notifications...');
+              print(
+                '🔵 API REQUEST: PUT /auth/update-device-token-status/$deviceToken/',
+              );
+              print('🔵 Request Data: {"is_active": false}');
+
+              final response = await ApiService.request(
+                url: 'auth/update-device-token-status/$deviceToken/',
+                method: 'PUT',
+                data: {'is_active': false},
+              );
+            } else {}
+          } catch (firebaseError) {
+          }
+
+          // Update local user data
+          final updatedUser = user.copyWith(userDeviceActive: false);
           authStore.setUser(updatedUser);
         }
       }
@@ -133,22 +285,25 @@ class _RemindersPageState extends State<RemindersPage> {
       // Show success message
       if (mounted) {
         Fluttertoast.showToast(
-          msg: _dailyMeditationEnabled 
-              ? 'Notifications enabled successfully!' 
+          msg: _dailyMeditationEnabled
+              ? 'Notifications enabled successfully!'
               : 'Notifications disabled successfully!',
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.TOP,
           backgroundColor: const Color(0xFFF2EFEA),
           textColor: const Color(0xFF3B6EAA),
         );
-        
+
         // Navigate to profile page using dashboard navigation
-        final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+        final dashboardState = context
+            .findAncestorStateOfType<DashboardMainPageState>();
         if (dashboardState != null) {
           dashboardState.navigateToProfile();
         }
       }
     } catch (e) {
+      print('DEBUG: Main error in _saveSettings: $e');
+      print('DEBUG: Error type: ${e.runtimeType}');
       if (mounted) {
         Fluttertoast.showToast(
           msg: 'Failed to update settings: ${e.toString()}',
@@ -169,13 +324,24 @@ class _RemindersPageState extends State<RemindersPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
+    return PopScope(
+      canPop: false, // Prevent default back button behavior
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          // Navigate back to profile page using dashboard navigation
+          final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+          if (dashboardState != null) {
+            dashboardState.navigateToProfile();
+          }
+        }
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        child: Scaffold(
         body: Stack(
           children: [
             const StarsAnimation(
@@ -216,6 +382,7 @@ class _RemindersPageState extends State<RemindersPage> {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -232,7 +399,8 @@ class _RemindersPageState extends State<RemindersPage> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
               onPressed: () {
-                final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+                final dashboardState = context
+                    .findAncestorStateOfType<DashboardMainPageState>();
                 if (dashboardState != null) {
                   dashboardState.navigateToSettings();
                 }
@@ -246,7 +414,11 @@ class _RemindersPageState extends State<RemindersPage> {
           Container(
             width: 36,
             height: 36,
-            child: const Icon(Icons.settings, color: Colors.transparent, size: 24),
+            child: const Icon(
+              Icons.settings,
+              color: Colors.transparent,
+              size: 24,
+            ),
           ),
         ],
       ),
@@ -269,16 +441,18 @@ class _RemindersPageState extends State<RemindersPage> {
               ),
             ),
             GestureDetector(
-              onTap: _isSaving ? null : () {
-                setState(() {
-                  _dailyMeditationEnabled = !_dailyMeditationEnabled;
-                });
-              },
+              onTap: _isSaving
+                  ? null
+                  : () {
+                      setState(() {
+                        _dailyMeditationEnabled = !_dailyMeditationEnabled;
+                      });
+                    },
               child: Container(
                 width: 45,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: _dailyMeditationEnabled 
+                  color: _dailyMeditationEnabled
                       ? const Color.fromRGBO(21, 43, 86, 0.1)
                       : Colors.white.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(1000),
@@ -345,5 +519,4 @@ class _RemindersPageState extends State<RemindersPage> {
       ],
     );
   }
-  
-} 
+}

@@ -34,7 +34,22 @@ import FirebaseMessaging
       application.registerUserNotificationSettings(settings)
     }
     
+    // Register for remote notifications immediately
     application.registerForRemoteNotifications()
+    
+    // Set up Firebase Messaging delegate
+    Messaging.messaging().delegate = self
+    
+    // Initialize Firebase Messaging immediately
+    print("DEBUG: Initializing Firebase Messaging...")
+    Messaging.messaging().isAutoInitEnabled = true
+    
+    // Force APNs registration
+    print("DEBUG: Forcing APNs registration...")
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        application.registerForRemoteNotifications()
+        print("DEBUG: APNs registration called again after delay")
+    }
     
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
@@ -52,5 +67,12 @@ import FirebaseMessaging
                            didFailToRegisterForRemoteNotificationsWithError error: Error) {
     print("Failed to register for remote notifications: \(error)")
     super.application(application, didFailToRegisterForRemoteNotificationsWithError: error)
+  }
+}
+
+// MARK: - MessagingDelegate
+extension AppDelegate: MessagingDelegate {
+  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+    print("Firebase registration token: \(String(describing: fcmToken))")
   }
 }

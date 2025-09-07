@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
-import '../../../core/stores/auth_store.dart';
-import '../settings_page.dart';
 import '../main.dart';
 
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({super.key});
+  final VoidCallback? onBackPressed;
+  
+  const ProfileHeader({this.onBackPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +28,25 @@ class ProfileHeader extends StatelessWidget {
             child: Center(
               child: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-                onPressed: () =>
-                    Navigator.of(context).pushReplacementNamed('/dashboard'),
+                onPressed: () {
+                  if (onBackPressed != null) {
+                    onBackPressed!();
+                  } else {
+                    // Check if there's a previous page to go back to
+                    final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+                    if (dashboardState != null) {
+                      // If previous index is the same as current (no previous page), go to home
+                      if (dashboardState.previousIndex == dashboardState.selectedIndex) {
+                        dashboardState.navigateToHome();
+                      } else {
+                        // Go back to previous page
+                        dashboardState.navigateBack();
+                      }
+                    } else {
+                      Navigator.of(context).pushReplacementNamed('/dashboard');
+                    }
+                  }
+                },
               ),
             ),
           ),

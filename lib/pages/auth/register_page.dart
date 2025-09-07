@@ -16,6 +16,10 @@ import '../../shared/widgets/terms_agreement.dart';
 import '../../shared/widgets/custom_toast.dart';
 import '../../core/stores/auth_store.dart';
 import '../../shared/widgets/notification_handler.dart';
+import '../../shared/widgets/google_signin_button.dart';
+import '../../shared/widgets/facebook_signin_button.dart';
+import '../../shared/widgets/apple_signin_button.dart';
+
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -41,6 +45,145 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+
+
+  // Google Sign-In handler
+  Future<void> _handleGoogleSignIn() async {
+    print('🔍 Google Sign-In button pressed!');
+    
+    final authStore = context.read<AuthStore>();
+    print('🔍 AuthStore loaded: ${authStore.isLoading}');
+    
+    await authStore.loginWithGoogle(
+      onSuccess: () async {
+        print('🔍 Existing user - redirecting to dashboard');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome back!'
+          );
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
+      },
+      onNewUser: () async {
+        print('🔍 New user - redirecting to steps');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome! Let\'s set up your profile'
+          );
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          Navigator.pushReplacementNamed(context, '/plan');
+        }
+      },
+    );
+
+    print('🔍 Google Sign-In completed, error: ${authStore.error}');
+    
+    // Handle error if success callback wasn't called
+    if (authStore.error != null && mounted) {
+      ToastService.showWarningToast(context, message: authStore.error!);
+    }
+  }
+
+  // Facebook Sign-In handler
+  Future<void> _handleFacebookSignIn() async {
+    print('🔍 Facebook Sign-In button pressed!');
+    
+    final authStore = context.read<AuthStore>();
+    print('🔍 AuthStore loaded: ${authStore.isLoading}');
+    
+    await authStore.loginWithFacebook(
+      onSuccess: () async {
+        print('🔍 Existing user - redirecting to dashboard');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome back!'
+          );
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
+      },
+    );
+
+    print('🔍 Facebook Sign-In completed, error: ${authStore.error}');
+    
+    // Handle error if success callback wasn't called
+    if (authStore.error != null && mounted) {
+      ToastService.showWarningToast(context, message: authStore.error!);
+    }
+  }
+
+  // Apple Sign-In handler
+  Future<void> _handleAppleSignIn() async {
+    print('🔍 Apple Sign-In button pressed!');
+    
+    final authStore = context.read<AuthStore>();
+    print('🔍 AuthStore loaded: ${authStore.isLoading}');
+    
+    await authStore.loginWithApple(
+      onSuccess: () async {
+        print('🔍 Existing user - redirecting to dashboard');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome back!'
+          );
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
+      },
+      onNewUser: () async {
+        print('🔍 New user - redirecting to plan');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Apple Sign-In successful!'
+          );
+          
+          // Save "first" variable to localStorage as true
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('first', true);
+          } catch (e) {
+            // Error saving first variable
+          }
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          Navigator.pushReplacementNamed(context, '/plan');
+        }
+      },
+    );
+
+    print('🔍 Apple Sign-In completed, error: ${authStore.error}');
+    
+    // Handle error if success callback wasn't called
+    if (authStore.error != null && mounted) {
+      ToastService.showWarningToast(context, message: authStore.error!);
+    }
   }
 
 
@@ -72,8 +215,7 @@ class _RegisterPageState extends State<RegisterPage> {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('first', true);
         } catch (e) {
-          // Handle error silently or log if needed
-          print('Error saving first variable: $e');
+          // Error saving first variable
         }
         
         // Request notification permission and send device token
@@ -489,7 +631,55 @@ class _RegisterPageState extends State<RegisterPage> {
                                                       ),
                                               ),
                                             ),
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: 20),
+                                            // Divider with "or continue with" text
+                                            Center(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                    ),
+                                                child: Text(
+                                                  '- or continue with -',
+                                                  style: TextStyle(
+                                                    color: const Color(
+                                                      0xFFF2EFEA,
+                                                    ),
+                                                    fontSize: 16,
+                                                    fontFamily: 'Satoshi',
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            // Social Sign-In Buttons in a row
+                                            Row(
+                                              children: [
+                                                // Google Sign-In Button
+                                                Expanded(
+                                                  child: GoogleSignInButton(
+                                                    onPressed: _handleGoogleSignIn,
+                                                    isLoading: authStore.isLoading,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                // Facebook Sign-In Button
+                                                Expanded(
+                                                  child: FacebookSignInButton(
+                                                    onPressed: _handleFacebookSignIn,
+                                                    isLoading: authStore.isLoading,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 16),
+                                            // Apple Sign-In Button
+                                            AppleSignInButton(
+                                              onPressed: _handleAppleSignIn,
+                                              isLoading: authStore.isLoading,
+                                            ),
+                                            const SizedBox(height: 20),
                                           ],
                                         ),
                                         SizedBox(

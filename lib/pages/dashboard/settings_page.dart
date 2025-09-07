@@ -2,64 +2,83 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../shared/widgets/stars_animation.dart';
 import '../../core/stores/auth_store.dart';
 import 'main.dart';
+import 'subscription_billing_page.dart';
+import 'privacy_security_page.dart';
+import 'help_support_page.dart';
+import 'about_vela_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
-        body: Stack(
-          children: [
-            // Star animation background
-            const StarsAnimation(
-              starCount: 50,
-              topColor: Color(0xFF5799D6),
-              bottomColor: Color(0xFFA4C6EB),
-            ),
-
-            // Main content
-            SafeArea(
-              child: Column(
-                children: [
-                  // Header
-                  _buildHeader(context),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // Settings title
-                  Text(
-                    'Settings',
-                    style: TextStyle(
-                      color: const Color.fromARGB(255, 242, 239, 234),
-                      fontSize: 38.sp,
-                      fontFamily: 'Canela',
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 28),
-                  
-                  // Settings list
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 0.sp),
-                      child: _buildSettingsList(context),
-                    ),
-                  ),
-                ],
+    return PopScope(
+      canPop: true,
+      // ignore: deprecated_member_use
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          // Navigate back to profile page using dashboard navigation
+          final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+          if (dashboardState != null) {
+            dashboardState.navigateToProfile();
+          }
+        }
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        child: Scaffold(
+          body: Stack(
+            children: [
+              // Star animation background
+              const StarsAnimation(
+                starCount: 50,
+                topColor: Color(0xFF5799D6),
+                bottomColor: Color(0xFFA4C6EB),
               ),
-            ),
-          ],
+
+              // Main content
+              SafeArea(
+                child: Column(
+                  children: [
+                    // Header
+                    _buildHeader(context),
+                    
+                    const SizedBox(height: 30),
+                    
+                    // Settings title
+                    Text(
+                      'Settings',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 242, 239, 234),
+                        fontSize: 38.sp,
+                        fontFamily: 'Canela',
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 28),
+                    
+                    // Settings list
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 0.sp),
+                        child: _buildSettingsList(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -112,10 +131,10 @@ class SettingsPage extends StatelessWidget {
     final settingsItems = [
       {'title': 'Edit Info', 'onTap': () => _navigateToEditInfo(context)},
       {'title': 'Reminders', 'onTap': () => _navigateToReminders(context)},
-      {'title': 'Subscription & Billing', 'onTap': () {}},
-      {'title': 'Privacy & Security', 'onTap': () {}},
-      {'title': 'Help & Support', 'onTap': () {}},
-      {'title': 'About Vela', 'onTap': () {}},
+      {'title': 'Subscription & Billing', 'onTap': () => _navigateToSubscriptionBilling(context)},
+      {'title': 'Privacy & Security', 'onTap': () => _navigateToPrivacySecurity(context)},
+      {'title': 'Help & Support', 'onTap': () => _navigateToHelpSupport(context)},
+      {'title': 'About Vela', 'onTap': () => _navigateToAboutVela(context)},
       {'title': 'Log out', 'onTap': () => _handleLogout(context)},
     ];
 
@@ -158,7 +177,19 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> _handleLogout(BuildContext context) async {
     final authStore = Provider.of<AuthStore>(context, listen: false);
+    
+    // Clear access token from secure storage
+    final storage = FlutterSecureStorage();
+    await storage.delete(key: 'access_token');
+    await storage.delete(key: 'refresh_token');
+    
+    // Reset saved tab index to 0
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('selected_tab_index', 0);
+    
+    // Call authStore logout to clear all auth data
     await authStore.logout();
+    
     if (context.mounted) {
       // Clear all routes and navigate to login
       Navigator.of(context).pushNamedAndRemoveUntil(
@@ -180,5 +211,41 @@ class SettingsPage extends StatelessWidget {
     if (dashboardState != null) {
       dashboardState.navigateToReminders();
     }
+  }
+
+  void _navigateToSubscriptionBilling(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SubscriptionBillingPage(),
+      ),
+    );
+  }
+
+  void _navigateToPrivacySecurity(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PrivacySecurityPage(),
+      ),
+    );
+  }
+
+  void _navigateToHelpSupport(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HelpSupportPage(),
+      ),
+    );
+  }
+
+  void _navigateToAboutVela(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AboutVelaPage(),
+      ),
+    );
   }
 } 

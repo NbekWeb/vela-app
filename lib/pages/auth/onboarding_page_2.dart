@@ -51,7 +51,7 @@ class _OnboardingPage2State extends State<OnboardingPage2> {
   @override
   Widget build(BuildContext context) {
     return VideoBackgroundWrapper(
-      topOffset: -110,
+      topOffset: 0,
       showControls: true,
       isMuted: false,
       child: Column(
@@ -74,10 +74,8 @@ class _OnboardingPage2State extends State<OnboardingPage2> {
                 const SizedBox(height: 30),
 
                 Text(
-                  'Vela turns your vision board into your daily meditation.\n\n'
-                  'Using your words, your dreams, and your goals, Vela creates powerfully personalized audio meditations designed to rewire your neural pathways and align your inner world with the life you want to live.\n\n'
-                  'Guided by AI. Backed by neuroscience.\n\n'
-                  'Whether you\'re manifesting your dream future or need support in the moment, Vela meets you where you are — and helps you rise.',
+                  'Vela turns your vision board into your daily meditation.\n'
+                  'Using your own words and goals, Vela creates personalized audio meditations to help rewire your neural pathways and align with the life you want to live.',
                   textAlign: TextAlign.center,
                   style: TextStyles.bodyLarge,
                 ),

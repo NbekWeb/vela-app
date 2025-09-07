@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_player/video_player.dart';
 import '../vault/vault_ritual_card.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../shared/widgets/video_background_wrapper.dart';
 import '../../shared/widgets/custom_star.dart';
+import '../../shared/widgets/info_dashboard_modal.dart';
+import '../../shared/widgets/show_check_in_modal.dart';
 import '../dashboard/my_meditations_page.dart';
 import '../dashboard/archive_page.dart';
 import '../generator/direct_ritual_page.dart';
-import '../sleep_stream_meditation_page.dart';
 import '../../core/stores/auth_store.dart';
 import '../../core/stores/meditation_store.dart';
 import '../dashboard/components/dashboard_audio_player.dart';
+import 'main.dart';
+import '../../main.dart' show shouldNavigateToProfile;
 
 class DashboardHomePage extends StatefulWidget {
   const DashboardHomePage({super.key});
@@ -22,18 +26,101 @@ class DashboardHomePage extends StatefulWidget {
 }
 
 class _DashboardHomePageState extends State<DashboardHomePage> {
+  bool _hasShownCheckInModal = false;
+  VideoPlayerController? _videoController;
+  
+  // Check if modal was shown today using SharedPreferences
+  Future<bool> _hasShownModalToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now();
+    final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final savedDate = prefs.getString('check_in_modal_date');
+    return savedDate == todayString;
+  }
+
+  // Mark modal as shown today
+  Future<void> _markModalAsShownToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now();
+    final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    await prefs.setString('check_in_modal_date', todayString);
+  }
+
   @override
   void initState() {
     super.initState();
     _getUserDetails();
     _loadMeditationData();
+    _initializeVideoController();
   }
+
+  Future<bool> _shouldShowCheckInModal() async {
+    final authStore = Provider.of<AuthStore>(context, listen: false);
+    final user = authStore.user;
+
+    if (user == null || _hasShownCheckInModal) {
+      return false;
+    }
+
+    // If user has check-ins, it means they checked in today - don't show modal
+    if (!user.checkIns.isEmpty) {
+      return false;
+    }
+
+    // Check if user has already checked in today
+    final today = DateTime.now();
+    final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    
+    final hasCheckedInToday = user.checkIns.any((checkIn) {
+      // Parse the check-in date and compare with today
+      try {
+        final checkInDate = DateTime.parse(checkIn.checkInDate);
+        final checkInDateString = '${checkInDate.year}-${checkInDate.month.toString().padLeft(2, '0')}-${checkInDate.day.toString().padLeft(2, '0')}';
+        return checkInDateString == todayString;
+      } catch (e) {
+        // If date parsing fails, fall back to string comparison
+        return checkIn.checkInDate.contains(todayString);
+      }
+    });
+
+    // Show modal if user has check-ins but hasn't checked in today
+    return !hasCheckedInToday;
+  }
+
+  Future<void> _showCheckInModalIfNeeded() async {
+    // Check if modal was already shown today using localStorage
+    final hasShownToday = await _hasShownModalToday();
+    if (hasShownToday) {
+      return;
+    }
+    
+    final shouldShow = await _shouldShowCheckInModal();
+    
+    if (shouldShow) {
+      // Mark modal as shown today in localStorage
+      await _markModalAsShownToday();
+      
+      // Add a small delay to ensure the page is fully loaded
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          showCheckInModal(context);
+        }
+      });
+    }
+  }
+
+
 
   Future<void> _getUserDetails() async {
     // Use Provider to access AuthStore
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final authStore = Provider.of<AuthStore>(context, listen: false);
-      authStore.getUserDetails();
+      await authStore.getUserDetails();
+      
+      // Show check-in modal after user details are loaded
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _showCheckInModalIfNeeded();
+      });
     });
   }
 
@@ -70,92 +157,119 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return VideoBackgroundWrapper(
-      topOffset: -40,
-      showControls: false,
-      isMuted: true,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            16.sp, // left
-            8.sp, // top
-            16.sp, // right
-            20.sp, // bottom
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Info icon in a circle, size 24x24
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.info_outline,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                  Image.asset(
-                    'assets/img/logo.png',
-                    width: 60,
-                    height: 39,
-                  ),
-                  // Avatar on the right, size 30x30
-                  Consumer<AuthStore>(
-                    builder: (context, authStore, child) {
-                      final user = authStore.user;
-                      final avatarUrl = user?.avatar;
-
-                      if (avatarUrl != null && avatarUrl.isNotEmpty) {
-                        return Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            image: DecorationImage(
-                              image: NetworkImage(avatarUrl),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        );
-                      } else {
-                        return Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: ClipOval(
-                            child: Container(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              child: const Icon(
-                                Icons.person,
-                                size: 18,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ],
+    return Scaffold(
+      backgroundColor: const Color(0xFF5398DA),
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            // Video background that scrolls with content
+            _buildVideoBackground(),
+            
+            // Content
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                16.sp, // left
+                MediaQuery.of(context).padding.top + 8, // top
+                16.sp, // right
+                20.sp, // bottom
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Info icon in a circle, size 24x24
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            builder: (BuildContext context) {
+                              return const InfoDashboardModal();
+                            },
+                          );
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.info_outline,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Image.asset(
+                        'assets/img/logo.png',
+                        width: 60,
+                        height: 39,
+                      ),
+                      // Avatar on the right, size 30x30
+                      GestureDetector(
+                        onTap: () {
+                          // Navigate to profile tab using dashboard navigation
+                          final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+                          if (dashboardState != null) {
+                            dashboardState.navigateToProfile();
+                          } else {
+                            // Fallback: use global flag
+                            shouldNavigateToProfile = true;
+                          }
+                        },
+                        child: Consumer<AuthStore>(
+                          builder: (context, authStore, child) {
+                            final user = authStore.user;
+                            final avatarUrl = user?.avatar;
 
-              const SizedBox(height: 300),
+                            if (avatarUrl != null && avatarUrl.isNotEmpty) {
+                              return Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: DecorationImage(
+                                    image: NetworkImage(avatarUrl),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: ClipOval(
+                                  child: Container(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 300),
 
               // Daily Streaks section
               Center(
@@ -198,6 +312,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                         color: Color(0xFFDCE6F0),
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w700,
+                        fontFamily: "Satoshi",
                       ),
                     ),
                   );
@@ -296,6 +411,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                Consumer<MeditationStore>(
                  builder: (context, meditationStore, child) {
                    final myMeditations = meditationStore.myMeditations;
+                   final meditationCount = myMeditations?.length ?? 0;
                    
                    if (myMeditations == null || myMeditations.isEmpty) {
                     return ClipRRect(
@@ -328,23 +444,34 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                     );
                   }
 
-                                     return Column(
-                     children: myMeditations!.take(3).map((meditation) {
-                       final details = meditation['details'] ?? {};
-                       final name = details['name'] ?? 'Untitled';
-                       final meditationId = meditation['id']?.toString() ?? '';
-                       
-                       return Container(
-                         margin: EdgeInsets.only(bottom: 12.sp),
-                         child: VaultRitualCard(
-                           name: name,
-                           meditationId: meditationId,
-                           file: meditation['file'],
-                           onAudioPlay: _onAudioPlay,
-                         ),
-                       );
-                     }).toList(),
-                   );
+                  return SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: meditationCount > 3 ? 3 : meditationCount,
+                      itemBuilder: (context, index) {
+                        final meditation = myMeditations[index];
+                        final details = meditation['details'] ?? {};
+                        final name = details['name'] ?? 'Untitled';
+                        final meditationId = meditation['id']?.toString() ?? '';
+                        
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            right: index < (meditationCount > 3 ? 3 : meditationCount) - 1 ? 12.0 : 0,
+                          ),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width - 36,
+                            child: VaultRitualCard(
+                              name: name,
+                              meditationId: meditationId,
+                              file: meditation['file'],
+                              onAudioPlay: _onAudioPlay,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
                 },
               ),
 
@@ -381,6 +508,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              fontFamily: "Satoshi",
                             ),
                           ),
                         ),
@@ -433,6 +561,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                Consumer<MeditationStore>(
                  builder: (context, meditationStore, child) {
                    final libraryMeditations = meditationStore.libraryDatas;
+                   final libraryCount = libraryMeditations?.length ?? 0;
                    
                    if (libraryMeditations == null || libraryMeditations.isEmpty) {
                     return ClipRRect(
@@ -465,40 +594,115 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                     );
                   }
 
-                                     return Column(
-                     children: libraryMeditations!.take(3).map((meditation) {
-                       final name = meditation['name'] ?? 'Untitled';
-                       final meditationId = meditation['id']?.toString() ?? '';
-                       final imageUrl = meditation['image'];
-                       final description = meditation['description'];
-                       
-                       return Container(
-                         margin: EdgeInsets.only(bottom: 12.sp),
-                         child: VaultRitualCard(
-                           name: name,
-                           meditationId: meditationId,
-                           file: meditation['file'],
-                           imageUrl: imageUrl,
-                           title: name,
-                           description: description,
-                           onAudioPlay: (id) => _onAudioPlay(
-                             id,
-                             title: name,
-                             description: description,
-                             imageUrl: imageUrl,
-                           ),
-                         ),
-                       );
-                     }).toList(),
-                   );
+                  return SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: libraryCount > 3 ? 3 : libraryCount,
+                      itemBuilder: (context, index) {
+                        final meditation = libraryMeditations[index];
+                        final name = meditation['name'] ?? 'Untitled';
+                        final meditationId = meditation['id']?.toString() ?? '';
+                        final imageUrl = meditation['image'];
+                        final description = meditation['description'];
+                        
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            right: index < (libraryCount > 3 ? 3 : libraryCount) - 1 ? 12.0 : 0,
+                          ),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width - 36,
+                            child: VaultRitualCard(
+                              name: name,
+                              meditationId: meditationId,
+                              file: meditation['file'],
+                              imageUrl: imageUrl,
+                              title: name,
+                              description: description,
+                              onAudioPlay: (id) => _onAudioPlay(
+                                id,
+                                title: name,
+                                description: description,
+                                imageUrl: imageUrl,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
                 },
               ),
 
               SizedBox(height: 32.sp),
-            ],
-          ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Future<void> _initializeVideoController() async {
+    try {
+      _videoController = VideoPlayerController.asset('assets/videos/2.mp4');
+      await _videoController!.initialize();
+      _videoController!.setLooping(true);
+      _videoController!.setVolume(0.0); // Mute the video
+      _videoController!.play();
+      
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      // Handle error silently
+    }
+  }
+
+  Widget _buildVideoBackground() {
+    if (_videoController == null || !_videoController!.value.isInitialized) {
+      return const SizedBox.shrink();
+    }
+    
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    return Positioned(
+      top: -40,
+      left: 0,
+      right: 0,
+      height: screenHeight + 270, // 100vh + 300px
+      child: Column(
+        children: [
+          // Video section - 100vh
+          SizedBox(
+            height: screenHeight,
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: _videoController!.value.size.width,
+                height: _videoController!.value.size.height,
+                child: VideoPlayer(_videoController!),
+              ),
+            ),
+          ),
+          // Red background section - 300px
+          Transform.translate(
+            offset: const Offset(0, -20),
+            child: Container(
+              height: 270,
+              width: double.infinity,
+              color: const Color(0xFF5799D6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
   }
 }

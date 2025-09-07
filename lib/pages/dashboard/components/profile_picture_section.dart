@@ -15,9 +15,14 @@ String capitalizeEachWord(String text) {
       .join(' ');
 }
 
-class ProfilePictureSection extends StatelessWidget {
+class ProfilePictureSection extends StatefulWidget {
   const ProfilePictureSection({super.key});
 
+  @override
+  State<ProfilePictureSection> createState() => _ProfilePictureSectionState();
+}
+
+class _ProfilePictureSectionState extends State<ProfilePictureSection> {
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthStore>(

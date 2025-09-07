@@ -109,6 +109,11 @@ class UserModel {
   final String? avatar;
   final DateTime createdAt;
   final bool? userDeviceActive;
+  final String? gender;
+  final String? ageRange;
+  final String? dream;
+  final String? goals;
+  final String? happiness;
   final WeeklyLoginStats? weeklyLoginStats;
   final List<CheckIn> checkIns;
 
@@ -121,6 +126,11 @@ class UserModel {
     this.avatar,
     required this.createdAt,
     this.userDeviceActive,
+    this.gender,
+    this.ageRange,
+    this.dream,
+    this.goals,
+    this.happiness,
     this.weeklyLoginStats,
     this.checkIns = const [],
   });
@@ -152,6 +162,9 @@ class UserModel {
       checkInsList = checkInsJson.map((item) => CheckIn.fromJson(item)).toList();
     }
 
+    // Parse user_detail nested object
+    final userDetail = json['user_detail'] as Map<String, dynamic>?;
+    
     return UserModel(
       id: json['id']?.toString() ?? '',
       firstName: json['first_name'] ?? '',
@@ -159,8 +172,15 @@ class UserModel {
       email: json['email'] ?? '',
       phone: json['phone'],
       avatar: json['avatar'],
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: json['created_at'] != null 
+          ? DateTime.parse(json['created_at']) 
+          : DateTime.now(),
       userDeviceActive: json['user_device_active'],
+      gender: userDetail?['gender'],
+      ageRange: userDetail?['age_range'],
+      dream: userDetail?['dream'],
+      goals: userDetail?['goals'],
+      happiness: userDetail?['happiness'],
       weeklyLoginStats: weeklyStats,
       checkIns: checkInsList,
     );
@@ -168,7 +188,7 @@ class UserModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'id': int.tryParse(id) ?? 0,
       'first_name': firstName,
       'last_name': lastName,
       'email': email,
@@ -178,6 +198,14 @@ class UserModel {
       'user_device_active': userDeviceActive,
       'weekly_login_stats': weeklyLoginStats?.toJson(),
       'check_in': checkIns.map((checkIn) => checkIn.toJson()).toList(),
+      'user_detail': {
+        'id': int.tryParse(id) ?? 0,
+        'gender': gender,
+        'age_range': ageRange,
+        'dream': dream,
+        'goals': goals,
+        'happiness': happiness,
+      },
     };
   }
 
@@ -190,6 +218,11 @@ class UserModel {
     String? avatar,
     DateTime? createdAt,
     bool? userDeviceActive,
+    String? gender,
+    String? ageRange,
+    String? dream,
+    String? goals,
+    String? happiness,
     WeeklyLoginStats? weeklyLoginStats,
     List<CheckIn>? checkIns,
   }) {
@@ -202,8 +235,73 @@ class UserModel {
       avatar: avatar ?? this.avatar,
       createdAt: createdAt ?? this.createdAt,
       userDeviceActive: userDeviceActive ?? this.userDeviceActive,
+      gender: gender ?? this.gender,
+      ageRange: ageRange ?? this.ageRange,
+      dream: dream ?? this.dream,
+      goals: goals ?? this.goals,
+      happiness: happiness ?? this.happiness,
       weeklyLoginStats: weeklyLoginStats ?? this.weeklyLoginStats,
       checkIns: checkIns ?? this.checkIns,
+    );
+  }
+} 
+
+class LifeVision {
+  final int id;
+  final String liveVision;
+  final String dreamsRealized;
+  final List<String> visionType;
+  final String createdAt;
+  final String updatedAt;
+
+  LifeVision({
+    this.id = 0,
+    this.liveVision = '',
+    this.dreamsRealized = '',
+    this.visionType = const [],
+    this.createdAt = '',
+    this.updatedAt = '',
+  });
+
+  factory LifeVision.fromJson(Map<String, dynamic> json) {
+    return LifeVision(
+      id: json['id'] ?? 0,
+      liveVision: json['live_vision'] ?? '',
+      dreamsRealized: json['dreams_realized'] ?? '',
+      visionType: json['vision_type'] != null 
+          ? List<String>.from(json['vision_type']) 
+          : [],
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'live_vision': liveVision,
+      'dreams_realized': dreamsRealized,
+      'vision_type': visionType,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+    };
+  }
+
+  LifeVision copyWith({
+    int? id,
+    String? liveVision,
+    String? dreamsRealized,
+    List<String>? visionType,
+    String? createdAt,
+    String? updatedAt,
+  }) {
+    return LifeVision(
+      id: id ?? this.id,
+      liveVision: liveVision ?? this.liveVision,
+      dreamsRealized: dreamsRealized ?? this.dreamsRealized,
+      visionType: visionType ?? this.visionType,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 } 

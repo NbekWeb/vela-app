@@ -29,6 +29,7 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
   VideoPlayerController? _controller;
   bool _isInitialized = false;
   bool _isMuted = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -39,26 +40,35 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
 
   Future<void> _initializeVideoController() async {
     try {
-      // Use preloaded controller if available
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Wait for video initialization to complete
+      await VideoLoader.waitForInitialization();
+      
+      // Get the preloaded controller
       _controller = VideoLoader.starterController;
       
-      if (_controller == null) {
-        // Fallback to direct loading if not preloaded
+      // If still not available, create a new controller
+      if (_controller == null || !_controller!.value.isInitialized) {
         _controller = VideoPlayerController.asset('assets/videos/starteropt.mp4');
         await _controller!.initialize();
         _controller!
           ..setLooping(true)
           ..setVolume(_isMuted ? 0.0 : 1.0);
       } else {
-        // Ensure volume is set correctly
+        // Ensure volume is set correctly for preloaded controller
         _controller!.setVolume(_isMuted ? 0.0 : 1.0);
       }
 
       if (mounted) {
         setState(() {
           _isInitialized = true;
+          _isLoading = false;
         });
 
+        // Start playing if not already playing
         if (!_controller!.value.isPlaying) {
           _controller!.play();
         }
@@ -67,6 +77,7 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
       if (mounted) {
         setState(() {
           _isInitialized = false;
+          _isLoading = false;
         });
       }
     }
@@ -80,6 +91,12 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
   }
 
   @override
+  void dispose() {
+    // Don't dispose the controller here as it's managed by VideoLoader
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: StarterPageStyles.systemUiStyleWhite,
@@ -88,7 +105,7 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
         body: Stack(
           children: [
             // Video background
-            if (_isInitialized && _controller != null)
+            if (_isInitialized && _controller != null && !_isLoading)
               Positioned(
                 top: widget.topOffset,
                 left: 0,

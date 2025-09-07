@@ -3,10 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EditInfoButtons extends StatelessWidget {
   final bool isSaving;
+  final VoidCallback? onSave;
 
   const EditInfoButtons({
     super.key,
     required this.isSaving,
+    this.onSave,
   });
 
   @override
@@ -42,9 +44,7 @@ class EditInfoButtons extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: isSaving ? null : () {
-              // Empty handler - do nothing for now
-            },
+            onPressed: isSaving ? null : onSave,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF3B6EAA),
               shape: RoundedRectangleBorder(

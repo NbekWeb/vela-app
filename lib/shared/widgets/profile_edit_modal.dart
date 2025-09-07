@@ -55,8 +55,9 @@ class _ProfileEditModalState extends State<ProfileEditModal> {
   void _handleSave() {
     if (_hasChanges) {
       widget.onSave(_controller.text);
+    } else {
+      Navigator.of(context).pop();
     }
-    Navigator.of(context).pop();
   }
 
   void _handleCancel() {

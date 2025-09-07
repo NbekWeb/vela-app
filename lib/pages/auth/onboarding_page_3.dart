@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:vela/pages/auth/onboarding_page_4.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../shared/widgets/video_background_wrapper.dart';
 import '../../styles/components/button_styles.dart';
 import '../../styles/components/text_styles.dart';
 import '../../styles/components/spacing_styles.dart';
 import '../../styles/base_styles.dart';
+import '../../core/utils/video_loader.dart';
 
 class OnboardingPage3 extends StatefulWidget {
   const OnboardingPage3({super.key});
@@ -15,6 +17,8 @@ class OnboardingPage3 extends StatefulWidget {
 }
 
 class _OnboardingPage3State extends State<OnboardingPage3> {
+  bool _isVideoReady = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,6 +28,24 @@ class _OnboardingPage3State extends State<OnboardingPage3> {
         statusBarIconBrightness: Brightness.light,
       ),
     );
+    _checkVideoStatus();
+  }
+
+  Future<void> _checkVideoStatus() async {
+    // Check if videos are already preloaded
+    if (VideoLoader.isInitialized) {
+      setState(() {
+        _isVideoReady = true;
+      });
+    } else {
+      // Wait for videos to be loaded
+      await VideoLoader.initializeVideos();
+      if (mounted) {
+        setState(() {
+          _isVideoReady = true;
+        });
+      }
+    }
   }
 
   @override
@@ -34,16 +56,15 @@ class _OnboardingPage3State extends State<OnboardingPage3> {
       isMuted: false,
       child: Column(
         children: [
-          // Main content
+          // Bottom content container
           Expanded(child: Container()),
 
-          // Bottom content container
           Container(
             padding: SpacingStyles.paddingHorizontal,
             child: Column(
               children: [
                 Text(
-                  'Set sail to your dream life, with Vela',
+                  'Built for transformation.',
                   textAlign: TextAlign.center,
                   style: TextStyles.headingLarge.copyWith(
                     fontSize: 46.sp,
@@ -53,7 +74,8 @@ class _OnboardingPage3State extends State<OnboardingPage3> {
                 const SizedBox(height: 30),
 
                 Text(
-                  'Vela is designed to rewire your inner world — and reshape your outer one. Your vision, on repeat. Your dream life, in motion.',
+                  'Guided by AI. Backed by neuroscience.\n'
+                  'Whether you\'re manifesting your future or need support in the moment, Vela meets you where you are — and helps you rise.',
                   textAlign: TextAlign.center,
                   style: TextStyles.bodyLarge,
                 ),
@@ -61,14 +83,32 @@ class _OnboardingPage3State extends State<OnboardingPage3> {
                 const SizedBox(height: 40),
 
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
+                  onPressed: _isVideoReady ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OnboardingPage4(),
+                      ),
+                    );
+                  } : null,
                   style: ButtonStyles.primary,
-                  child: Text(
-                    'Get Started',
-                    style: ButtonStyles.primaryText,
-                  ),
+                  child: _isVideoReady 
+                    ? Text('Next', style: ButtonStyles.primaryText)
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text('Loading...', style: ButtonStyles.primaryText),
+                        ],
+                      ),
                 ),
 
                 const SizedBox(height: 8),

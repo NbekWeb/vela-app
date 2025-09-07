@@ -44,6 +44,8 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
   Duration _position = Duration.zero;
   bool _isLiked = false;
   bool _isMuted = false;
+  bool _isDragging = false;
+  bool _wasPlayingBeforeDrag = false;
   String? fileUrl;
 
   @override
@@ -55,60 +57,74 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
 
   Future<void> _configureAudioSession() async {
     try {
-      // iOS uchun audio session configuration
       if (Platform.isIOS) {
-        // iOS specific audio configuration
-        debugPrint('Configuring iOS audio session...');
+        // iOS audio session configuration
+      } else if (Platform.isAndroid) {
+        // Android audio session configuration
       }
     } catch (e) {
-      debugPrint('Error configuring audio session: $e');
+      // Error configuring audio session
     }
   }
 
   Future<void> _loadAndPlayMeditation() async {
     try {
-      debugPrint('Loading meditation audio...');
-
-      // MeditationStore dan meditation profile ni olish
       final meditationStore = Provider.of<MeditationStore>(
         context,
         listen: false,
       );
       final profileData = meditationStore.meditationProfile;
 
-      // Agar meditationId berilgan bo'lsa, uni ishlat
       if (widget.meditationId != null) {
-        debugPrint('Using provided meditationId: ${widget.meditationId}');
-        // Bu yerda meditationId bo'yicha meditation ni yuklash logikasi bo'lishi kerak
-        // Hozircha store dan olishni davom ettiramiz
       }
 
+      // First try to get fileUrl from store
       fileUrl = meditationStore.fileUrl;
-      debugPrint('Got fileUrl from store: $fileUrl');
 
-      // Agar fileUrl null bo'lsa, qisqa kutish va qayta urinish
+      // If not in store, wait a bit and retry
       if (fileUrl == null || fileUrl!.isEmpty) {
-        debugPrint('FileUrl is null, waiting a bit and retrying...');
         await Future.delayed(const Duration(milliseconds: 500));
         fileUrl = meditationStore.fileUrl;
-        debugPrint('Retried fileUrl from store: $fileUrl');
       }
 
-      // Dispose previous audio player if exists
-      await _audioPlayer?.dispose();
+      // Dispose previous audio player safely
+      if (_audioPlayer != null) {
+        try {
+          await _audioPlayer!.stop();
+        } catch (e) {
+          // Ignore stop errors
+        }
+        
+        try {
+          await _audioPlayer!.dispose();
+        } catch (e) {
+          // Ignore dispose errors
+        }
+        _audioPlayer = null;
+      }
+
+      // Dispose previous waveform controller safely
+      if (_waveformController != null) {
+        try {
+          _waveformController!.dispose();
+        } catch (e) {
+          // Ignore dispose errors
+        }
+        _waveformController = null;
+      }
+
+      // Create new instances
       _audioPlayer = just_audio.AudioPlayer();
       _waveformController = PlayerController();
 
-      if (fileUrl != null && fileUrl!.isNotEmpty) {
-        debugPrint('Setting audio URL: $fileUrl');
-        await _audioPlayer!.setUrl(fileUrl!);
-        debugPrint('Audio URL set successfully');
+      if (fileUrl != null && fileUrl!.isNotEmpty && _audioPlayer != null) {
+        try {
+          await _audioPlayer!.setUrl(fileUrl!);
+        } catch (e) {
+          return;
+        }
 
-        // Listen to player state changes
         _audioPlayer!.playerStateStream.listen((state) {
-          debugPrint(
-            'Player state: ${state.processingState} - playing: ${state.playing}',
-          );
           if (mounted) {
             setState(() {
               _isPlaying = state.playing;
@@ -118,9 +134,7 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
           }
         });
 
-        // Listen to duration changes
         _audioPlayer!.durationStream.listen((duration) {
-          debugPrint('Duration: $duration');
           if (mounted) {
             setState(() {
               _duration = duration ?? const Duration(minutes: 3, seconds: 29);
@@ -128,7 +142,6 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
           }
         });
 
-        // Listen to position changes
         _audioPlayer!.positionStream.listen((position) {
           if (mounted) {
             setState(() {
@@ -141,20 +154,13 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
           _isAudioReady = true;
         });
 
-        debugPrint('Audio player initialized successfully');
-
-        // Prepare waveform after audio player is ready
         await _prepareWaveform();
       } else {
-        debugPrint(
-          'No fileUrl available from store: ${meditationStore.fileUrl}',
-        );
         setState(() {
           _isAudioReady = true;
         });
       }
     } catch (e) {
-      debugPrint('Error in _loadAndPlayMeditation: $e');
       setState(() {
         _isAudioReady = true;
       });
@@ -163,6 +169,32 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
 
   Future<void> _initializeAudioPlayer() async {
     try {
+      // Dispose previous instances if they exist
+      if (_audioPlayer != null) {
+        try {
+          await _audioPlayer!.stop();
+        } catch (e) {
+          // Ignore stop errors
+        }
+        
+        try {
+          await _audioPlayer!.dispose();
+        } catch (e) {
+          // Ignore dispose errors
+        }
+        _audioPlayer = null;
+      }
+
+      if (_waveformController != null) {
+        try {
+          _waveformController!.dispose();
+        } catch (e) {
+          // Ignore dispose errors
+        }
+        _waveformController = null;
+      }
+
+      // Create new instances
       _audioPlayer = just_audio.AudioPlayer();
       _waveformController = PlayerController();
 
@@ -256,9 +288,32 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
 
   @override
   void dispose() {
-    _audioPlayer?.stop();
-    _audioPlayer?.dispose();
-    _waveformController?.dispose();
+    // Safely dispose audio player
+    if (_audioPlayer != null) {
+      try {
+        _audioPlayer!.stop();
+      } catch (e) {
+        // Ignore stop errors
+      }
+      
+      try {
+        _audioPlayer!.dispose();
+      } catch (e) {
+        // Ignore dispose errors
+      }
+      _audioPlayer = null;
+    }
+
+    // Safely dispose waveform controller
+    if (_waveformController != null) {
+      try {
+        _waveformController!.dispose();
+      } catch (e) {
+        // Ignore dispose errors
+      }
+      _waveformController = null;
+    }
+
     super.dispose();
   }
 
@@ -278,6 +333,9 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
             debugPrint('Error pausing waveform: $e');
           }
         }
+        setState(() {
+          _isPlaying = false;
+        });
       } else {
         if (!_isAudioReady) {
           await _audioPlayer!.setUrl(fileUrl!);
@@ -295,6 +353,9 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
             debugPrint('Error starting waveform: $e');
           }
         }
+        setState(() {
+          _isPlaying = true;
+        });
       }
     } catch (e) {
       debugPrint('Error toggling play/pause: $e');
@@ -359,15 +420,49 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
       if (isFirst) {
         // First time - go to vault and remove first flag
         await prefs.remove('first');
-        Navigator.pushReplacementNamed(context, '/vault');
+        // Clear navigation stack to prevent back navigation to auth pages
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/vault',
+          (route) {
+            // Keep only vault and dashboard routes, remove auth pages
+            return route.settings.name == '/vault' || 
+                   route.settings.name == '/dashboard' ||
+                   route.settings.name == '/my-meditations' ||
+                   route.settings.name == '/archive' ||
+                   route.settings.name == '/generator';
+          }
+        );
       } else {
         // Not first time - go to dashboard
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        // Clear navigation stack to prevent back navigation to auth pages
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/dashboard',
+          (route) {
+            // Keep only dashboard and its sub-routes, remove auth pages
+            return route.settings.name == '/dashboard' || 
+                   route.settings.name == '/my-meditations' ||
+                   route.settings.name == '/archive' ||
+                   route.settings.name == '/vault' ||
+                   route.settings.name == '/generator';
+          }
+        );
       }
     } catch (e) {
-      // Error handling - default to dashboard
-      print('Error checking first flag: $e');
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      // Error handling - default to dashboard with cleared stack
+      Navigator.pushNamedAndRemoveUntil(
+        context, 
+        '/dashboard',
+        (route) {
+          // Keep only dashboard and its sub-routes, remove auth pages
+          return route.settings.name == '/dashboard' || 
+                 route.settings.name == '/my-meditations' ||
+                 route.settings.name == '/archive' ||
+                 route.settings.name == '/vault' ||
+                 route.settings.name == '/generator';
+        }
+      );
     }
   }
 
@@ -429,15 +524,44 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
                                 ),
                                 min: 0,
                                 max: _duration.inSeconds.toDouble(),
-                                onChanged: (value) async {
-                                  final newPosition = Duration(
-                                    seconds: value.toInt(),
-                                  );
-                                  await _audioPlayer?.seek(newPosition);
-                                  setState(() {
-                                    _position = newPosition;
-                                  });
-                                },
+                                                                 onChanged: (value) async {
+                                   // If this is the first change during drag, pause audio
+                                   if (!_isDragging && _isPlaying) {
+                                     await _audioPlayer?.pause();
+                                     setState(() {
+                                       _isDragging = true;
+                                       _wasPlayingBeforeDrag = true;
+                                     });
+                                   }
+                                   
+                                   final newPosition = Duration(
+                                     seconds: value.toInt(),
+                                   );
+                                   await _audioPlayer?.seek(newPosition);
+                                   setState(() {
+                                     _position = newPosition;
+                                   });
+                                 },
+                                                                 onChangeStart: (value) {
+                                   setState(() {
+                                     _isDragging = true;
+                                     _wasPlayingBeforeDrag = _isPlaying;
+                                   });
+                                   // Pause audio while seeking
+                                   if (_isPlaying) {
+                                     _audioPlayer?.pause();
+                                   }
+                                 },
+                                                                 onChangeEnd: (value) async {
+                                   setState(() {
+                                     _isDragging = false;
+                                   });
+                                   // Resume audio after seeking if it was playing before drag
+                                   if (_wasPlayingBeforeDrag) {
+                                     await _audioPlayer?.play();
+                                     // The audio player state listener will update _isPlaying automatically
+                                   }
+                                 },
                                 activeColor: Colors.white,
                                 inactiveColor: Colors.white.withOpacity(0.3),
                               ),

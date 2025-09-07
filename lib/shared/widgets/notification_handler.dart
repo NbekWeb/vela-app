@@ -29,8 +29,19 @@ class NotificationHandler {
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {
-        String mockToken = _generateMockDeviceToken();
-        await _sendDeviceTokenToAPI(mockToken);
+        try {
+          String? deviceToken = await FirebaseMessaging.instance.getToken();
+          if (deviceToken != null) {
+            
+            await _sendDeviceTokenToAPI(deviceToken);
+          } else {
+            String mockToken = _generateMockDeviceToken();
+            await _sendDeviceTokenToAPI(mockToken);
+          }
+        } catch (e) {
+          String mockToken = _generateMockDeviceToken();
+          await _sendDeviceTokenToAPI(mockToken);
+        }
       }
     } catch (e) {
       String mockToken = _generateMockDeviceToken();

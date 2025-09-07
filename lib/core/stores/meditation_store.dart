@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
 import '../services/api_service.dart';
 import '../../shared/models/meditation_profile_data.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../main.dart'; // Import navigatorKey
 
 // Meditation store for handling meditation profile data and related functionality
 class MeditationStore extends ChangeNotifier {
@@ -274,10 +274,10 @@ class MeditationStore extends ChangeNotifier {
     required String duration,
     int? planType,
     bool isDirectRitual = false,
+    VoidCallback? onError, // Callback for error handling
   }) async {
     setLoading(true);
     setError(null);
-
     try {
       final data = <String, dynamic>{
         "plan_type": planType ?? 1,
@@ -288,15 +288,22 @@ class MeditationStore extends ChangeNotifier {
         "duration": duration.isNotEmpty ? duration : '2',
       };
 
-      // Faqat direct ritual emas bo'lsa, qo'shimcha fieldlarni qo'sh
-      if (!isDirectRitual) {
-        if (gender != null) data["gender"] = gender.toLowerCase();
-        if (dream != null) data["dream"] = dream;
-        if (goals != null) data["goals"] = goals;
-        if (ageRange != null)
-          data["age_range"] = ageRange.split('-').last.trim();
-        if (happiness != null) data["happiness"] = happiness;
-      }
+      // Server hali ham barcha fieldlarni talab qilmoqda, shuning uchun default qiymatlar qo'shamiz
+      data["gender"] = (gender != null && gender.isNotEmpty)
+          ? gender.toLowerCase()
+          : "male";
+      data["dream"] = (dream != null && dream.isNotEmpty)
+          ? dream
+          : "general_wellbeing";
+      data["goals"] = (goals != null && goals.isNotEmpty)
+          ? goals
+          : "personal_growth";
+      data["age_range"] = (ageRange != null && ageRange.isNotEmpty)
+          ? ageRange.split('-').last.trim()
+          : "25";
+      data["happiness"] = (happiness != null && happiness.isNotEmpty)
+          ? happiness
+          : "moderate";
 
       final response = await ApiService.request(
         url: 'auth/meditation/external/',
@@ -306,7 +313,7 @@ class MeditationStore extends ChangeNotifier {
 
       // Handle external meditation response
       final responseData = response.data;
-
+      print('responseData: $responseData');
       if (responseData != null && responseData['success'] == true) {
         final fileUrl = responseData['file_url'] ?? responseData['file'];
         final ritualTypeName = responseData['ritual_type_name'];
@@ -349,9 +356,82 @@ class MeditationStore extends ChangeNotifier {
         } catch (e) {
           // Continue without setting profile if parsing fails
         }
+      } else {
+        setError(
+          'Meditation generation failed: ${responseData?['error'] ?? 'Unknown error'}. Please try again.',
+        );
+
+        // Show toast and navigate to dashboard
+        Fluttertoast.showToast(
+          msg: "Something went wrong, please try again",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.TOP,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+
+        // Call error callback if provided
+        if (onError != null) {
+          Future.delayed(const Duration(seconds: 2), () {
+            onError();
+          });
+        } else {
+          print('🔴 onError callback is null!');
+        }
+      }
+    } catch (e) {
+      // More specific error handling
+      if (e.toString().contains('timeout')) {
+        setError(
+          'Request timed out. Please check your internet connection and try again.',
+        );
+      } else if (e.toString().contains('network')) {
+        setError('Network error. Please check your internet connection.');
+      } else if (e.toString().contains('500')) {
+        setError('Server error. Please try again later.');
+      } else if (e.toString().contains('401')) {
+        setError('Authentication failed. Please login again.');
+      } else {
+        setError('Meditation generation failed: ${e.toString()}');
+      }
+
+      // Show toast and navigate to dashboard for any error
+      Fluttertoast.showToast(
+        msg: "Something went wrong, please try again",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+
+      // Call error callback if provided
+      if (onError != null) {
+
+        Future.delayed(const Duration(seconds: 2), () {
+          onError();
+        });
+      } else {
+        print('🔴 onError callback is null in catch block!');
       }
     } finally {
       setLoading(false);
+      
+      // Clear navigation stack to prevent back navigation to auth pages
+      // This ensures that when user presses back button, they don't go to login/register
+      if (navigatorKey.currentState != null) {
+        // Remove any auth-related routes from the stack
+        navigatorKey.currentState!.pushNamedAndRemoveUntil(
+          '/dashboard', 
+          (route) {
+            // Keep only dashboard and its sub-routes, remove auth pages
+            return route.settings.name == '/dashboard' || 
+                   route.settings.name == '/my-meditations' ||
+                   route.settings.name == '/archive' ||
+                   route.settings.name == '/vault' ||
+                   route.settings.name == '/generator';
+          }
+        );
+      }
     }
   }
 

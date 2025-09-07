@@ -5,17 +5,18 @@ import '../../../shared/widgets/svg_icon.dart';
 class DreamsRealizedCard extends StatelessWidget {
   final double? height;
   final VoidCallback onEdit;
+  final String? content;
 
   const DreamsRealizedCard({
     super.key,
     this.height,
     required this.onEdit,
+    this.content,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: const Color.fromRGBO(164, 199, 234, 0.5),
@@ -41,9 +42,9 @@ class DreamsRealizedCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           // Content
-          Expanded(
+          Center(
             child: Text(
-              'Embarking on a journey to realize my dreams has been transformative. I feel most alive when I chase my aspirations and stay true to who I am.',
+              content ?? 'Embarking on a journey to realize my dreams has been transformative. I feel most alive when I chase my aspirations and stay true to who I am.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.9),

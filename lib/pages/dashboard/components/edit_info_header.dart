@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../main.dart';
 
 class EditInfoHeader extends StatelessWidget {
   const EditInfoHeader({super.key});
@@ -22,13 +21,7 @@ class EditInfoHeader extends StatelessWidget {
                 color: Colors.white,
                 size: 24,
               ),
-              onPressed: () {
-                final dashboardState = context
-                    .findAncestorStateOfType<DashboardMainPageState>();
-                if (dashboardState != null) {
-                  dashboardState.navigateToSettings();
-                }
-              },
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ),
           Transform.translate(

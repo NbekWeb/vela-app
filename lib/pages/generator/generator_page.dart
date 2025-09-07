@@ -78,6 +78,22 @@ class _GeneratorPageState extends State<GeneratorPage> {
       voice: _getFirstValue(profileData.voice),
       duration: _getFirstValue(profileData.duration),
       isDirectRitual: false,
+      onError: () {
+         if (mounted) {
+          // Clear navigation stack to prevent back navigation to auth pages
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/dashboard',
+            (route) {
+              // Keep only dashboard and its sub-routes, remove auth pages
+              return route.settings.name == '/dashboard' || 
+                     route.settings.name == '/my-meditations' ||
+                     route.settings.name == '/archive' ||
+                     route.settings.name == '/vault' ||
+                     route.settings.name == '/generator';
+            },
+          );
+        }
+      },
     );
   }
 
@@ -169,7 +185,9 @@ class _GeneratorPageState extends State<GeneratorPage> {
       body: Stack(
         children: [
           const StarsAnimation(),
-          Center(child: _steps[_currentStep]),
+          Center(
+            child: _steps[_currentStep],
+          ),
         ],
       ),
       // floatingActionButton removed

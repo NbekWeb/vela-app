@@ -223,21 +223,30 @@ class _CheckInFormState extends State<_CheckInForm> {
                         Expanded(
                           child: Text(
                             'Struggling',
-                            style: TextStyle(color: Color(0xFFF2EFEA)),
+                            style: TextStyle(
+                              color: Color(0xFFF2EFEA),
+                              fontFamily: 'Satoshi',
+                            ),
                             textAlign: TextAlign.left,
                           ),
                         ),
                         Expanded(
                           child: Text(
                             'Neutral',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Satoshi',
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
                         Expanded(
                           child: Text(
                             'Excellent',
-                            style: TextStyle(color: Color(0xFFF2EFEA)),
+                            style: TextStyle(
+                              color: Color(0xFFF2EFEA),
+                              fontFamily: 'Satoshi',
+                            ),
                             textAlign: TextAlign.right,
                           ),
                         ),
@@ -357,8 +366,8 @@ class _CheckInButtonsState extends State<_CheckInButtons> {
     if (description.isEmpty) {
       Fluttertoast.showToast(
         msg: 'Please enter a description',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
         backgroundColor: const Color(0xFFF2EFEA),
         textColor: const Color(0xFF3B6EAA),
       );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter/services.dart';
 import 'stars_animation.dart';
 import '../../pages/sleep_stream_meditation_page.dart';
 import '../../pages/dashboard/main.dart';
@@ -30,21 +31,61 @@ class GeneratingMeditation extends StatefulWidget {
   State<GeneratingMeditation> createState() => _GeneratingMeditationState();
 }
 
-class _GeneratingMeditationState extends State<GeneratingMeditation> {
+class _GeneratingMeditationState extends State<GeneratingMeditation>
+    with WidgetsBindingObserver {
   VideoPlayerController? _controller;
   bool _isInitialized = false;
   bool _isGenerating = true;
+  bool _wasPlayingBeforePause = false;
   String _statusMessage =
       'We\'re shaping your vision\ninto a meditative journey...';
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializeVideoController();
     // initState da setState chaqirish muammosini oldini olish uchun keyingi frame da ishga tushiramiz
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startProfileGeneration();
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        // App background ga o'tganda video to'xtatish
+        if (_controller != null && _controller!.value.isPlaying) {
+          _wasPlayingBeforePause = true;
+          _controller!.pause();
+        }
+        break;
+
+      case AppLifecycleState.resumed:
+        // App foreground ga qaytganda video davom ettirish
+        if (_controller != null) {
+          if (_wasPlayingBeforePause) {
+            _controller!.play();
+            _wasPlayingBeforePause = false;
+          } else if (!_controller!.value.isPlaying && _isInitialized) {
+            // Agar video to'xtagan bo'lsa va initialized bo'lsa, qayta ishga tushirish
+            _restartVideo();
+          }
+        }
+        break;
+
+      case AppLifecycleState.detached:
+        // App to'liq yopilganda
+        break;
+
+      case AppLifecycleState.hidden:
+        // App yashiringan holatda
+        break;
+    }
   }
 
   Future<void> _initializeVideoController() async {
@@ -61,13 +102,33 @@ class _GeneratingMeditationState extends State<GeneratingMeditation> {
         _controller!
           ..setLooping(true)
           ..setVolume(0)
+          ..addListener(_videoListener)
           ..play();
       }
     } catch (e) {
+      print('Video initialization error: $e');
       if (mounted) {
         setState(() {
           _isInitialized = false;
         });
+        // 3 soniyadan keyin qayta urinish
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted && !_isInitialized) {
+            _initializeVideoController();
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> _restartVideo() async {
+    if (_controller != null) {
+      try {
+        await _controller!.seekTo(Duration.zero);
+        await _controller!.play();
+      } catch (e) {
+        // Video qayta ishga tushirishda xatolik bo'lsa, qayta initialize qilish
+        await _initializeVideoController();
       }
     }
   }
@@ -116,6 +177,8 @@ class _GeneratingMeditationState extends State<GeneratingMeditation> {
                 : '5');
 
       // Profile ma'lumotlarini API ga yuborish
+      bool hasError = false;
+
       await meditationStore.postCombinedProfile(
         gender: widget.profileData!.gender ?? '',
         dream: widget.profileData!.dream?.isNotEmpty == true
@@ -138,24 +201,32 @@ class _GeneratingMeditationState extends State<GeneratingMeditation> {
         duration: durationValue,
         planType: widget.profileData!.planType,
         isDirectRitual: widget.isDirectRitual,
+        onError: () {
+          hasError = true;
+
+          // Clear navigation stack to prevent back navigation to auth pages
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/dashboard', 
+            (route) {
+              // Keep only dashboard and its sub-routes, remove auth pages
+              return route.settings.name == '/dashboard' || 
+                     route.settings.name == '/my-meditations' ||
+                     route.settings.name == '/archive' ||
+                     route.settings.name == '/vault' ||
+                     route.settings.name == '/generator';
+            }
+          );
+        },
       );
 
-      // // Free trial ni assign qilish
-      // setState(() {
-      //   _statusMessage = 'Setting up your free trial...';
-      // });
+      // Qisqa kutish va keyin xatolik tekshirish
+      await Future.delayed(const Duration(seconds: 3));
 
-      // await authStore.assignFreeTrial();
-
-      // Muvaffaqiyatli natija
-      if (mounted) {
+      // Faqat xatolik bo'lmagan taqdirda success navigation qilish
+      if (!hasError && mounted) {
         setState(() {
           _isGenerating = false;
-          // _statusMessage = 'Your meditation is ready!';
         });
-
-        // Qisqa kutish va keyin o'tish
-        await Future.delayed(const Duration(seconds: 2));
 
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -168,7 +239,7 @@ class _GeneratingMeditationState extends State<GeneratingMeditation> {
         }
       }
     } catch (e) {
-      _showErrorAndNavigate();
+      // Error occurred during meditation generation
     }
   }
 
@@ -192,9 +263,7 @@ class _GeneratingMeditationState extends State<GeneratingMeditation> {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => const DashboardMainPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const DashboardMainPage()),
           );
         }
       });
@@ -203,12 +272,40 @@ class _GeneratingMeditationState extends State<GeneratingMeditation> {
 
   @override
   void dispose() {
-    _controller?.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    if (_controller != null) {
+      _controller!.removeListener(_videoListener);
+      _controller!.dispose();
+    }
     super.dispose();
+  }
+
+  // Video controller ni tekshirish va qayta ishga tushirish
+  void _checkAndRestartVideo() {
+    if (_controller != null &&
+        !_controller!.value.isPlaying &&
+        _isInitialized) {
+      _restartVideo();
+    }
+  }
+
+  // Video listener - video holatini kuzatish uchun
+  void _videoListener() {
+    if (_controller != null && mounted) {
+      // Video to'xtagan bo'lsa va loop bo'lsa, qayta ishga tushirish
+      if (!_controller!.value.isPlaying && _controller!.value.isLooping) {
+        _restartVideo();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Har safar build bo'lganda video holatini tekshirish
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndRestartVideo();
+    });
+
     return Stack(
       children: [
         // Gradient background
@@ -221,6 +318,16 @@ class _GeneratingMeditationState extends State<GeneratingMeditation> {
                 width: _controller!.value.size.width,
                 height: _controller!.value.size.height,
                 child: VideoPlayer(_controller!),
+              ),
+            ),
+          )
+        else if (!_isInitialized)
+          // Video yuklanmagan bo'lsa, background image ko'rsatish
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/img/dep.png'),
+                fit: BoxFit.cover,
               ),
             ),
           ),

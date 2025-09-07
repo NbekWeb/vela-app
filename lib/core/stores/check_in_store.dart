@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 import '../services/api_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'auth_store.dart';
 
 class CheckInStore extends ChangeNotifier {
   bool _isLoading = false;
@@ -32,6 +33,7 @@ class CheckInStore extends ChangeNotifier {
     required String checkInChoice,
     required String description,
     VoidCallback? onSuccess,
+    AuthStore? authStore,
   }) async {
     setLoading(true);
     setError(null);
@@ -48,7 +50,11 @@ class CheckInStore extends ChangeNotifier {
 
       // Check if the request was successful
       if (response.statusCode == 200 || response.statusCode == 201) {
-        developer.log('✅ Check-in submitted successfully');
+        
+        // Refresh user data to update check-ins
+        if (authStore != null) {
+          await authStore.getUserDetails();
+        }
         
         // Call success callback
         onSuccess?.call();

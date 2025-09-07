@@ -96,104 +96,114 @@ class VaultRitualCard extends StatelessWidget {
       }
     }
 
-    return Container(
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.22),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              bottomLeft: Radius.circular(20),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: imageUrl != null && imageUrl!.isNotEmpty
-                      ? Image.network(
-                          imagePath,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              width: 100,
-                              height: 100,
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              'assets/img/card4.png',
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        )
-                      : Image.asset(
-                          imagePath,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    // Save file to secure storage if provided
-                    if (file != null) {
-                      const storage = FlutterSecureStorage();
-                      await storage.write(key: 'file', value: file);
-                    }
+    return GestureDetector(
+      onTap: () async {
+        // Save file to secure storage if provided
+        if (file != null) {
+          const storage = FlutterSecureStorage();
+          await storage.write(key: 'file', value: file);
+        }
 
-                    if (meditationId != null) {
-                      // Set storedRitualType based on name
-                      final meditationStore = Provider.of<MeditationStore>(
-                        context,
-                        listen: false,
-                      );
-                      if (name != null) {
-                        final firstWord = name!.split(' ').first.toLowerCase();
-                        String ritualType = '4'; // default
+        if (meditationId != null) {
+          // Set storedRitualType based on name
+          final meditationStore = Provider.of<MeditationStore>(
+            context,
+            listen: false,
+          );
+          if (name != null) {
+            final firstWord = name!.split(' ').first.toLowerCase();
+            String ritualType = '4'; // default
 
-                        if (firstWord == 'sleep') {
-                          ritualType = '1';
-                        } else if (firstWord == 'morning') {
-                          ritualType = '2';
-                        } else if (firstWord == 'calming') {
-                          ritualType = '3';
-                        }
+            if (firstWord == 'sleep') {
+              ritualType = '1';
+            } else if (firstWord == 'morning') {
+              ritualType = '2';
+            } else if (firstWord == 'calming') {
+              ritualType = '3';
+            }
 
-                        // Set the ritual type directly in the store
-                        meditationStore.saveRitualSettings(
-                          ritualType: ritualType,
-                          tone: meditationStore.storedTone ?? 'dreamy',
-                          duration: meditationStore.storedDuration ?? '5',
-                          planType: meditationStore.storedPlanType ?? 1,
-                        );
-                      }
+            // Set the ritual type directly in the store
+            meditationStore.saveRitualSettings(
+              ritualType: ritualType,
+              tone: meditationStore.storedTone ?? 'dreamy',
+              duration: meditationStore.storedDuration ?? '5',
+              planType: meditationStore.storedPlanType ?? 1,
+            );
+          }
 
-                      if (onAudioPlay != null) {
-                        onAudioPlay!(meditationId!);
-                      } else {
-                        // Use global navigation as fallback
-                        globalMeditationId = meditationId;
-                        Navigator.pushReplacementNamed(context, '/dashboard');
-                      }
-                    } else {
-                      print('meditationId is null');
-                    }
-                  },
-                  child: Container(
+          if (onAudioPlay != null) {
+            onAudioPlay!(meditationId!);
+          } else {
+            // Use global navigation as fallback with cleared navigation stack
+            globalMeditationId = meditationId;
+            Navigator.pushNamedAndRemoveUntil(
+              context, 
+              '/dashboard',
+              (route) {
+                // Keep only dashboard and its sub-routes, remove auth pages
+                return route.settings.name == '/dashboard' || 
+                       route.settings.name == '/my-meditations' ||
+                       route.settings.name == '/archive' ||
+                       route.settings.name == '/vault' ||
+                       route.settings.name == '/generator';
+              }
+            );
+          }
+        } else {
+        }
+      },
+      child: Container(
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.22),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: imageUrl != null && imageUrl!.isNotEmpty
+                        ? Image.network(
+                            imagePath,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.grey[300],
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/img/card4.png',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            imagePath,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                  Container(
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
@@ -206,46 +216,46 @@ class VaultRitualCard extends StatelessWidget {
                       size: 32,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 18),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title ?? _getTitleFromName(name),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Satoshi',
-                    fontSize: 16.sp,
-                  ),
-                ),
-                const SizedBox(height: 0),
-                Padding(
-                  padding: const EdgeInsets.only(right: 30),
-                  child: Text(
-                    description ??
-                        'A deeply personalized journey crafted from your unique vision and dreams',
+            const SizedBox(width: 18),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title ?? _getTitleFromName(name),
                     style: TextStyle(
-                      color: Color(0xFFF2EFEA),
-                      fontSize: 12.sp,
-                      height: 1.25,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Satoshi',
+                      fontSize: 16.sp,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 0),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 30),
+                    child: Text(
+                      description ??
+                          'A deeply personalized journey crafted from your unique vision and dreams',
+                      style: TextStyle(
+                        color: Color(0xFFF2EFEA),
+                        fontSize: 12.sp,
+                        height: 1.25,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Satoshi',
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

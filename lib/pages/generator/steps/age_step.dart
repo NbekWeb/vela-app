@@ -72,6 +72,7 @@ class _AgeStepState extends State<AgeStep> {
             bottom: 140,
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(

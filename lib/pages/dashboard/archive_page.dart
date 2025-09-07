@@ -3,7 +3,10 @@ import 'package:provider/provider.dart';
 import '../vault/vault_ritual_card.dart';
 import '../../shared/widgets/stars_animation.dart';
 import '../../core/stores/meditation_store.dart';
+import '../../core/stores/auth_store.dart';
 import 'components/dashboard_audio_player.dart';
+import 'main.dart';
+import '../../main.dart' show shouldNavigateToProfile;
 
 class ArchivePage extends StatefulWidget {
   const ArchivePage({super.key});
@@ -45,12 +48,54 @@ class _ArchivePageState extends State<ArchivePage> {
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       Image.asset('assets/img/logo.png', width: 60, height: 39),
-                      ClipOval(
-                        child: Image.asset(
-                          'assets/img/card.png',
-                          width: 30,
-                          height: 30,
-                          fit: BoxFit.cover,
+                      GestureDetector(
+                        onTap: () {
+                          // Set global flag and navigate to dashboard
+                          shouldNavigateToProfile = true;
+                          print('Archive: Setting shouldNavigateToProfile = true');
+                          Navigator.of(context).pushReplacementNamed('/dashboard');
+                        },
+                        child: Consumer<AuthStore>(
+                          builder: (context, authStore, child) {
+                            final user = authStore.user;
+                            final avatarUrl = user?.avatar;
+
+                            if (avatarUrl != null && avatarUrl.isNotEmpty) {
+                              return Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: DecorationImage(
+                                    image: NetworkImage(avatarUrl),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: ClipOval(
+                                  child: Container(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ),
                     ],

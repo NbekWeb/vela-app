@@ -52,7 +52,23 @@
 				<string>REVERSED_CLIENT_ID</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>com.googleusercontent.apps.1060421858309-bmhrrq45hoipc36mafm141nhmc889f7m</string>
+					<string>com.googleusercontent.apps.354237870385-fh2mnbv6phird2bm0f7q20o0o9hom1ri</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>Facebook</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>fb3566512716817329</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>Apple</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>com.nbekdev.vela.signin</string>
 				</array>
 			</dict>
 		</array>
@@ -85,6 +101,11 @@
 		<array>
 			<string>google</string>
 			<string>googlegmail</string>
+			<string>com.google.gppconsent</string>
+			<string>fbapi</string>
+			<string>fb-messenger-share-api</string>
+			<string>fbauth2</string>
+			<string>fbshareextension</string>
 		</array>
 		<key>NSAppTransportSecurity</key>
 		<dict>
@@ -105,5 +126,13 @@
 		<false/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>GIDClientID</key>
+		<string>354237870385-fh2mnbv6phird2bm0f7q20o0o9hom1ri.apps.googleusercontent.com</string>
+		<key>FacebookAppID</key>
+		<string>3566512716817329</string>
+		<key>FacebookClientToken</key>
+		<string>7d107527331d4e6e9b411d49fa0267f4</string>
+		<key>FacebookDisplayName</key>
+		<string>Vela</string>
 	</dict>
 </plist>

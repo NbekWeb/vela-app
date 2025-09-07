@@ -148,11 +148,11 @@ class StepScaffold extends StatelessWidget {
                   ),
                   // Content area
                   Expanded(
-                    child: SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Center(
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -169,7 +169,6 @@ class StepScaffold extends StatelessWidget {
                             const SizedBox(height: 20),
                             child,
                           ],
-                          ),
                         ),
                       ),
                     ),
