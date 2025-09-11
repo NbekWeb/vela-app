@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+import 'package:card_swiper/card_swiper.dart';
 import '../vault/vault_ritual_card.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../shared/widgets/custom_star.dart';
@@ -446,9 +447,9 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
 
                   return SizedBox(
                     height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
+                    child: Swiper(
                       itemCount: meditationCount > 3 ? 3 : meditationCount,
+                      loop: false,
                       itemBuilder: (context, index) {
                         final meditation = myMeditations[index];
                         final details = meditation['details'] ?? {};
@@ -456,20 +457,17 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                         final meditationId = meditation['id']?.toString() ?? '';
                         
                         return Padding(
-                          padding: EdgeInsets.only(
-                            right: index < (meditationCount > 3 ? 3 : meditationCount) - 1 ? 12.0 : 0,
-                          ),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width - 36,
-                            child: VaultRitualCard(
-                              name: name,
-                              meditationId: meditationId,
-                              file: meditation['file'],
-                              onAudioPlay: _onAudioPlay,
-                            ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: VaultRitualCard(
+                            name: name,
+                            meditationId: meditationId,
+                            file: meditation['file'],
+                            onAudioPlay: _onAudioPlay,
                           ),
                         );
                       },
+                      viewportFraction: 1,
+                      scale: 1,
                     ),
                   );
                 },
@@ -596,9 +594,9 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
 
                   return SizedBox(
                     height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
+                    child: Swiper(
                       itemCount: libraryCount > 3 ? 3 : libraryCount,
+                      loop: false,
                       itemBuilder: (context, index) {
                         final meditation = libraryMeditations[index];
                         final name = meditation['name'] ?? 'Untitled';
@@ -607,28 +605,25 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                         final description = meditation['description'];
                         
                         return Padding(
-                          padding: EdgeInsets.only(
-                            right: index < (libraryCount > 3 ? 3 : libraryCount) - 1 ? 12.0 : 0,
-                          ),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width - 36,
-                            child: VaultRitualCard(
-                              name: name,
-                              meditationId: meditationId,
-                              file: meditation['file'],
-                              imageUrl: imageUrl,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: VaultRitualCard(
+                            name: name,
+                            meditationId: meditationId,
+                            file: meditation['file'],
+                            imageUrl: imageUrl,
+                            title: name,
+                            description: description,
+                            onAudioPlay: (id) => _onAudioPlay(
+                              id,
                               title: name,
                               description: description,
-                              onAudioPlay: (id) => _onAudioPlay(
-                                id,
-                                title: name,
-                                description: description,
-                                imageUrl: imageUrl,
-                              ),
+                              imageUrl: imageUrl,
                             ),
                           ),
                         );
                       },
+                      viewportFraction: 1,
+                      scale: 1,
                     ),
                   );
                 },

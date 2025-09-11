@@ -43,9 +43,10 @@ class _LoadingScreenState extends State<LoadingScreen>
     final isAuthenticated = await authStore.isAuthenticated();
 
     if (isAuthenticated) {
-      // User is authenticated, go directly to dashboard
+      // User is authenticated, check profile completion and redirect accordingly
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/dashboard');
+      final redirectRoute = await authStore.getRedirectRoute();
+      Navigator.of(context).pushReplacementNamed(redirectRoute);
       return;
     }
 

@@ -35,8 +35,8 @@ class _GeneratingMeditationState extends State<GeneratingMeditation>
     with WidgetsBindingObserver {
   VideoPlayerController? _controller;
   bool _isInitialized = false;
-  bool _isGenerating = true;
   bool _wasPlayingBeforePause = false;
+  bool _isGenerating = true;
   String _statusMessage =
       'We\'re shaping your vision\ninto a meditative journey...';
 
@@ -306,8 +306,27 @@ class _GeneratingMeditationState extends State<GeneratingMeditation>
       _checkAndRestartVideo();
     });
 
-    return Stack(
-      children: [
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          // Clear navigation stack to prevent back navigation to auth pages
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            '/dashboard',
+            (route) {
+              // Keep only dashboard and its sub-routes, remove auth pages
+              return route.settings.name == '/dashboard' || 
+                     route.settings.name == '/my-meditations' ||
+                     route.settings.name == '/archive' ||
+                     route.settings.name == '/vault' ||
+                     route.settings.name == '/generator';
+            }
+          );
+        }
+      },
+      child: Stack(
+        children: [
         // Gradient background
         const StarsAnimation(),
         if (_isInitialized && _controller != null)
@@ -380,6 +399,7 @@ class _GeneratingMeditationState extends State<GeneratingMeditation>
           ),
         ),
       ],
+      ),
     );
   }
 }

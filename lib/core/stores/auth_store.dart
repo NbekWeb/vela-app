@@ -5,7 +5,6 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:developer' as developer;
 import 'dart:typed_data';
 import 'dart:io';
-import 'dart:convert';
 import '../services/api_service.dart';
 import '../../shared/models/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -48,6 +47,49 @@ class AuthStore extends ChangeNotifier {
     } catch (e) {
       return false;
     }
+  }
+
+  // Check if user profile is complete
+  bool isProfileComplete() {
+    if (_user == null) return false;
+
+    // Check if essential profile fields are filled
+    final hasGender = _user!.gender != null && _user!.gender!.isNotEmpty;
+    final hasAgeRange = _user!.ageRange != null && _user!.ageRange!.isNotEmpty;
+    final hasDream = _user!.dream != null && _user!.dream!.isNotEmpty;
+    final hasGoals = _user!.goals != null && _user!.goals!.isNotEmpty;
+    final hasHappiness =
+        _user!.happiness != null && _user!.happiness!.isNotEmpty;
+
+    return hasGender && hasAgeRange && hasDream && hasGoals && hasHappiness;
+  }
+
+  // Check if user has selected a plan
+  Future<bool> hasSelectedPlan() async {
+    try {
+      final planType = await _secureStorage.read(key: 'plan_type');
+      return planType != null && planType.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Get the appropriate redirect route based on profile completion
+  Future<String> getRedirectRoute() async {
+    if (!isProfileComplete()) {
+      // If profile is not complete, check which step to start from
+      if (_user?.gender == null || _user!.gender!.isEmpty) {
+        return '/generator'; // Start from gender step
+      }
+      return '/generator'; // Continue from where they left off
+    }
+
+    final hasPlan = await hasSelectedPlan();
+    if (!hasPlan) {
+      return '/plan'; // Need to select a plan
+    }
+
+    return '/dashboard'; // Profile is complete, go to dashboard
   }
 
   // Actions (Pinia actions ga o'xshash)
@@ -249,15 +291,14 @@ class AuthStore extends ChangeNotifier {
                 // User details'ni olish
                 await getUserDetails();
 
-                // User'ning gender'i bor-yo'qligini tekshirish
-                if (_user != null &&
-                    _user!.gender != null &&
-                    _user!.gender!.isNotEmpty) {
-                  // Existing user - dashboard'ga o'tkazish
+                // Check profile completion and redirect accordingly
+                final redirectRoute = await getRedirectRoute();
+                if (redirectRoute == '/dashboard') {
+                  // Profile is complete - go to dashboard
                   onSuccess?.call();
                 } else {
-                  // New user - steplarga o'tkazish
-                  onNewUser?.call(); // Yangi user uchun callback
+                  // Profile incomplete - go to appropriate step
+                  onNewUser?.call();
                 }
               }
             } catch (e) {
@@ -306,6 +347,114 @@ class AuthStore extends ChangeNotifier {
           errorMessage = 'Google Sign-In was cancelled.';
         } else {
           errorMessage = 'Google Sign-In failed. Please try again.';
+        }
+      }
+
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Apple Sign In
+  Future<void> loginWithApple({
+    VoidCallback? onSuccess,
+    VoidCallback? onNewUser, // Yangi user uchun callback
+  }) async {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Apple Sign In
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      if (credential.identityToken == null) {
+        developer.log('❌ Apple Sign-In failed: No identity token');
+        setError('Apple Sign-In failed: No identity token');
+        return;
+      }
+
+      // Firebase Authentication bilan sign-in qilish
+      try {
+        developer.log('🔍 Firebase Authentication bilan Apple sign-in qilish...');
+
+        // Firebase credential yaratish
+        final firebaseCredential = OAuthProvider("apple.com").credential(
+          idToken: credential.identityToken,
+          accessToken: credential.authorizationCode,
+        );
+
+        // Firebase Authentication bilan sign-in
+        final userCredential = await FirebaseAuth.instance
+            .signInWithCredential(firebaseCredential);
+        final firebaseUser = userCredential.user;
+
+        if (firebaseUser != null) {
+          // ID token'ni global variable'ga saqlash
+          _lastIdToken = credential.identityToken;
+
+          // Firebase ID token'ni olish
+          final firebaseIdToken = await firebaseUser.getIdToken();
+
+          // Firebase login API ga so'rov yuborish
+          try {
+            final response = await ApiService.request(
+              url: 'auth/firebase/login/',
+              method: 'POST',
+              data: {'firebase_id_token': firebaseIdToken},
+              open: true, // Bu endpoint uchun token kerak emas
+            );
+
+            // Backend token'ni saqlash
+            if (response.data['access_token'] != null) {
+              await _secureStorage.write(
+                key: 'access_token',
+                value: response.data['access_token'],
+              );
+              setTokens(accessToken: response.data['access_token']);
+
+              // User details'ni olish
+              await getUserDetails();
+
+              // Check profile completion and redirect accordingly
+              final redirectRoute = await getRedirectRoute();
+              if (redirectRoute == '/dashboard') {
+                // Profile is complete - go to dashboard
+                onSuccess?.call();
+              } else {
+                // Profile incomplete - go to appropriate step
+                onNewUser?.call();
+              }
+            }
+          } catch (e) {
+            setError('Firebase authentication failed. Please try again.');
+          }
+        } else {
+          setError('Firebase Authentication failed. User is null.');
+        }
+      } catch (firebaseError) {
+        developer.log('❌ Firebase Authentication error: $firebaseError');
+        setError('Firebase Authentication failed: $firebaseError');
+      }
+    } catch (e) {
+      String errorMessage = 'Apple Sign-In failed. Please try again.';
+
+      if (e.toString().contains('SignInWithAppleAuthorizationException')) {
+        if (e.toString().contains('canceled')) {
+          errorMessage = 'Apple Sign-In was cancelled by user.';
+        } else if (e.toString().contains('failed')) {
+          errorMessage = 'Apple Sign-In failed. Please try again.';
+        } else if (e.toString().contains('invalidResponse')) {
+          errorMessage = 'Invalid Apple Sign-In response.';
+        } else if (e.toString().contains('notHandled')) {
+          errorMessage = 'Apple Sign-In not handled.';
+        } else if (e.toString().contains('unknown')) {
+          errorMessage = 'Unknown Apple Sign-In error.';
         }
       }
 
@@ -375,6 +524,12 @@ class AuthStore extends ChangeNotifier {
       if (userData != null) {
         final user = UserModel.fromJson(userData);
         setUser(user);
+        
+        // Check if user has gender, if not redirect to gender selection
+        if (user.gender == null || user.gender!.isEmpty) {
+          developer.log('🔍 User gender is missing, redirecting to gender selection');
+          // This will be handled by getRedirectRoute() in the calling function
+        }
       }
     } catch (e) {
       developer.log('❌ Get user details error: $e');
@@ -455,14 +610,13 @@ class AuthStore extends ChangeNotifier {
               // Get user details to determine if new or existing user
               await getUserDetails();
 
-              // Check if user has gender field to determine if new or existing user
-              if (_user != null &&
-                  _user!.gender != null &&
-                  _user!.gender!.isNotEmpty) {
-                // Existing user - call success callback
+              // Check profile completion and redirect accordingly
+              final redirectRoute = await getRedirectRoute();
+              if (redirectRoute == '/dashboard') {
+                // Profile is complete - go to dashboard
                 onSuccess?.call();
               } else {
-                // New user - call new user callback
+                // Profile incomplete - go to appropriate step
                 onNewUser?.call();
               }
             } else {
@@ -500,185 +654,6 @@ class AuthStore extends ChangeNotifier {
     }
   }
 
-  // Apple Sign-In action with API call
-  Future<void> loginWithApple({
-    VoidCallback? onSuccess,
-    VoidCallback? onNewUser,
-  }) async {
-    // Web platformasi uchun Apple Sign-In o'chirilgan
-    if (kIsWeb) {
-      setError('Apple Sign-In is not available on web platform');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      developer.log('🍎 Starting Apple Sign-In process...');
-      print('🍎 Starting Apple Sign-In process...');
-      print('🍎 Platform: ${Platform.operatingSystem}');
-      print('🍎 Is iOS: ${Platform.isIOS}');
-      
-      // Check if Apple Sign-In is available
-      developer.log('🍎 Checking Apple Sign-In availability...');
-      print('🍎 Checking Apple Sign-In availability...');
-      
-      final isAvailable = await SignInWithApple.isAvailable();
-      developer.log('🍎 Apple Sign-In available: $isAvailable');
-      print('🍎 Apple Sign-In available: $isAvailable');
-      
-      if (!isAvailable) {
-        developer.log('🍎 Apple Sign-In not available on this device');
-        print('🍎 Apple Sign-In not available on this device');
-        setError('Apple Sign-In is not available on this device');
-        return;
-      }
-
-      // Request Apple Sign-In
-      developer.log('🍎 Requesting Apple ID credential...');
-      print('🍎 Requesting Apple ID credential...');
-      
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
-
-      developer.log('🍎 Apple credential received: ${credential.userIdentifier}');
-      print('🍎 Apple credential received: ${credential.userIdentifier}');
-      
-      if (credential.userIdentifier == null) {
-        setError('Apple Sign-In failed: No user identifier received');
-        return;
-      }
-
-      // Prepare Apple user data
-      final appleUserData = {
-        "first_name": credential.givenName ?? '',
-        "last_name": credential.familyName ?? '',
-        "email": credential.email ?? '',
-        "apple_user_id": credential.userIdentifier!,
-        "identity_token": credential.identityToken,
-        "authorization_code": credential.authorizationCode,
-      };
-
-      // Print Apple Sign In data (API ga murojat qilmaymiz)
-      developer.log('🍎 Apple Sign In successful!');
-      developer.log('🍎 User data: $appleUserData');
-      print('🍎 Apple Sign In successful!');
-      print('🍎 User ID: ${credential.userIdentifier}');
-      print('🍎 Email: ${credential.email}');
-      print('🍎 First Name: ${credential.givenName}');
-      print('🍎 Last Name: ${credential.familyName}');
-      print('🍎 Identity Token: ${credential.identityToken}');
-      print('🍎 Authorization Code: ${credential.authorizationCode}');
-      
-      // JWT Token'ni decode qilish
-      if (credential.identityToken != null) {
-        try {
-          final tokenParts = credential.identityToken!.split('.');
-          if (tokenParts.length >= 2) {
-            // JWT payload'ni decode qilish
-            final payload = tokenParts[1];
-            // Base64 padding qo'shish
-            final paddedPayload = payload + '=' * (4 - payload.length % 4);
-            final decodedBytes = base64Url.decode(paddedPayload);
-            final decodedPayload = utf8.decode(decodedBytes);
-            print('🍎 JWT Payload: $decodedPayload');
-          }
-        } catch (e) {
-          print('🍎 JWT decode error: $e');
-        }
-      }
-
-      // Firebase Authentication bilan Apple Sign In
-      if (credential.identityToken != null && !kIsWeb) {
-        try {
-          developer.log('🍎 Firebase Authentication bilan Apple Sign In...');
-          print('🍎 Firebase Authentication bilan Apple Sign In...');
-
-          // Firebase credential yaratish
-          final firebaseCredential = OAuthProvider("apple.com").credential(
-            idToken: credential.identityToken,
-            accessToken: credential.authorizationCode,
-          );
-
-          // Firebase Authentication bilan sign-in
-          final userCredential = await FirebaseAuth.instance
-              .signInWithCredential(firebaseCredential);
-          final firebaseUser = userCredential.user;
-
-          if (firebaseUser != null) {
-            developer.log('🍎 Firebase user: ${firebaseUser.uid}');
-            print('🍎 Firebase user ID: ${firebaseUser.uid}');
-            print('🍎 Firebase email: ${firebaseUser.email}');
-            print('🍎 Firebase display name: ${firebaseUser.displayName}');
-            print('🍎 Firebase phone number: ${firebaseUser.phoneNumber}');
-            print('🍎 Firebase photo URL: ${firebaseUser.photoURL}');
-            print('🍎 Firebase email verified: ${firebaseUser.emailVerified}');
-            print('🍎 Firebase creation time: ${firebaseUser.metadata.creationTime}');
-            print('🍎 Firebase last sign in: ${firebaseUser.metadata.lastSignInTime}');
-            print('🍎 Firebase provider data: ${firebaseUser.providerData}');
-            print('🍎 Firebase is anonymous: ${firebaseUser.isAnonymous}');
-            print('🍎 Firebase refresh token: ${firebaseUser.refreshToken}');
-
-            // Firebase ID token'ni olish
-            final firebaseIdToken = await firebaseUser.getIdToken();
-            print('🍎 Firebase ID Token: $firebaseIdToken');
-
-            // Firebase user'ning barcha ma'lumotlarini ko'rish
-            print('🍎 Firebase User Object: ${firebaseUser.toString()}');
-
-            // Yangi user deb hisoblaymiz va plan sahifasiga o'tkazamiz
-            onNewUser?.call();
-          } else {
-            setError('Firebase Authentication failed. User is null.');
-          }
-        } catch (firebaseError) {
-          developer.log('🍎 Firebase Authentication error: $firebaseError');
-          print('🍎 Firebase Authentication error: $firebaseError');
-          setError('Firebase Authentication failed: $firebaseError');
-        }
-      } else {
-        // Firebase yo'q bo'lsa, oddiy Apple Sign In
-        print('🍎 Firebase yo\'q, oddiy Apple Sign In');
-        onNewUser?.call();
-      }
-    } catch (e) {
-      developer.log('🍎 Apple Sign-In error: $e');
-      developer.log('🍎 Error type: ${e.runtimeType}');
-      print('🍎 Apple Sign-In error: $e');
-      print('🍎 Error type: ${e.runtimeType}');
-      print('🍎 Error details: ${e.toString()}');
-      
-      String errorMessage = 'Apple Sign-In failed. Please try again.';
-
-      if (e.toString().contains('cancelled')) {
-        errorMessage = 'Apple Sign-In was cancelled by user.';
-      } else if (e.toString().contains('network')) {
-        errorMessage =
-            'Apple Sign-In failed. Please check your internet connection.';
-      } else if (e.toString().contains('permission')) {
-        errorMessage = 'Apple Sign-In permissions denied. Please try again.';
-      } else if (e.toString().contains('configuration')) {
-        errorMessage =
-            'Apple Sign-In configuration error. Please restart the app.';
-      } else if (e.toString().contains('invalid-credential')) {
-        errorMessage = 'Apple authentication token issue. Please try again.';
-      } else if (e.toString().contains('not_handled')) {
-        errorMessage = 'Apple Sign-In is not available on this device.';
-      } else if (e.toString().contains('unknown')) {
-        errorMessage = 'Apple Sign-In failed with unknown error. Please try again.';
-      }
-
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   // Logout action (Pinia'ga o'xshash)
   Future<void> logout() async {
     try {
@@ -687,7 +662,7 @@ class AuthStore extends ChangeNotifier {
         await _googleSignIn.signOut();
         await FacebookAuth.instance.logOut();
       }
-      
+
       await _secureStorage.delete(key: 'access_token');
       await _secureStorage.delete(key: 'refresh_token');
 
@@ -714,7 +689,7 @@ class AuthStore extends ChangeNotifier {
       print('🔍 Firebase ID Token not available on web platform');
       return null;
     }
-    
+
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
@@ -736,10 +711,7 @@ class AuthStore extends ChangeNotifier {
     setError(null);
 
     try {
-      await ApiService.request(
-        url: 'auth/assign-free-trial/',
-        method: 'POST',
-      );
+      await ApiService.request(url: 'auth/assign-free-trial/', method: 'POST');
     } catch (e) {
       setError('Failed to assign free trial');
       // Toast will be shown from the UI layer
@@ -956,7 +928,7 @@ class AuthStore extends ChangeNotifier {
 
       // Parse response data
       final responseData = response.data;
-      
+
       // Handle direct array response from API
       if (responseData != null && responseData is List) {
         final lifeVisions = responseData
@@ -980,7 +952,6 @@ class AuthStore extends ChangeNotifier {
     required String visionType,
   }) async {
     try {
-
       // Validate visionType
       if (!['north_star', 'goal', 'dream'].contains(visionType)) {
         throw Exception('Invalid visionType');
@@ -1016,7 +987,6 @@ class AuthStore extends ChangeNotifier {
     required List<String> newVisionType,
   }) async {
     try {
-
       // Validate newVisionType
       for (String type in newVisionType) {
         if (!['north_star', 'goal', 'dream'].contains(type)) {

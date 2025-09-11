@@ -8,8 +8,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../shared/widgets/stars_animation.dart';
 import '../../core/stores/auth_store.dart';
 import '../../core/services/api_service.dart';
-import 'main.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class RemindersPage extends StatefulWidget {
   const RemindersPage({super.key});
@@ -103,7 +101,7 @@ class _RemindersPageState extends State<RemindersPage> {
       print('🔵 API REQUEST: POST /auth/create-device-token/');
       print('🔵 Request Data: $data');
 
-      final response = await ApiService.request(
+      await ApiService.request(
         url: 'auth/create-device-token/',
         method: 'POST',
         data: data,
@@ -267,7 +265,7 @@ class _RemindersPageState extends State<RemindersPage> {
               );
               print('🔵 Request Data: {"is_active": false}');
 
-              final response = await ApiService.request(
+              await ApiService.request(
                 url: 'auth/update-device-token-status/$deviceToken/',
                 method: 'PUT',
                 data: {'is_active': false},
@@ -294,12 +292,8 @@ class _RemindersPageState extends State<RemindersPage> {
           textColor: const Color(0xFF3B6EAA),
         );
 
-        // Navigate to profile page using dashboard navigation
-        final dashboardState = context
-            .findAncestorStateOfType<DashboardMainPageState>();
-        if (dashboardState != null) {
-          dashboardState.navigateToProfile();
-        }
+        // Navigate back to previous page
+        Navigator.of(context).pop();
       }
     } catch (e) {
       print('DEBUG: Main error in _saveSettings: $e');
@@ -328,11 +322,7 @@ class _RemindersPageState extends State<RemindersPage> {
       canPop: false, // Prevent default back button behavior
       onPopInvoked: (didPop) {
         if (!didPop) {
-          // Navigate back to profile page using dashboard navigation
-          final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
-          if (dashboardState != null) {
-            dashboardState.navigateToProfile();
-          }
+          Navigator.of(context).pop();
         }
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -399,11 +389,7 @@ class _RemindersPageState extends State<RemindersPage> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
               onPressed: () {
-                final dashboardState = context
-                    .findAncestorStateOfType<DashboardMainPageState>();
-                if (dashboardState != null) {
-                  dashboardState.navigateToSettings();
-                }
+                Navigator.of(context).pop();
               },
             ),
           ),

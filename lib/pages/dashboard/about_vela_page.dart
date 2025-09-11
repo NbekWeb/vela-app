@@ -127,7 +127,7 @@ class AboutVelaPage extends StatelessWidget {
       children: [
         Icon(
           Icons.check_circle,
-          color: const Color(0xFF3B6EAA),
+          color: const Color(0xFFC9DFF4),
           size: 20,
         ),
         const SizedBox(width: 12),

@@ -3,7 +3,6 @@ import '../services/api_service.dart';
 import '../../shared/models/meditation_profile_data.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../../main.dart'; // Import navigatorKey
 
 // Meditation store for handling meditation profile data and related functionality
 class MeditationStore extends ChangeNotifier {
@@ -357,9 +356,11 @@ class MeditationStore extends ChangeNotifier {
           // Continue without setting profile if parsing fails
         }
       } else {
+
         setError(
           'Meditation generation failed: ${responseData?['error'] ?? 'Unknown error'}. Please try again.',
         );
+    
 
         // Show toast and navigate to dashboard
         Fluttertoast.showToast(
@@ -381,6 +382,7 @@ class MeditationStore extends ChangeNotifier {
       }
     } catch (e) {
       // More specific error handling
+      print('🔴 e: $e');
       if (e.toString().contains('timeout')) {
         setError(
           'Request timed out. Please check your internet connection and try again.',
@@ -415,23 +417,8 @@ class MeditationStore extends ChangeNotifier {
       }
     } finally {
       setLoading(false);
-      
-      // Clear navigation stack to prevent back navigation to auth pages
-      // This ensures that when user presses back button, they don't go to login/register
-      if (navigatorKey.currentState != null) {
-        // Remove any auth-related routes from the stack
-        navigatorKey.currentState!.pushNamedAndRemoveUntil(
-          '/dashboard', 
-          (route) {
-            // Keep only dashboard and its sub-routes, remove auth pages
-            return route.settings.name == '/dashboard' || 
-                   route.settings.name == '/my-meditations' ||
-                   route.settings.name == '/archive' ||
-                   route.settings.name == '/vault' ||
-                   route.settings.name == '/generator';
-          }
-        );
-      }
+      // Removed automatic navigation from finally block
+      // Navigation should only happen in error cases via onError callback
     }
   }
 
@@ -516,6 +503,25 @@ class MeditationStore extends ChangeNotifier {
     _meditationProfile = null;
     _resetStateVariables();
     notifyListeners();
+  }
+
+  // Delete meditation from server and clear local data
+  Future<void> deleteMeditation(String meditationId) async {
+    try {
+      print('🗑️ Calling delete API for meditation ID: $meditationId');
+      await ApiService.request(
+        url: 'auth/delete-meditation/$meditationId/',
+        method: 'DELETE',
+      );
+      
+      print('✅ Meditation deleted successfully from server');
+      // Clear local meditation data after successful deletion
+      completeReset();
+    } catch (e) {
+      print('❌ Error deleting meditation: $e');
+      // Silent error handling - just clear local data
+      completeReset();
+    }
   }
 
   // Private method to reset state variables (reduces code duplication)

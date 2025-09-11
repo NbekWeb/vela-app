@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../shared/widgets/stars_animation.dart';
 
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +66,7 @@ class HelpSupportPage extends StatelessWidget {
                             'FAQ',
                             'Find answers to common questions',
                             Icons.question_answer,
-                            () {},
+                            () => _launchURL('https://myvela.ai/faq'),
                           ),
                           const SizedBox(height: 12),
                           _buildHelpOption(
@@ -66,7 +74,7 @@ class HelpSupportPage extends StatelessWidget {
                             'Contact Support',
                             'Get in touch with our team',
                             Icons.support_agent,
-                            () {},
+                            () => _launchURL('https://myvela.ai/contact'),
                           ),
                           const SizedBox(height: 12),
                           _buildHelpOption(
@@ -74,7 +82,7 @@ class HelpSupportPage extends StatelessWidget {
                             'Report a Bug',
                             'Help us improve the app',
                             Icons.bug_report,
-                            () {},
+                            () => _launchURL('https://myvela.ai/report'),
                           ),
                           const SizedBox(height: 32),
                           Text(
@@ -124,6 +132,7 @@ class HelpSupportPage extends StatelessWidget {
   Widget _buildHelpOption(BuildContext context, String title, String description, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.all(20.sp),
@@ -139,7 +148,7 @@ class HelpSupportPage extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: const Color(0xFF3B6EAA),
+              color: const Color(0xFFC9DFF4),
               size: 24,
             ),
             const SizedBox(width: 16),

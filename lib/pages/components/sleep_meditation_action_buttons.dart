@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../generator/direct_ritual_page.dart';
 
 class SleepMeditationActionButtons extends StatelessWidget {
   final VoidCallback onResetPressed;
@@ -21,14 +20,7 @@ class SleepMeditationActionButtons extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints(minWidth: 100, minHeight: 60),
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DirectRitualPage(),
-                ),
-              );
-            },
+            onPressed: onResetPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               elevation: 0,

@@ -93,9 +93,12 @@ class _DashboardCheckInPageState extends State<DashboardCheckInPage> {
       return;
     }
 
+    final authStore = Provider.of<AuthStore>(context, listen: false);
+    
     checkInStore.submitCheckIn(
       checkInChoice: checkInChoice,
       description: description,
+      authStore: authStore,
       onSuccess: () {
         Navigator.of(context).pushReplacementNamed('/dashboard');
       },

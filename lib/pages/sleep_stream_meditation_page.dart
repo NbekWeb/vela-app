@@ -3,7 +3,6 @@ import 'dart:io';
 import '../shared/widgets/stars_animation.dart';
 import '../shared/widgets/personalized_meditation_modal.dart';
 import 'package:just_audio/just_audio.dart' as just_audio;
-import 'package:audio_session/audio_session.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,13 +10,11 @@ import 'components/sleep_meditation_header.dart';
 import 'components/sleep_meditation_audio_player.dart';
 import 'components/sleep_meditation_control_bar.dart';
 import 'components/sleep_meditation_action_buttons.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../core/stores/meditation_store.dart';
 import '../core/stores/like_store.dart';
 import 'generator/direct_ritual_page.dart';
 
-final _secureStorage = FlutterSecureStorage();
 
 class SleepStreamMeditationPage extends StatefulWidget {
   final String? meditationId;
@@ -73,7 +70,6 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
         context,
         listen: false,
       );
-      final profileData = meditationStore.meditationProfile;
 
       if (widget.meditationId != null) {
       }
@@ -203,7 +199,6 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
         context,
         listen: false,
       );
-      final profileData = meditationStore.meditationProfile;
 
       String? audioFileUrl = meditationStore.fileUrl;
 
@@ -394,22 +389,30 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
     await Share.share('Vela - Navigate fron Within. https://myvela.ai/');
   }
 
-  void _resetMeditation() {
-    // Complete reset of meditation store
-    context.read<MeditationStore>().completeReset();
+  void _resetMeditation() async {
+    final meditationStore = context.read<MeditationStore>();
+    final meditationId = meditationStore.meditationProfile?.id?.toString();
     
-    // Agar isDirectRitual true bo'lsa, DirectRitualPage ga o't
-    if (widget.isDirectRitual) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const DirectRitualPage(),
-        ),
-      );
+    print('🔄 Reset meditation - ID: $meditationId');
+    print('🔄 Meditation profile: ${meditationStore.meditationProfile?.toJson()}');
+    
+    // Delete meditation from server if ID exists
+    if (meditationId != null && meditationId.isNotEmpty) {
+      print('🗑️ Deleting meditation with ID: $meditationId');
+      await meditationStore.deleteMeditation(meditationId);
     } else {
-      // Aks holda generator page ga o't
-      Navigator.pushReplacementNamed(context, '/generator');
+      print('⚠️ No meditation ID found, just clearing local data');
+      // If no ID, just clear local data
+      meditationStore.completeReset();
     }
+    
+    // Navigate to DirectRitualPage
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const DirectRitualPage(),
+      ),
+    );
   }
 
   void _saveToVault() async {
@@ -478,9 +481,28 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white.withAlpha(204), // 0.8 * 255 ≈ 204
-      body: Stack(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          // Clear navigation stack to prevent back navigation to auth pages
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            '/dashboard',
+            (route) {
+              // Keep only dashboard and its sub-routes, remove auth pages
+              return route.settings.name == '/dashboard' || 
+                     route.settings.name == '/my-meditations' ||
+                     route.settings.name == '/archive' ||
+                     route.settings.name == '/vault' ||
+                     route.settings.name == '/generator';
+            }
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white.withAlpha(204), // 0.8 * 255 ≈ 204
+        body: Stack(
         children: [
           const StarsAnimation(),
           SafeArea(
@@ -583,6 +605,7 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

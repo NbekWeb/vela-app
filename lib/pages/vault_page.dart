@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:card_swiper/card_swiper.dart';
 import 'package:provider/provider.dart';
 import '../shared/widgets/stars_animation.dart';
 import '../shared/widgets/personalized_meditation_modal.dart';
@@ -251,12 +252,9 @@ class _VaultPageState extends State<VaultPage> {
                             } else {
                               return SizedBox(
                                 height: 100,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
+                                child: Swiper(
                                   itemCount: meditationCount,
+                                  loop: false,
                                   itemBuilder: (context, index) {
                                     final meditation = myMeditations[index];
                                     final details = meditation['details'];
@@ -267,23 +265,16 @@ class _VaultPageState extends State<VaultPage> {
                                     final file = details?['file']?.toString();
 
                                     return Padding(
-                                      padding: EdgeInsets.only(
-                                        right: index < meditationCount - 1
-                                            ? 12.0
-                                            : 0,
-                                      ),
-                                      child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width -
-                                            32,
-                                        child: VaultRitualCard(
-                                          name: name,
-                                          meditationId: meditationId,
-                                          file: file,
-                                        ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                                      child: VaultRitualCard(
+                                        name: name,
+                                        meditationId: meditationId,
+                                        file: file,
                                       ),
                                     );
                                   },
+                                  viewportFraction: 1,
+                                  scale: 1,
                                 ),
                               );
                             }
@@ -377,12 +368,9 @@ class _VaultPageState extends State<VaultPage> {
                             } else {
                               return SizedBox(
                                 height: 100,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
+                                child: Swiper(
                                   itemCount: libraryCount,
+                                  loop: false,
                                   itemBuilder: (context, index) {
                                     final meditation = libraryDatas[index];
                                     final name =
@@ -399,26 +387,19 @@ class _VaultPageState extends State<VaultPage> {
                                         ?.toString();
 
                                     return Padding(
-                                      padding: EdgeInsets.only(
-                                        right: index < libraryCount - 1
-                                            ? 12.0
-                                            : 0,
-                                      ),
-                                      child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width -
-                                            32,
-                                        child: VaultRitualCard(
-                                          name: name,
-                                          meditationId: meditationId,
-                                          file: file,
-                                          title: title,
-                                          description: description,
-                                          imageUrl: imageUrl,
-                                        ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                                      child: VaultRitualCard(
+                                        name: name,
+                                        meditationId: meditationId,
+                                        file: file,
+                                        title: title,
+                                        description: description,
+                                        imageUrl: imageUrl,
                                       ),
                                     );
                                   },
+                                  viewportFraction: 1,
+                                  scale: 1,
                                 ),
                               );
                             }

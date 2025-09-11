@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../styles/pages/login_page_styles.dart';
 
 class GoogleSignInButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -29,6 +28,10 @@ class GoogleSignInButton extends StatelessWidget {
           'assets/icons/google.svg',
           width: 24,
           height: 24,
+          colorFilter: const ColorFilter.mode(
+            Color(0xFFC9DFF4),
+            BlendMode.srcIn,
+          ),
         ),
         label: const SizedBox.shrink(), // Show only icon, no text
       ),

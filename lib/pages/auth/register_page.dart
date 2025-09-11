@@ -17,8 +17,8 @@ import '../../shared/widgets/custom_toast.dart';
 import '../../core/stores/auth_store.dart';
 import '../../shared/widgets/notification_handler.dart';
 import '../../shared/widgets/google_signin_button.dart';
-import '../../shared/widgets/facebook_signin_button.dart';
 import '../../shared/widgets/apple_signin_button.dart';
+import 'dart:io';
 
 
 class RegisterPage extends StatefulWidget {
@@ -47,7 +47,64 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  // Apple Sign-In handler
+  Future<void> _handleAppleSignIn() async {
+    print('🍎 Apple Sign-In button pressed!');
+    
+    final authStore = context.read<AuthStore>();
+    print('🍎 AuthStore loaded: ${authStore.isLoading}');
+    
+    await authStore.loginWithApple(
+      onSuccess: () async {
+        print('🍎 Existing user - redirecting to dashboard');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome back!'
+          );
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
+      },
+      onNewUser: () async {
+        print('🍎 Profile incomplete - redirecting to appropriate step');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome! Let\'s complete your profile'
+          );
+          
+          // Save "first" variable to localStorage as true for new users
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('first', true);
+          } catch (e) {
+            // Error saving first variable
+          }
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          // Get the appropriate redirect route based on profile completion
+          final authStore = context.read<AuthStore>();
+          final redirectRoute = await authStore.getRedirectRoute();
+          Navigator.pushReplacementNamed(context, redirectRoute);
+        }
+      },
+    );
 
+    print('🍎 Apple Sign-In completed, error: ${authStore.error}');
+    
+    // Handle error if success callback wasn't called
+    if (authStore.error != null && mounted) {
+      ToastService.showWarningToast(context, message: authStore.error!);
+    }
+  }
 
   // Google Sign-In handler
   Future<void> _handleGoogleSignIn() async {
@@ -73,18 +130,29 @@ class _RegisterPageState extends State<RegisterPage> {
         }
       },
       onNewUser: () async {
-        print('🔍 New user - redirecting to steps');
+        print('🔍 Profile incomplete - redirecting to appropriate step');
         
         if (mounted) {
           ToastService.showSuccessToast(
             context, 
-            message: 'Welcome! Let\'s set up your profile'
+            message: 'Welcome! Let\'s complete your profile'
           );
+          
+          // Save "first" variable to localStorage as true for new users
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('first', true);
+          } catch (e) {
+            // Error saving first variable
+          }
           
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
           
-          Navigator.pushReplacementNamed(context, '/plan');
+          // Get the appropriate redirect route based on profile completion
+          final authStore = context.read<AuthStore>();
+          final redirectRoute = await authStore.getRedirectRoute();
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
     );
@@ -96,97 +164,6 @@ class _RegisterPageState extends State<RegisterPage> {
       ToastService.showWarningToast(context, message: authStore.error!);
     }
   }
-
-  // Facebook Sign-In handler
-  Future<void> _handleFacebookSignIn() async {
-    print('🔍 Facebook Sign-In button pressed!');
-    
-    final authStore = context.read<AuthStore>();
-    print('🔍 AuthStore loaded: ${authStore.isLoading}');
-    
-    await authStore.loginWithFacebook(
-      onSuccess: () async {
-        print('🔍 Existing user - redirecting to dashboard');
-        
-        if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome back!'
-          );
-          
-          // Request notification permission and send device token
-          await NotificationHandler.requestNotificationPermission();
-          
-          Navigator.pushReplacementNamed(context, '/dashboard');
-        }
-      },
-    );
-
-    print('🔍 Facebook Sign-In completed, error: ${authStore.error}');
-    
-    // Handle error if success callback wasn't called
-    if (authStore.error != null && mounted) {
-      ToastService.showWarningToast(context, message: authStore.error!);
-    }
-  }
-
-  // Apple Sign-In handler
-  Future<void> _handleAppleSignIn() async {
-    print('🔍 Apple Sign-In button pressed!');
-    
-    final authStore = context.read<AuthStore>();
-    print('🔍 AuthStore loaded: ${authStore.isLoading}');
-    
-    await authStore.loginWithApple(
-      onSuccess: () async {
-        print('🔍 Existing user - redirecting to dashboard');
-        
-        if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome back!'
-          );
-          
-          // Request notification permission and send device token
-          await NotificationHandler.requestNotificationPermission();
-          
-          Navigator.pushReplacementNamed(context, '/dashboard');
-        }
-      },
-      onNewUser: () async {
-        print('🔍 New user - redirecting to plan');
-        
-        if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Apple Sign-In successful!'
-          );
-          
-          // Save "first" variable to localStorage as true
-          try {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setBool('first', true);
-          } catch (e) {
-            // Error saving first variable
-          }
-          
-          // Request notification permission and send device token
-          await NotificationHandler.requestNotificationPermission();
-          
-          Navigator.pushReplacementNamed(context, '/plan');
-        }
-      },
-    );
-
-    print('🔍 Apple Sign-In completed, error: ${authStore.error}');
-    
-    // Handle error if success callback wasn't called
-    if (authStore.error != null && mounted) {
-      ToastService.showWarningToast(context, message: authStore.error!);
-    }
-  }
-
-
 
   Future<void> _handleEmailRegister() async {
     if (!_isAgree) {
@@ -210,7 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       onSuccess: () async {
-        // Save "first" variable to localStorage as true
+        // Save "first" variable to localStorage as true for new users
         try {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('first', true);
@@ -663,22 +640,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                                     isLoading: authStore.isLoading,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 16),
-                                                // Facebook Sign-In Button
-                                                Expanded(
-                                                  child: FacebookSignInButton(
-                                                    onPressed: _handleFacebookSignIn,
-                                                    isLoading: authStore.isLoading,
+                                                if (Platform.isIOS) ...[
+                                                  const SizedBox(width: 16),
+                                                  // Apple Sign-In Button (iOS only)
+                                                  Expanded(
+                                                    child: AppleSignInButton(
+                                                      onPressed: _handleAppleSignIn,
+                                                      isLoading: authStore.isLoading,
+                                                      text: '', // Icon only
+                                                    ),
                                                   ),
-                                                ),
+                                                ],
                                               ],
                                             ),
                                             const SizedBox(height: 16),
-                                            // Apple Sign-In Button
-                                            AppleSignInButton(
-                                              onPressed: _handleAppleSignIn,
-                                              isLoading: authStore.isLoading,
-                                            ),
                                             const SizedBox(height: 20),
                                           ],
                                         ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'core/constants/app_constants.dart';
 import 'shared/themes/app_theme.dart';
 import 'core/stores/auth_store.dart';
@@ -23,6 +22,8 @@ import 'pages/generator/generator_page.dart';
 import 'pages/vault_page.dart';
 import 'pages/dashboard/my_meditations_page.dart';
 import 'pages/dashboard/archive_page.dart';
+import 'pages/dashboard/reminders_page.dart';
+import 'pages/edit_info_page.dart';
 import 'core/utils/video_loader.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -36,8 +37,6 @@ String? globalMeditationId;
 // Global variable to navigate to profile tab
 bool shouldNavigateToProfile = false;
 
-// Global secure storage instance
-final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,8 +62,8 @@ void main() async {
   String initialRoute = '/loading';
   final isAuthenticated = await authStore.isAuthenticated();
   if (isAuthenticated) {
-    initialRoute =
-        '/dashboard'; // Still go to loading screen to check authentication
+    // Still go to loading screen to check authentication and profile completion
+    initialRoute = '/loading';
   }
 
   runApp(
@@ -146,6 +145,8 @@ class MyApp extends StatelessWidget {
                   },
                 ),
                 '/archive': (context) => const ArchivePage(),
+                '/reminders': (context) => const RemindersPage(),
+                '/edit-info': (context) => const EditInfoPage(),
               },
             );
           },
