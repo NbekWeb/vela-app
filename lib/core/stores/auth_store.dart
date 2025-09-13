@@ -74,8 +74,20 @@ class AuthStore extends ChangeNotifier {
     }
   }
 
-  // Get the appropriate redirect route based on profile completion
+  // Get the appropriate redirect route based on profile completion and plan status
   Future<String> getRedirectRoute() async {
+    // First check plan status from API
+    final planStatus = await checkPlanStatus();
+    if (planStatus != null) {
+      final hasActivePlan = planStatus['has_active_plan'] ?? false;
+      if (!hasActivePlan) {
+        return '/plan'; // No active plan, redirect to plan selection
+      }
+    }
+
+    // If user has active plan, get user details and check profile completion
+    await getUserDetails();
+    
     if (!isProfileComplete()) {
       // If profile is not complete, check which step to start from
       if (_user?.gender == null || _user!.gender!.isEmpty) {
@@ -84,12 +96,7 @@ class AuthStore extends ChangeNotifier {
       return '/generator'; // Continue from where they left off
     }
 
-    final hasPlan = await hasSelectedPlan();
-    if (!hasPlan) {
-      return '/plan'; // Need to select a plan
-    }
-
-    return '/dashboard'; // Profile is complete, go to dashboard
+    return '/dashboard'; // Profile is complete and has active plan, go to dashboard
   }
 
   // Actions (Pinia actions ga o'xshash)
@@ -151,6 +158,7 @@ class AuthStore extends ChangeNotifier {
     required String email,
     required String password,
     VoidCallback? onSuccess,
+    VoidCallback? onNewUser, // Yangi user uchun callback
   }) async {
     setLoading(true);
     setError(null);
@@ -195,8 +203,15 @@ class AuthStore extends ChangeNotifier {
         // Get user details from API
         await getUserDetails();
 
-        // Call success callback
-        onSuccess?.call();
+        // Check plan status and profile completion, then redirect accordingly
+        final redirectRoute = await getRedirectRoute();
+        if (redirectRoute == '/dashboard') {
+          // Profile is complete and has active plan - go to dashboard
+          onSuccess?.call();
+        } else {
+          // Either no active plan or profile incomplete - go to appropriate step
+          onNewUser?.call();
+        }
       }
     } catch (e) {
       String errorMessage = 'Login failed. Please check your credentials.';
@@ -288,18 +303,18 @@ class AuthStore extends ChangeNotifier {
                 );
                 setTokens(accessToken: response.data['access_token']);
 
-                // User details'ni olish
-                await getUserDetails();
+              // User details'ni olish
+              await getUserDetails();
 
-                // Check profile completion and redirect accordingly
-                final redirectRoute = await getRedirectRoute();
-                if (redirectRoute == '/dashboard') {
-                  // Profile is complete - go to dashboard
-                  onSuccess?.call();
-                } else {
-                  // Profile incomplete - go to appropriate step
-                  onNewUser?.call();
-                }
+              // Check plan status and profile completion, then redirect accordingly
+              final redirectRoute = await getRedirectRoute();
+              if (redirectRoute == '/dashboard') {
+                // Profile is complete and has active plan - go to dashboard
+                onSuccess?.call();
+              } else {
+                // Either no active plan or profile incomplete - go to appropriate step
+                onNewUser?.call();
+              }
               }
             } catch (e) {
               setError('Firebase authentication failed. Please try again.');
@@ -421,13 +436,13 @@ class AuthStore extends ChangeNotifier {
               // User details'ni olish
               await getUserDetails();
 
-              // Check profile completion and redirect accordingly
+              // Check plan status and profile completion, then redirect accordingly
               final redirectRoute = await getRedirectRoute();
               if (redirectRoute == '/dashboard') {
-                // Profile is complete - go to dashboard
+                // Profile is complete and has active plan - go to dashboard
                 onSuccess?.call();
               } else {
-                // Profile incomplete - go to appropriate step
+                // Either no active plan or profile incomplete - go to appropriate step
                 onNewUser?.call();
               }
             }
@@ -491,7 +506,12 @@ class AuthStore extends ChangeNotifier {
         data: data,
         open: true, // Bu endpoint uchun token kerak emas
       );
-      await login(email: email, password: password, onSuccess: onSuccess);
+      await login(
+        email: email, 
+        password: password, 
+        onSuccess: onSuccess,
+        onNewUser: onSuccess, // Register qilayotgan user har doim yangi user
+      );
     } catch (e) {
       String errorMessage = 'Registration failed. Please try again.';
 
@@ -610,13 +630,13 @@ class AuthStore extends ChangeNotifier {
               // Get user details to determine if new or existing user
               await getUserDetails();
 
-              // Check profile completion and redirect accordingly
+              // Check plan status and profile completion, then redirect accordingly
               final redirectRoute = await getRedirectRoute();
               if (redirectRoute == '/dashboard') {
-                // Profile is complete - go to dashboard
+                // Profile is complete and has active plan - go to dashboard
                 onSuccess?.call();
               } else {
-                // Profile incomplete - go to appropriate step
+                // Either no active plan or profile incomplete - go to appropriate step
                 onNewUser?.call();
               }
             } else {
@@ -717,6 +737,24 @@ class AuthStore extends ChangeNotifier {
       // Toast will be shown from the UI layer
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Check plan status from API
+  Future<Map<String, dynamic>?> checkPlanStatus() async {
+    try {
+      final response = await ApiService.request(
+        url: 'auth/check-plan-status/',
+        method: 'GET',
+      );
+
+      if (response.data != null) {
+        return response.data;
+      }
+      return null;
+    } catch (e) {
+      developer.log('❌ Check plan status error: $e');
+      return null;
     }
   }
 

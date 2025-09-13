@@ -448,7 +448,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                   return SizedBox(
                     height: 100,
                     child: Swiper(
-                      itemCount: meditationCount > 3 ? 3 : meditationCount,
+                      itemCount: meditationCount ,
                       loop: false,
                       itemBuilder: (context, index) {
                         final meditation = myMeditations[index];
@@ -595,7 +595,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                   return SizedBox(
                     height: 100,
                     child: Swiper(
-                      itemCount: libraryCount > 3 ? 3 : libraryCount,
+                      itemCount:  libraryCount,
                       loop: false,
                       itemBuilder: (context, index) {
                         final meditation = libraryMeditations[index];

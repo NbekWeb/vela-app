@@ -167,17 +167,43 @@ class _LoginPageState extends State<LoginPage> {
     await authStore.login(
       email: _emailController.text.trim(),
       password: _passwordController.text,
+      onSuccess: () async {
+        print('🔍 Existing user - redirecting to dashboard');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome back!'
+          );
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
+      },
+      onNewUser: () async {
+        print('🔍 Profile incomplete or no active plan - redirecting to appropriate step');
+        
+        if (mounted) {
+          ToastService.showSuccessToast(
+            context, 
+            message: 'Welcome! Let\'s complete your profile'
+          );
+          
+          // Request notification permission and send device token
+          await NotificationHandler.requestNotificationPermission();
+          
+          // Get the appropriate redirect route based on profile completion
+          final authStore = context.read<AuthStore>();
+          final redirectRoute = await authStore.getRedirectRoute();
+          Navigator.pushReplacementNamed(context, redirectRoute);
+        }
+      },
     );
 
-    final isAuthenticated = await authStore.isAuthenticated();
-    if (isAuthenticated && mounted) {
-      // Request notification permission and send device token
-      await NotificationHandler.requestNotificationPermission();
-
-      // Get the appropriate redirect route based on profile completion
-      final redirectRoute = await authStore.getRedirectRoute();
-      Navigator.pushReplacementNamed(context, redirectRoute);
-    } else if (authStore.error != null && mounted) {
+    // Handle error if success callback wasn't called
+    if (authStore.error != null && mounted) {
       ToastService.showErrorToast(context, message: authStore.error!);
     }
   }
@@ -265,12 +291,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Consumer<AuthStore>(
       builder: (context, authStore, child) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: const SystemUiOverlayStyle(
-            systemNavigationBarColor: Colors.white,
-            systemNavigationBarIconBrightness: Brightness.dark,
-          ),
-          child: Scaffold(
+        return PopScope(
+          canPop: false, // Back button ni o'chirish
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: const SystemUiOverlayStyle(
+              systemNavigationBarColor: Colors.white,
+              systemNavigationBarIconBrightness: Brightness.dark,
+            ),
+            child: Scaffold(
             resizeToAvoidBottomInset: false,
             body: KeyboardVisibilityBuilder(
               controller: _keyboardVisibilityController,
@@ -579,7 +607,7 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
           ),
-        );
+        ));
       },
     );
   }

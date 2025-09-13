@@ -113,6 +113,18 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
       _audioPlayer = just_audio.AudioPlayer();
       _waveformController = PlayerController();
 
+      // Android uchun maxsus konfiguratsiya
+      if (Platform.isAndroid) {
+        try {
+          // Android'da audio session'ni to'g'ri sozlash va ovozni kuchaytirish
+          await _audioPlayer!.setVolume(1.0);
+          // Android uchun qo'shimcha ovoz kuchaytirish
+          await _audioPlayer!.setVolume(1.5);
+        } catch (e) {
+          // Error configuring Android audio session
+        }
+      }
+
       if (fileUrl != null && fileUrl!.isNotEmpty && _audioPlayer != null) {
         try {
           await _audioPlayer!.setUrl(fileUrl!);
@@ -360,7 +372,11 @@ class _SleepStreamMeditationPageState extends State<SleepStreamMeditationPage> {
   void _toggleMute() {
     setState(() {
       _isMuted = !_isMuted;
-      _audioPlayer?.setVolume(_isMuted ? 0.0 : 1.0);
+      if (Platform.isAndroid) {
+        _audioPlayer?.setVolume(_isMuted ? 0.0 : 1.5);
+      } else {
+        _audioPlayer?.setVolume(_isMuted ? 0.0 : 1.0);
+      }
     });
   }
 

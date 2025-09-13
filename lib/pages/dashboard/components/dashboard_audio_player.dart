@@ -136,7 +136,7 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         try {
           // Android'da audio session'ni to'g'ri sozlash va ovozni kuchaytirish
           await _audioPlayer!.setVolume(1.0);
-          // Android emulator uchun qo'shimcha ovoz kuchaytirish
+          // Android uchun qo'shimcha ovoz kuchaytirish
           await _audioPlayer!.setVolume(1.5);
         } catch (e) {
           // Error configuring Android audio session
@@ -292,7 +292,11 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
   void _toggleMute() {
     setState(() {
       _isMuted = !_isMuted;
-      _audioPlayer?.setVolume(_isMuted ? 0.0 : 1.0);
+      if (Platform.isAndroid) {
+        _audioPlayer?.setVolume(_isMuted ? 0.0 : 1.5);
+      } else {
+        _audioPlayer?.setVolume(_isMuted ? 0.0 : 1.0);
+      }
     });
   }
 

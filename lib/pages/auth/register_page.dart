@@ -305,7 +305,11 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Consumer<AuthStore>(
       builder: (context, authStore, child) {
-        // Handle authStore errors
+        return PopScope(
+          canPop: false, // Back button ni o'chirish
+          child: Builder(
+            builder: (context) {
+              // Handle authStore errors
         if (authStore.error != null && mounted) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ToastService.showErrorToast(
@@ -688,6 +692,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 );
               },
             ),
+          ),
+        );
+            },
           ),
         );
       },
