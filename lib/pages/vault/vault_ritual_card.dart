@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../main.dart' show globalMeditationId;
 import 'package:provider/provider.dart';
 import '../../core/stores/meditation_store.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../generator/direct_ritual_page.dart';
 
 class VaultRitualCard extends StatelessWidget {
   final String? name;
@@ -134,19 +132,16 @@ class VaultRitualCard extends StatelessWidget {
           if (onAudioPlay != null) {
             onAudioPlay!(meditationId!);
           } else {
-            // Use global navigation as fallback with cleared navigation stack
-            globalMeditationId = meditationId;
-            Navigator.pushNamedAndRemoveUntil(
-              context, 
-              '/dashboard',
-              (route) {
-                // Keep only dashboard and its sub-routes, remove auth pages
-                return route.settings.name == '/dashboard' || 
-                       route.settings.name == '/my-meditations' ||
-                       route.settings.name == '/archive' ||
-                       route.settings.name == '/vault' ||
-                       route.settings.name == '/generator';
-              }
+            // Navigate to audio player directly instead of dashboard
+            Navigator.pushNamed(
+              context,
+              '/audio-player',
+              arguments: {
+                'meditationId': meditationId,
+                'title': title ?? _getTitleFromName(name),
+                'description': description ?? 'A deeply personalized journey crafted from your unique vision and dreams',
+                'imageUrl': imageUrl,
+              },
             );
           }
         } else {

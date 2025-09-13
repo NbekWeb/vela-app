@@ -24,9 +24,25 @@ import 'pages/dashboard/my_meditations_page.dart';
 import 'pages/dashboard/archive_page.dart';
 import 'pages/dashboard/reminders_page.dart';
 import 'pages/edit_info_page.dart';
+import 'pages/dashboard/components/dashboard_audio_player.dart';
 import 'core/utils/video_loader.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+
+class NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
+  const NoAnimationPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T extends Object?>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return child;
+  }
+}
 
 // Global navigator key for API service
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -121,8 +137,22 @@ class MyApp extends StatelessWidget {
             return MaterialApp(
               navigatorKey: navigatorKey,
               title: AppConstants.appName,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
+              theme: AppTheme.lightTheme.copyWith(
+                pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: {
+                    TargetPlatform.android: NoAnimationPageTransitionsBuilder(),
+                    TargetPlatform.iOS: NoAnimationPageTransitionsBuilder(),
+                  },
+                ),
+              ),
+              darkTheme: AppTheme.darkTheme.copyWith(
+                pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: {
+                    TargetPlatform.android: NoAnimationPageTransitionsBuilder(),
+                    TargetPlatform.iOS: NoAnimationPageTransitionsBuilder(),
+                  },
+                ),
+              ),
               debugShowCheckedModeBanner: false,
               initialRoute: initialRoute,
               routes: {
@@ -147,6 +177,15 @@ class MyApp extends StatelessWidget {
                 '/archive': (context) => const ArchivePage(),
                 '/reminders': (context) => const RemindersPage(),
                 '/edit-info': (context) => const EditInfoPage(),
+                '/audio-player': (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+                  return DashboardAudioPlayer(
+                    meditationId: args?['meditationId'] ?? '',
+                    title: args?['title'],
+                    description: args?['description'],
+                    imageUrl: args?['imageUrl'],
+                  );
+                },
               },
             );
           },

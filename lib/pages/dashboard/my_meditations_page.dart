@@ -5,13 +5,37 @@ import '../../shared/widgets/stars_animation.dart';
 import '../../core/stores/meditation_store.dart';
 import '../../core/stores/auth_store.dart';
 import '../generator/direct_ritual_page.dart';
-import 'main.dart';
+import 'components/dashboard_audio_player.dart';
 import '../../main.dart' show shouldNavigateToProfile;
 
-class MyMeditationsPage extends StatelessWidget {
+class MyMeditationsPage extends StatefulWidget {
   final Function(String)? onAudioPlay;
 
   const MyMeditationsPage({this.onAudioPlay, super.key});
+
+  @override
+  State<MyMeditationsPage> createState() => _MyMeditationsPageState();
+}
+
+class _MyMeditationsPageState extends State<MyMeditationsPage> {
+  void _onAudioPlay(
+    String meditationId, {
+    String? title,
+    String? description,
+    String? imageUrl,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DashboardAudioPlayer(
+          meditationId: meditationId,
+          title: title,
+          description: description,
+          imageUrl: imageUrl,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +152,7 @@ class MyMeditationsPage extends StatelessWidget {
                                   name: name,
                                   meditationId: meditation['id']?.toString(),
                                   file: meditation['file'],
-                                  onAudioPlay: onAudioPlay,
+                                  onAudioPlay: _onAudioPlay,
                                 ),
                               );
                             }),
@@ -144,7 +168,7 @@ class MyMeditationsPage extends StatelessWidget {
                             child: VaultRitualCard(
                               isEmpty: true,
                               emptyText: 'No meditations created',
-                              onAudioPlay: onAudioPlay,
+                              onAudioPlay: _onAudioPlay,
                             ),
                           ),
                         ),

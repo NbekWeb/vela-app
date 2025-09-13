@@ -117,7 +117,7 @@ class _VaultPageState extends State<VaultPage> {
                         ),
                         const SizedBox(height: 24),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
                           child: Consumer<MeditationStore>(
                             builder: (context, meditationStore, child) {
                               final myMeditations =
@@ -169,7 +169,7 @@ class _VaultPageState extends State<VaultPage> {
                         ),
                         const SizedBox(height: 24),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
                           child: Consumer<MeditationStore>(
                             builder: (context, meditationStore, child) {
                               return Row(
@@ -216,7 +216,7 @@ class _VaultPageState extends State<VaultPage> {
                             // Show loader while data is being fetched
                             if (myMeditations == null) {
                               return const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                padding: EdgeInsets.symmetric(horizontal: 6),
                                 child: Center(
                                   child: CircularProgressIndicator(
                                     color: Colors.white,
@@ -241,7 +241,7 @@ class _VaultPageState extends State<VaultPage> {
 
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                                  horizontal: 6,
                                 ),
                                 child: VaultRitualCard(
                                   name: name,
@@ -282,7 +282,7 @@ class _VaultPageState extends State<VaultPage> {
                         ),
                         const SizedBox(height: 24),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
                           child: Consumer<MeditationStore>(
                             builder: (context, meditationStore, child) {
                               return Row(
@@ -329,7 +329,7 @@ class _VaultPageState extends State<VaultPage> {
                             // Show loader while data is being fetched
                             if (libraryDatas == null) {
                               return const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                padding: EdgeInsets.symmetric(horizontal: 6),
                                 child: Center(
                                   child: CircularProgressIndicator(
                                     color: Colors.white,
@@ -354,7 +354,7 @@ class _VaultPageState extends State<VaultPage> {
 
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                                  horizontal: 6,
                                 ),
                                 child: VaultRitualCard(
                                   name: name,
