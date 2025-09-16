@@ -28,6 +28,7 @@ import 'pages/dashboard/components/dashboard_audio_player.dart';
 import 'core/utils/video_loader.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'firebase_options.dart';
 
 class NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
   const NoAnimationPageTransitionsBuilder();
@@ -57,10 +58,10 @@ bool shouldNavigateToProfile = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase only for mobile platforms (not web)
-  if (!kIsWeb) {
-    await Firebase.initializeApp();
-  }
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Initialize stores
   final authStore = AuthStore();

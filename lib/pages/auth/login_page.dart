@@ -389,7 +389,7 @@ class _LoginPageState extends State<LoginPage> {
                                                 ),
                                               ],
                                             ),
-                                            const SizedBox(height: 180),
+                                            SizedBox(height: MediaQuery.of(context).size.height * 0.18),
                                             Center(
                                               child: Text(
                                                 'Continue to sign in',

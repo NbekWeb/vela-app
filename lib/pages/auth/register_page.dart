@@ -49,14 +49,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Apple Sign-In handler
   Future<void> _handleAppleSignIn() async {
-    print('🍎 Apple Sign-In button pressed!');
     
     final authStore = context.read<AuthStore>();
-    print('🍎 AuthStore loaded: ${authStore.isLoading}');
     
     await authStore.loginWithApple(
       onSuccess: () async {
-        print('🍎 Existing user - redirecting to dashboard');
+        print('🍎 Existing user - redirecting to appropriate route');
         
         if (mounted) {
           ToastService.showSuccessToast(
@@ -67,7 +65,10 @@ class _RegisterPageState extends State<RegisterPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
           
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          // Get the appropriate redirect route based on profile completion
+          final authStore = context.read<AuthStore>();
+          final redirectRoute = await authStore.getRedirectRoute();
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
       onNewUser: () async {
@@ -115,7 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
     
     await authStore.loginWithGoogle(
       onSuccess: () async {
-        print('🔍 Existing user - redirecting to dashboard');
+        print('🔍 Existing user - redirecting to appropriate route');
         
         if (mounted) {
           ToastService.showSuccessToast(
@@ -126,7 +127,10 @@ class _RegisterPageState extends State<RegisterPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
           
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          // Get the appropriate redirect route based on profile completion
+          final authStore = context.read<AuthStore>();
+          final redirectRoute = await authStore.getRedirectRoute();
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
       onNewUser: () async {
@@ -341,7 +345,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           padding: EdgeInsets.only(
                             left: 20,
                             right: 20,
-                            bottom: isKeyboardVisible ? 0 : 0,
+                            bottom: 35 + MediaQuery.of(context).padding.bottom,
                           ),
                           child: Column(
                             children: [

@@ -11,9 +11,9 @@ class ApiService {
         'API_BASE_URL',
         defaultValue: 'http://31.97.98.47:9000/api/',
       ),
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(minutes: 5),
-      sendTimeout: const Duration(seconds: 30),
+      connectTimeout: const Duration(minutes: 10),
+      receiveTimeout: const Duration(minutes: 10),
+      sendTimeout: const Duration(minutes: 10),
     ),
   );
 

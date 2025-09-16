@@ -87,7 +87,7 @@ class AuthStore extends ChangeNotifier {
 
     // If user has active plan, get user details and check profile completion
     await getUserDetails();
-    
+
     if (!isProfileComplete()) {
       // If profile is not complete, check which step to start from
       if (_user?.gender == null || _user!.gender!.isEmpty) {
@@ -221,7 +221,7 @@ class AuthStore extends ChangeNotifier {
       } else if (e.toString().contains('401')) {
         errorMessage = 'Unauthorized. Please check your credentials.';
       } else if (e.toString().contains('500')) {
-        errorMessage = 'Server error. Please try again later.';
+        errorMessage = 'Wrong Login or Password. Please try again';
       }
 
       setError(errorMessage);
@@ -303,18 +303,18 @@ class AuthStore extends ChangeNotifier {
                 );
                 setTokens(accessToken: response.data['access_token']);
 
-              // User details'ni olish
-              await getUserDetails();
+                // User details'ni olish
+                await getUserDetails();
 
-              // Check plan status and profile completion, then redirect accordingly
-              final redirectRoute = await getRedirectRoute();
-              if (redirectRoute == '/dashboard') {
-                // Profile is complete and has active plan - go to dashboard
-                onSuccess?.call();
-              } else {
-                // Either no active plan or profile incomplete - go to appropriate step
-                onNewUser?.call();
-              }
+                // Check plan status and profile completion, then redirect accordingly
+                final redirectRoute = await getRedirectRoute();
+                if (redirectRoute == '/dashboard') {
+                  // Profile is complete and has active plan - go to dashboard
+                  onSuccess?.call();
+                } else {
+                  // Either no active plan or profile incomplete - go to appropriate step
+                  onNewUser?.call();
+                }
               }
             } catch (e) {
               setError('Firebase authentication failed. Please try again.');
@@ -342,7 +342,7 @@ class AuthStore extends ChangeNotifier {
       } else if (e.toString().contains('401')) {
         errorMessage = 'Unauthorized. Please try again.';
       } else if (e.toString().contains('500')) {
-        errorMessage = 'Server error. Please try again later.';
+        errorMessage = 'Wrong Login or Password. Please try again';
       } else if (e.toString().contains('configuration')) {
         errorMessage =
             'Google Sign-In configuration error. Please restart the app.';
@@ -396,7 +396,9 @@ class AuthStore extends ChangeNotifier {
 
       // Firebase Authentication bilan sign-in qilish
       try {
-        developer.log('🔍 Firebase Authentication bilan Apple sign-in qilish...');
+        developer.log(
+          '🔍 Firebase Authentication bilan Apple sign-in qilish...',
+        );
 
         // Firebase credential yaratish
         final firebaseCredential = OAuthProvider("apple.com").credential(
@@ -405,8 +407,9 @@ class AuthStore extends ChangeNotifier {
         );
 
         // Firebase Authentication bilan sign-in
-        final userCredential = await FirebaseAuth.instance
-            .signInWithCredential(firebaseCredential);
+        final userCredential = await FirebaseAuth.instance.signInWithCredential(
+          firebaseCredential,
+        );
         final firebaseUser = userCredential.user;
 
         if (firebaseUser != null) {
@@ -507,8 +510,8 @@ class AuthStore extends ChangeNotifier {
         open: true, // Bu endpoint uchun token kerak emas
       );
       await login(
-        email: email, 
-        password: password, 
+        email: email,
+        password: password,
         onSuccess: onSuccess,
         onNewUser: onSuccess, // Register qilayotgan user har doim yangi user
       );
@@ -520,7 +523,7 @@ class AuthStore extends ChangeNotifier {
       } else if (e.toString().contains('401')) {
         errorMessage = 'Unauthorized. Please try again.';
       } else if (e.toString().contains('500')) {
-        errorMessage = 'Server error. Please try again later.';
+        errorMessage = 'Wrong Login or Password. Please try again';
       }
 
       setError(errorMessage);
@@ -544,10 +547,12 @@ class AuthStore extends ChangeNotifier {
       if (userData != null) {
         final user = UserModel.fromJson(userData);
         setUser(user);
-        
+
         // Check if user has gender, if not redirect to gender selection
         if (user.gender == null || user.gender!.isEmpty) {
-          developer.log('🔍 User gender is missing, redirecting to gender selection');
+          developer.log(
+            '🔍 User gender is missing, redirecting to gender selection',
+          );
           // This will be handled by getRedirectRoute() in the calling function
         }
       }
@@ -686,6 +691,10 @@ class AuthStore extends ChangeNotifier {
       await _secureStorage.delete(key: 'access_token');
       await _secureStorage.delete(key: 'refresh_token');
 
+      // Clear neuroplasticity state
+      await _secureStorage.delete(key: 'neuroplasticity_active');
+      await _secureStorage.delete(key: 'neuroplasticity_content');
+
       _user = null;
       _accessToken = null;
       _refreshToken = null;
@@ -731,7 +740,16 @@ class AuthStore extends ChangeNotifier {
     setError(null);
 
     try {
-      await ApiService.request(url: 'auth/assign-free-trial/', method: 'POST');
+      final response = await ApiService.request(
+        url: 'auth/assign-free-trial/',
+        method: 'POST',
+      );
+      // print('🔍 Assign free trial response: $response');
+      // final planStatus = await checkPlanStatus();
+      // print('🔍 Plan status: $planStatus');
+      if (response.data != null) {
+        return response.data;
+      }
     } catch (e) {
       setError('Failed to assign free trial');
       // Toast will be shown from the UI layer
@@ -748,6 +766,7 @@ class AuthStore extends ChangeNotifier {
         method: 'GET',
       );
 
+      print('🔍 Check plan status response: $response');
       if (response.data != null) {
         return response.data;
       }
@@ -946,7 +965,7 @@ class AuthStore extends ChangeNotifier {
       } else if (e.toString().contains('401')) {
         errorMessage = 'Unauthorized. Please login again.';
       } else if (e.toString().contains('500')) {
-        errorMessage = 'Server error. Please try again later.';
+        errorMessage = 'Wrong Login or Password. Please try again';
       }
 
       setError(errorMessage);

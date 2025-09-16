@@ -169,9 +169,9 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
             // Content
             Padding(
               padding: EdgeInsets.fromLTRB(
-                16.sp, // left
+                16, // left
                 MediaQuery.of(context).padding.top + 8, // top
-                16.sp, // right
+                16, // right
                 20.sp, // bottom
               ),
               child: Column(
@@ -421,7 +421,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
                           width: double.infinity,
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 40),
                           decoration: BoxDecoration(
                             color: const Color.fromRGBO(164, 199, 234, 0.5),
                             borderRadius: BorderRadius.circular(24),
@@ -457,7 +457,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                         final meditationId = meditation['id']?.toString() ?? '';
                         
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
                           child: VaultRitualCard(
                             name: name,
                             meditationId: meditationId,
@@ -491,7 +491,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                       borderRadius: BorderRadius.circular(32),
                     ),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
+                      horizontal: 16,
                       vertical: 16,
                     ),
                   ),
@@ -568,7 +568,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
                           width: double.infinity,
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 40),
                           decoration: BoxDecoration(
                             color: const Color.fromRGBO(164, 199, 234, 0.5),
                             borderRadius: BorderRadius.circular(24),
@@ -605,7 +605,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                         final description = meditation['description'];
                         
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
                           child: VaultRitualCard(
                             name: name,
                             meditationId: meditationId,
