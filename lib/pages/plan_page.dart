@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../styles/pages/plan_page_styles.dart';
@@ -6,6 +7,7 @@ import 'components/plan_switch.dart';
 import 'components/plan_info_card.dart';
 import '../shared/widgets/auth.dart';
 import '../core/stores/auth_store.dart';
+import '../shared/widgets/exit_modal.dart';
 
 enum PlanStep { choosePlan, dreamLifeIntro }
 
@@ -27,6 +29,7 @@ class _PlanPageState extends State<PlanPage> {
       _currentStep = PlanStep.dreamLifeIntro;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +122,13 @@ class _PlanPageState extends State<PlanPage> {
             const SizedBox(height: 30),
           ],
         );
-        onBack = null;
+        onBack = () {
+          ExitModal.show(
+            context,
+            title: 'Exit App?',
+            message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
+          );
+        };
         break;
       case PlanStep.dreamLifeIntro:
         title = '';
@@ -196,20 +205,35 @@ class _PlanPageState extends State<PlanPage> {
           },
         );
         onBack = () {
-          setState(() {
-            _currentStep = PlanStep.choosePlan;
-          });
+          ExitModal.show(
+            context,
+            title: 'Exit App?',
+            message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
+          );
         };
         break;
     }
 
-    return AuthScaffold(
-      title: title,
-      subtitle: subtitle,
-      onBack: onBack,
-      showTerms: _currentStep == PlanStep.choosePlan,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
-      child: child,
+    return PopScope(
+      canPop: false, // Prevent default back button behavior
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          // Handle system back button (Android/iOS)
+          ExitModal.show(
+            context,
+            title: 'Exit App?',
+            message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
+          );
+        }
+      },
+      child: AuthScaffold(
+        title: title,
+        subtitle: subtitle,
+        onBack: onBack,
+        showTerms: _currentStep == PlanStep.choosePlan,
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+        child: child,
+      ),
     );
   }
 }

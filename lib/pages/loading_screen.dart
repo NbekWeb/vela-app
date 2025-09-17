@@ -60,7 +60,16 @@ class _LoadingScreenState extends State<LoadingScreen>
         await Future.delayed(const Duration(milliseconds: 800));
         
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed(redirectRoute);
+        
+        // If redirecting to plan page, clear navigation stack to prevent back to login
+        if (redirectRoute == '/plan') {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            redirectRoute,
+            (route) => false,
+          );
+        } else {
+          Navigator.of(context).pushReplacementNamed(redirectRoute);
+        }
         return;
       } catch (e) {
         // If there's an error, go to dashboard

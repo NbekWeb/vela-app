@@ -53,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
     
     final authStore = context.read<AuthStore>();
     print('🍎 AuthStore loaded: ${authStore.isLoading}');
+    print('🍎 Current error: ${authStore.error}');
     
     await authStore.loginWithApple(
       onSuccess: () async {
@@ -67,7 +68,11 @@ class _LoginPageState extends State<LoginPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
           
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            '/dashboard',
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
       onNewUser: () async {
@@ -93,10 +98,22 @@ class _LoginPageState extends State<LoginPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushReplacementNamed(context, redirectRoute);
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            redirectRoute,
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
     );
+
+    print('🍎 Apple Sign-In completed, error: ${authStore.error}');
+    
+    // Handle error if success callback wasn't called
+    if (authStore.error != null && mounted) {
+      print('🍎 Showing error toast: ${authStore.error}');
+      ToastService.showWarningToast(context, message: authStore.error!);
+    }
   }
 
   // Google Sign-In handler
@@ -119,7 +136,11 @@ class _LoginPageState extends State<LoginPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
           
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            '/dashboard',
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
       onNewUser: () async {
@@ -145,7 +166,11 @@ class _LoginPageState extends State<LoginPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushReplacementNamed(context, redirectRoute);
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            redirectRoute,
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
     );
@@ -179,7 +204,11 @@ class _LoginPageState extends State<LoginPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
           
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            '/dashboard',
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
       onNewUser: () async {
@@ -197,7 +226,11 @@ class _LoginPageState extends State<LoginPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushReplacementNamed(context, redirectRoute);
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            redirectRoute,
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
     );
@@ -349,12 +382,7 @@ class _LoginPageState extends State<LoginPage> {
                                                     if (Navigator.of(
                                                       context,
                                                     ).canPop()) {
-                                                      Navigator.of(
-                                                        context,
-                                                      ).pushReplacementNamed(
-                                                        '/onboarding-1',
-                                                      );
-                                                      // Navigator.of(context).pop();
+                                                      Navigator.of(context).pop();
                                                     } else {
                                                       // If no previous route, navigate to onboarding
                                                       Navigator.of(

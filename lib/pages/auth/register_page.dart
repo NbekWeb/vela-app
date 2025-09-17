@@ -49,8 +49,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Apple Sign-In handler
   Future<void> _handleAppleSignIn() async {
+    print('🍎 Apple Sign-In button pressed!');
     
     final authStore = context.read<AuthStore>();
+    print('🍎 AuthStore loaded: ${authStore.isLoading}');
+    print('🍎 Current error: ${authStore.error}');
     
     await authStore.loginWithApple(
       onSuccess: () async {
@@ -68,7 +71,11 @@ class _RegisterPageState extends State<RegisterPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushReplacementNamed(context, redirectRoute);
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            redirectRoute,
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
       onNewUser: () async {
@@ -94,7 +101,11 @@ class _RegisterPageState extends State<RegisterPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushReplacementNamed(context, redirectRoute);
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            redirectRoute,
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
     );
@@ -130,7 +141,11 @@ class _RegisterPageState extends State<RegisterPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushReplacementNamed(context, redirectRoute);
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            redirectRoute,
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
       onNewUser: () async {
@@ -156,7 +171,11 @@ class _RegisterPageState extends State<RegisterPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushReplacementNamed(context, redirectRoute);
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            redirectRoute,
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
     );
@@ -203,7 +222,11 @@ class _RegisterPageState extends State<RegisterPage> {
         await NotificationHandler.requestNotificationPermission();
         
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/plan');
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            '/plan',
+            (route) => false, // Barcha oldingi sahifalarni o'chirish
+          );
         }
       },
     );
@@ -376,7 +399,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   ),
                                                   onPressed: () => Navigator.of(
                                                     context,
-                                                  ).maybePop(),
+                                                  ).pushReplacementNamed('/login'),
                                                 ),
                                                 Expanded(
                                                   child: Center(
