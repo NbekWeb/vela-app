@@ -46,8 +46,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 
-
-  // Apple Sign-In handler
   Future<void> _handleAppleSignIn() async {
     print('🍎 Apple Sign-In button pressed!');
     
