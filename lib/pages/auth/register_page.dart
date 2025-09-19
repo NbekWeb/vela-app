@@ -19,7 +19,7 @@ import '../../shared/widgets/notification_handler.dart';
 import '../../shared/widgets/google_signin_button.dart';
 import '../../shared/widgets/apple_signin_button.dart';
 import 'dart:io';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -49,44 +49,33 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Apple Sign-In handler
   Future<void> _handleAppleSignIn() async {
-    print('🍎 Apple Sign-In button pressed!');
-    
     final authStore = context.read<AuthStore>();
-    print('🍎 AuthStore loaded: ${authStore.isLoading}');
-    print('🍎 Current error: ${authStore.error}');
-    
+
     await authStore.loginWithApple(
       onSuccess: () async {
         print('🍎 Existing user - redirecting to appropriate route');
-        
+
         if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome back!'
-          );
-          
+          ToastService.showSuccessToast(context, message: 'Welcome back!');
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
+
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            redirectRoute,
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
       onNewUser: () async {
         print('🍎 Profile incomplete - redirecting to appropriate step');
-        
+
         if (mounted) {
           ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome! Let\'s complete your profile'
+            context,
+            message: 'Welcome! Let\'s complete your profile',
           );
-          
+
           // Save "first" variable to localStorage as true for new users
           try {
             final prefs = await SharedPreferences.getInstance();
@@ -94,24 +83,20 @@ class _RegisterPageState extends State<RegisterPage> {
           } catch (e) {
             // Error saving first variable
           }
-          
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
+
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            redirectRoute,
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
     );
 
     print('🍎 Apple Sign-In completed, error: ${authStore.error}');
-    
+
     // Handle error if success callback wasn't called
     if (authStore.error != null && mounted) {
       ToastService.showWarningToast(context, message: authStore.error!);
@@ -121,42 +106,35 @@ class _RegisterPageState extends State<RegisterPage> {
   // Google Sign-In handler
   Future<void> _handleGoogleSignIn() async {
     print('🔍 Google Sign-In button pressed!');
-    
+
     final authStore = context.read<AuthStore>();
     print('🔍 AuthStore loaded: ${authStore.isLoading}');
-    
+
     await authStore.loginWithGoogle(
       onSuccess: () async {
         print('🔍 Existing user - redirecting to appropriate route');
-        
+
         if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome back!'
-          );
-          
+          ToastService.showSuccessToast(context, message: 'Welcome back!');
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
+
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            redirectRoute,
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
       onNewUser: () async {
         print('🔍 Profile incomplete - redirecting to appropriate step');
-        
+
         if (mounted) {
           ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome! Let\'s complete your profile'
+            context,
+            message: 'Welcome! Let\'s complete your profile',
           );
-          
+
           // Save "first" variable to localStorage as true for new users
           try {
             final prefs = await SharedPreferences.getInstance();
@@ -164,24 +142,20 @@ class _RegisterPageState extends State<RegisterPage> {
           } catch (e) {
             // Error saving first variable
           }
-          
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
+
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            redirectRoute,
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
     );
 
     print('🔍 Google Sign-In completed, error: ${authStore.error}');
-    
+
     // Handle error if success callback wasn't called
     if (authStore.error != null && mounted) {
       ToastService.showWarningToast(context, message: authStore.error!);
@@ -217,26 +191,19 @@ class _RegisterPageState extends State<RegisterPage> {
         } catch (e) {
           // Error saving first variable
         }
-        
+
         // Request notification permission and send device token
         await NotificationHandler.requestNotificationPermission();
-        
+
         if (mounted) {
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            '/plan',
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          Navigator.pushReplacementNamed(context, '/plan');
         }
       },
     );
 
     // Handle errors from authStore
     if (authStore.error != null && mounted) {
-      ToastService.showErrorToast(
-        context,
-        message: authStore.error!,
-      );
+      ToastService.showErrorToast(context, message: authStore.error!);
     }
   }
 
@@ -337,399 +304,372 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Builder(
             builder: (context) {
               // Handle authStore errors
-        if (authStore.error != null && mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ToastService.showErrorToast(
-              context,
-              message: authStore.error!,
-            );
-            authStore.clearError();
-          });
-        }
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: const SystemUiOverlayStyle(
-            systemNavigationBarColor: Colors.white,
-            systemNavigationBarIconBrightness: Brightness.dark,
-          ),
-          child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: KeyboardVisibilityBuilder(
-              controller: KeyboardVisibilityController(),
-              builder: (context, isKeyboardVisible) {
-                return GestureDetector(
-                  onTap: () => FocusScope.of(context).unfocus(),
-                  behavior: HitTestBehavior.opaque,
-                  child: Stack(
-                    children: [
-                      const Positioned.fill(child: StarsAnimation()),
-                      SafeArea(
-                        bottom: false,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            left: 20,
-                            right: 20,
-                            bottom: 35 + MediaQuery.of(context).padding.bottom,
-                          ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.only(
-                                    bottom: isKeyboardVisible ? 20 : 0,
-                                  ),
-                                  child: Form(
-                                    key: _formKey,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            const SizedBox(height: 24),
-                                            Row(
-                                              children: [
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.arrow_back,
-                                                    color: BaseStyles.white,
-                                                    size: 30,
-                                                  ),
-                                                  onPressed: () => Navigator.of(
-                                                    context,
-                                                  ).pushReplacementNamed('/login'),
-                                                ),
-                                                Expanded(
-                                                  child: Center(
-                                                    child: SvgPicture.asset(
-                                                      'assets/icons/logo.svg',
-                                                      width: 60,
-                                                      height: 40,
-                                                    ),
-                                                  ),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.info_outline,
-                                                    color: BaseStyles.white,
-                                                    size: 30,
-                                                  ),
-                                                  onPressed: () {
-                                                    openPopupFromTop(
-                                                      context,
-                                                      const HowWorkModal(),
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 60.h),
-                                            Center(
-                                              child: Text(
-                                                'Create an account',
-                                                style: const TextStyle(
-                                                  fontFamily: 'Canela',
-                                                  fontSize: 36,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Center(
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  Navigator.pushNamed(
-                                                    context,
-                                                    '/login',
-                                                  );
-                                                },
-                                                child: RichText(
-                                                  text: TextSpan(
-                                                    text:
-                                                        "Already have an account? ",
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: Color(0xFFF2EFEA),
-                                                      fontFamily: 'Satoshi',
-                                                    ),
+              if (authStore.error != null && mounted) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  ToastService.showErrorToast(
+                    context,
+                    message: authStore.error!,
+                  );
+                  authStore.clearError();
+                });
+              }
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: const SystemUiOverlayStyle(
+                  systemNavigationBarColor: Colors.white,
+                  systemNavigationBarIconBrightness: Brightness.dark,
+                ),
+                child: Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  body: KeyboardVisibilityBuilder(
+                    controller: KeyboardVisibilityController(),
+                    builder: (context, isKeyboardVisible) {
+                      return GestureDetector(
+                        onTap: () => FocusScope.of(context).unfocus(),
+                        behavior: HitTestBehavior.opaque,
+                        child: Stack(
+                          children: [
+                            const Positioned.fill(child: StarsAnimation()),
+                            SafeArea(
+                              bottom: false,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 20,
+                                  right: 20,
+                                  bottom: 0,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: SingleChildScrollView(
+                                        physics: const BouncingScrollPhysics(),
+                                        padding: EdgeInsets.only(
+                                          bottom: isKeyboardVisible ? 20 : 0,
+                                        ),
+                                        child: Form(
+                                          key: _formKey,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.stretch,
+                                                children: [
+                                                  const SizedBox(height: 24),
+                                                  Row(
                                                     children: [
-                                                      TextSpan(
-                                                        text: 'Sign in',
-                                                        style: const TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.white,
-                                                          fontFamily: 'Satoshi',
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .underline,
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                          Icons.arrow_back,
+                                                          color:
+                                                              BaseStyles.white,
+                                                          size: 30,
+                                                        ),
+                                                        onPressed: () {
+                                                          // Check if there's a previous route
+                                                          if (Navigator.of(
+                                                            context,
+                                                          ).canPop()) {
+                                                            Navigator.of(
+                                                              context,
+                                                            ).pushReplacementNamed(
+                                                              '/login',
+                                                            );
+                                                            // Navigator.of(context).pop();
+                                                          } else {
+                                                            // If no previous route, navigate to onboarding
+                                                            Navigator.of(
+                                                              context,
+                                                            ).pushReplacementNamed(
+                                                              '/login',
+                                                            );
+                                                          }
+                                                        },
+                                                      ),
+                                                      Expanded(
+                                                        child: Center(
+                                                          child: SvgPicture.asset(
+                                                            'assets/icons/logo.svg',
+                                                            width: 60,
+                                                            height: 40,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                          Icons.info_outline,
+                                                          color:
+                                                              BaseStyles.white,
+                                                          size: 30,
+                                                        ),
+                                                        onPressed: () {
+                                                          openPopupFromTop(
+                                                            context,
+                                                            const HowWorkModal(),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 60.sp),
+                                                  Center(
+                                                    child: Text(
+                                                      'Create an account',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Canela',
+                                                        fontSize: 36.sp,
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Center(
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.pushNamed(
+                                                          context,
+                                                          '/login',
+                                                        );
+                                                      },
+                                                      child: RichText(
+                                                        text: TextSpan(
+                                                          text:
+                                                              "Already have an account? ",
+                                                          style: TextStyle(
+                                                            fontSize: 16.sp,
+                                                            color: Color(
+                                                              0xFFF2EFEA,
+                                                            ),
+                                                            fontFamily:
+                                                                'Satoshi',
+                                                          ),
+                                                          children: [
+                                                            TextSpan(
+                                                              text: 'Sign in',
+                                                              style: TextStyle(
+                                                                fontSize: 16.sp,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontFamily:
+                                                                    'Satoshi',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                decoration:
+                                                                    TextDecoration
+                                                                        .underline,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 36),
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: _buildTextField(
+                                                          label: 'First name',
+                                                          controller:
+                                                              _firstNameController,
+                                                          validator: (value) =>
+                                                              Validators.validateRequired(
+                                                                value,
+                                                                'First name',
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 12,
+                                                      ), // небольшой отступ между полями
+                                                      Expanded(
+                                                        child: _buildTextField(
+                                                          label: 'Last name',
+                                                          controller:
+                                                              _lastNameController,
+                                                          validator: (value) =>
+                                                              Validators.validateRequired(
+                                                                value,
+                                                                'Last name',
+                                                              ),
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 36),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: _buildTextField(
-                                                    label: 'First name',
-                                                    controller: _firstNameController,
-                                                    validator: (value) =>
-                                                        Validators.validateRequired(
-                                                          value,
-                                                          'First name',
-                                                        ),
+                                                  _buildTextField(
+                                                    label: 'Email address',
+                                                    controller:
+                                                        _emailController,
+                                                    validator: Validators
+                                                        .validateEmail,
                                                   ),
-                                                ),
-                                                const SizedBox(width: 12), // небольшой отступ между полями
-                                                Expanded(
-                                                  child: _buildTextField(
-                                                    label: 'Last name',
-                                                    controller: _lastNameController,
-                                                    validator: (value) =>
-                                                        Validators.validateRequired(
-                                                          value,
-                                                          'Last name',
-                                                        ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            _buildTextField(
-                                              label: 'Email address',
-                                              controller: _emailController,
-                                              validator:
-                                                  Validators.validateEmail,
-                                            ),
-                                            _buildTextField(
-                                              label: 'Password',
-                                              controller: _passwordController,
-                                              obscure: _obscurePassword,
-                                              validator:
-                                                  Validators.validatePassword,
-                                              suffixIcon: Icon(
-                                                _obscurePassword
-                                                    ? Icons.visibility
-                                                    : Icons.visibility_off,
-                                                color: Color(0xFFF2EFEA),
-                                              ),
-                                              onSuffixTap: () {
-                                                setState(() {
-                                                  _obscurePassword =
-                                                      !_obscurePassword;
-                                                });
-                                              },
-                                            ),
-                                            const SizedBox(height: 0),
-                                            Row(
-                                              children: [
-                                                Checkbox(
-                                                  value: _isAgree,
-                                                  onChanged: (val) {
-                                                    setState(() {
-                                                      _isAgree = val ?? false;
-                                                      if (_isAgree)
-                                                        _termsError = null;
-                                                    });
-                                                  },
-                                                  activeColor: const Color(
-                                                    0xFF3C6EAB,
-                                                  ),
-                                                  checkColor: Colors.white,
-                                                ),
-                                                Expanded(
-                                                  child: GestureDetector(
-                                                    onTap: () {
+                                                  _buildTextField(
+                                                    label: 'Password',
+                                                    controller:
+                                                        _passwordController,
+                                                    obscure: _obscurePassword,
+                                                    validator: Validators
+                                                        .validatePassword,
+                                                    suffixIcon: Icon(
+                                                      _obscurePassword
+                                                          ? Icons.visibility
+                                                          : Icons
+                                                                .visibility_off,
+                                                      color: Color(0xFFF2EFEA),
+                                                    ),
+                                                    onSuffixTap: () {
                                                       setState(() {
-                                                        _isAgree = !_isAgree;
-                                                        if (_isAgree)
-                                                          _termsError = null;
+                                                        _obscurePassword =
+                                                            !_obscurePassword;
                                                       });
                                                     },
-                                                    child: RichText(
-                                                      text: TextSpan(
-                                                        text: 'I agree to the ',
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontFamily: 'Satoshi',
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight.w400,
-                                                        ),
-                                                        children: [
-                                                          TextSpan(
-                                                            text: 'Terms of Use',
-                                                            style: const TextStyle(
-                                                              color: Colors.white,
-                                                              fontFamily: 'Satoshi',
-                                                              fontSize: 14,
-                                                              fontWeight: FontWeight.w400,
-                                                              decoration: TextDecoration.underline,
+                                                  ),
+
+                                                  const SizedBox(height: 10),
+                                                  SizedBox(
+                                                    height: 60,
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            const Color(
+                                                              0xFF3C6EAB,
                                                             ),
-                                                            recognizer: TapGestureRecognizer()
-                                                              ..onTap = () {
-                                                                // Open Terms of Use URL
-                                                                launchUrl(Uri.parse('https://myvela.ai/terms-of-use/'));
-                                                              },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            if (_termsError != null)
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                  bottom: 8.0,
-                                                  left: 8.0,
-                                                ),
-                                                child: Text(
-                                                  _termsError!,
-                                                  style: TextStyle(
-                                                    color: Colors.red,
-                                                    fontSize: 13,
-                                                    fontFamily: 'Satoshi',
-                                                  ),
-                                                ),
-                                              ),
-                                            const SizedBox(height: 10),
-                                            SizedBox(
-                                              height: 60,
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: const Color(
-                                                    0xFF3C6EAB,
-                                                  ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          30,
-                                                        ),
-                                                  ),
-                                                  elevation: 0,
-                                                ),
-                                                onPressed: authStore.isLoading
-                                                    ? null
-                                                    : _handleEmailRegister,
-                                                child: authStore.isLoading
-                                                    ? const SizedBox(
-                                                        width: 20,
-                                                        height: 20,
-                                                        child: CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                          valueColor:
-                                                              AlwaysStoppedAnimation<
-                                                                Color
-                                                              >(
-                                                                BaseStyles
-                                                                    .cream,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                30,
                                                               ),
                                                         ),
-                                                      )
-                                                    : const Text(
-                                                        'Continue with Email',
+                                                        elevation: 0,
+                                                      ),
+                                                      onPressed:
+                                                          authStore.isLoading
+                                                          ? null
+                                                          : _handleEmailRegister,
+                                                      child: authStore.isLoading
+                                                          ? const SizedBox(
+                                                              width: 20,
+                                                              height: 20,
+                                                              child: CircularProgressIndicator(
+                                                                strokeWidth: 2,
+                                                                valueColor:
+                                                                    AlwaysStoppedAnimation<
+                                                                      Color
+                                                                    >(
+                                                                      BaseStyles
+                                                                          .cream,
+                                                                    ),
+                                                              ),
+                                                            )
+                                                          : const Text(
+                                                              'Continue with Email',
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                color:
+                                                                    BaseStyles
+                                                                        .cream,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                fontFamily:
+                                                                    'Satoshi',
+                                                              ),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 20),
+                                                  // Divider with "or continue with" text
+                                                  Center(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 16,
+                                                          ),
+                                                      child: Text(
+                                                        '- or continue with -',
                                                         style: TextStyle(
+                                                          color: const Color(
+                                                            0xFFF2EFEA,
+                                                          ),
                                                           fontSize: 16,
-                                                          color:
-                                                              BaseStyles.cream,
-                                                          fontWeight:
-                                                              FontWeight.w700,
                                                           fontFamily: 'Satoshi',
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 20),
-                                            // Divider with "or continue with" text
-                                            Center(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                    ),
-                                                child: Text(
-                                                  '- or continue with -',
-                                                  style: TextStyle(
-                                                    color: const Color(
-                                                      0xFFF2EFEA,
-                                                    ),
-                                                    fontSize: 16,
-                                                    fontFamily: 'Satoshi',
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 20),
-                                            // Social Sign-In Buttons in a row
-                                            Row(
-                                              children: [
-                                                // Google Sign-In Button
-                                                Expanded(
-                                                  child: GoogleSignInButton(
-                                                    onPressed: _handleGoogleSignIn,
-                                                    isLoading: authStore.isLoading,
-                                                  ),
-                                                ),
-                                                if (Platform.isIOS) ...[
-                                                  const SizedBox(width: 16),
-                                                  // Apple Sign-In Button (iOS only)
-                                                  Expanded(
-                                                    child: AppleSignInButton(
-                                                      onPressed: _handleAppleSignIn,
-                                                      isLoading: authStore.isLoading,
-                                                      text: '', // Icon only
                                                     ),
                                                   ),
+                                                  const SizedBox(height: 20),
+                                                  // Social Sign-In Buttons in a row
+                                                  Row(
+                                                    children: [
+                                                      // Google Sign-In Button
+                                                      Expanded(
+                                                        child: GoogleSignInButton(
+                                                          onPressed:
+                                                              _handleGoogleSignIn,
+                                                          isLoading: authStore
+                                                              .isLoading,
+                                                        ),
+                                                      ),
+                                                      if (Platform.isIOS) ...[
+                                                        const SizedBox(
+                                                          width: 16,
+                                                        ),
+                                                        // Apple Sign-In Button (iOS only)
+                                                        Expanded(
+                                                          child: AppleSignInButton(
+                                                            onPressed:
+                                                                _handleAppleSignIn,
+                                                            isLoading: authStore
+                                                                .isLoading,
+                                                            text:
+                                                                '', // Icon only
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 0),
+                                                  const SizedBox(height: 0),
                                                 ],
-                                              ],
-                                            ),
-                                            const SizedBox(height: 16),
-                                            const SizedBox(height: 20),
-                                          ],
+                                              ),
+                                              SizedBox(
+                                                height: isKeyboardVisible
+                                                    ? 20
+                                                    : MediaQuery.of(
+                                                            context,
+                                                          ).size.height *
+                                                          0.2,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        SizedBox(
-                                          height: isKeyboardVisible
-                                              ? 20
-                                              : MediaQuery.of(
-                                                      context,
-                                                    ).size.height *
-                                                    0.2,
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            if (!isKeyboardVisible)
+                              Positioned(
+                                left: 0,
+                                right: 0,
+                                bottom: 40,
+                                child: Center(child: const TermsAgreement()),
+                              ),
+                          ],
                         ),
-                      ),
-                      if (!isKeyboardVisible)
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 40,
-                          child: Center(
-                            child: const TermsAgreement(),
-                          ),
-                        ),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-        );
+                ),
+              );
             },
           ),
         );

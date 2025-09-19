@@ -66,15 +66,13 @@ class _OnboardingPage2State extends State<OnboardingPage2> {
                 Text(
                   'What is Vela?',
                   textAlign: TextAlign.center,
-                  style: TextStyles.headingLarge.copyWith(
-                    fontSize: 46.sp,
-                  ),
+                  style: TextStyles.headingLarge.copyWith(fontSize: 46.sp),
                 ),
 
                 const SizedBox(height: 30),
 
                 Text(
-                  'Vela turns your vision board into your daily meditation.\n'
+                  'Vela turns your vision board into your daily meditation.\n\n'
                   'Using your own words and goals, Vela creates personalized audio meditations to help rewire your neural pathways and align with the life you want to live.',
                   textAlign: TextAlign.center,
                   style: TextStyles.bodyLarge,
@@ -83,56 +81,67 @@ class _OnboardingPage2State extends State<OnboardingPage2> {
                 const SizedBox(height: 40),
 
                 ElevatedButton(
-                  onPressed: _isVideoReady ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OnboardingPage3(),
-                      ),
-                    );
-                  } : null,
-                  style: ButtonStyles.primary,
-                  child: _isVideoReady 
-                    ? Text('Next', style: ButtonStyles.primaryText)
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                  onPressed: _isVideoReady
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const OnboardingPage3(),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text('Loading...', style: ButtonStyles.primaryText),
-                        ],
-                      ),
+                          );
+                        }
+                      : null,
+                  style: ButtonStyles.primary,
+                  child: _isVideoReady
+                      ? Text('Next', style: ButtonStyles.primaryText)
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text('Loading...', style: ButtonStyles.primaryText),
+                          ],
+                        ),
                 ),
 
-                const SizedBox(height: 8),
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  style: ButtonStyles.text,
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Don't have an account?",
-                          style: BaseStyles.signInLinkText,
+                const SizedBox(height: 20),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Already have an account? ",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Color(0xFFF2EFEA),
+                          fontFamily: 'Satoshi',
                         ),
-                        TextSpan(
-                          text: ' Sign up',
-                          style: BaseStyles.signInUnderlinedText,
-                        ),
-                      ],
+                        children: [
+                          TextSpan(
+                            text: 'Sign in',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.white,
+                              fontFamily: 'Satoshi',
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

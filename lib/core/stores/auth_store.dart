@@ -150,11 +150,7 @@ class AuthStore extends ChangeNotifier {
 
         await getUserDetails();
       }
-    } catch (e) {
-      developer.log('❌ AuthStore initialization error: $e');
-      // Don't throw the error, just log it to prevent app crash
-      // The app can still function without pre-loaded user data
-    }
+    } catch (e) {}
   }
 
   // Login action with API call
@@ -380,13 +376,11 @@ class AuthStore extends ChangeNotifier {
     VoidCallback? onSuccess,
     VoidCallback? onNewUser, // Yangi user uchun callback
   }) async {
-    developer.log('🍎 Starting Apple Sign-In process...');
     setLoading(true);
     setError(null);
 
     try {
       // Apple Sign In
-      developer.log('🍎 Requesting Apple ID credential...');
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
@@ -394,8 +388,6 @@ class AuthStore extends ChangeNotifier {
         ],
       );
 
-      developer.log('🍎 Apple credential received: ${credential.userIdentifier}');
-      
       if (credential.identityToken == null) {
         developer.log('❌ Apple Sign-In failed: No identity token');
         setError('Apple Sign-In failed: No identity token');
@@ -468,7 +460,6 @@ class AuthStore extends ChangeNotifier {
         setError('Firebase Authentication failed: $firebaseError');
       }
     } catch (e) {
-      developer.log('❌ Apple Sign-In error: $e');
       String errorMessage = 'Apple Sign-In failed. Please try again.';
 
       if (e.toString().contains('SignInWithAppleAuthorizationException')) {
@@ -485,10 +476,8 @@ class AuthStore extends ChangeNotifier {
         }
       }
 
-      developer.log('❌ Setting error message: $errorMessage');
       setError(errorMessage);
     } finally {
-      developer.log('🍎 Apple Sign-In process completed, setting loading to false');
       setLoading(false);
     }
   }

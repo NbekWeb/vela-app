@@ -25,7 +25,11 @@ class _EditInfoPageState extends State<EditInfoPage> {
 
   String _selectedAge = '25-34';
   String _selectedGender = 'Female';
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> origin/boris
   // Original values for comparison
   String _originalFirstName = '';
   String _originalLastName = '';
@@ -47,12 +51,20 @@ class _EditInfoPageState extends State<EditInfoPage> {
   void _loadUserData() {
     final authStore = Provider.of<AuthStore>(context, listen: false);
     final user = authStore.user;
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> origin/boris
     if (user != null) {
       _firstNameController.text = user.firstName;
       _lastNameController.text = user.lastName;
       _emailController.text = user.email;
+<<<<<<< HEAD
       
+=======
+
+>>>>>>> origin/boris
       // Update selected values from user data
       if (user.ageRange != null) {
         // Convert API age range to UI format
@@ -65,14 +77,22 @@ class _EditInfoPageState extends State<EditInfoPage> {
       if (user.gender != null) {
         _selectedGender = _capitalizeFirst(user.gender!);
       }
+<<<<<<< HEAD
       
+=======
+
+>>>>>>> origin/boris
       // Save original values
       _originalFirstName = user.firstName;
       _originalLastName = user.lastName;
       _originalAge = _selectedAge;
       _originalGender = _selectedGender;
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> origin/boris
     setState(() {
       _isLoading = false;
     });
@@ -108,11 +128,20 @@ class _EditInfoPageState extends State<EditInfoPage> {
     });
 
     try {
+<<<<<<< HEAD
       bool hasNameChanges = _firstNameController.text != _originalFirstName ||
           _lastNameController.text != _originalLastName;
       
       bool hasProfileChanges = _selectedAge != _originalAge ||
           _selectedGender != _originalGender;
+=======
+      bool hasNameChanges =
+          _firstNameController.text != _originalFirstName ||
+          _lastNameController.text != _originalLastName;
+
+      bool hasProfileChanges =
+          _selectedAge != _originalAge || _selectedGender != _originalGender;
+>>>>>>> origin/boris
 
       // Update user details if age or gender changed
       if (hasProfileChanges) {
@@ -127,14 +156,22 @@ class _EditInfoPageState extends State<EditInfoPage> {
       // Refresh user profile data
       final authStore = Provider.of<AuthStore>(context, listen: false);
       await authStore.getUserDetails();
+<<<<<<< HEAD
       
+=======
+
+>>>>>>> origin/boris
       // Force UI update with new values from API response
       if (mounted) {
         setState(() {
           // Update age range - force update
           _selectedAge = authStore.user?.ageRange ?? _selectedAge;
           // Update gender - force update
+<<<<<<< HEAD
           _selectedGender = authStore.user?.gender != null 
+=======
+          _selectedGender = authStore.user?.gender != null
+>>>>>>> origin/boris
               ? _capitalizeFirst(authStore.user!.gender!)
               : _selectedGender;
         });
@@ -151,7 +188,10 @@ class _EditInfoPageState extends State<EditInfoPage> {
 
       // Navigate back to profile
       Navigator.of(context).pop();
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/boris
     } catch (e) {
       Fluttertoast.showToast(
         msg: 'Failed to update profile. Please try again.',
@@ -170,12 +210,20 @@ class _EditInfoPageState extends State<EditInfoPage> {
   Future<void> _updateUserDetails() async {
     final authStore = Provider.of<AuthStore>(context, listen: false);
     final user = authStore.user;
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> origin/boris
     // Get existing user detail values
     String existingDream = user?.dream ?? '';
     String existingGoals = user?.goals ?? '';
     String existingHappiness = user?.happiness ?? '';
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> origin/boris
     final requestData = {
       'gender': _selectedGender.toLowerCase(),
       'age_range': _formatAgeRange(_selectedAge),
@@ -211,11 +259,19 @@ class _EditInfoPageState extends State<EditInfoPage> {
     if (ageRange == '55+') {
       return '55-64';
     }
+<<<<<<< HEAD
     
     try {
       // Extract first number from age range like "18-24" -> 18
       int age = int.parse(ageRange.split('-').first);
       
+=======
+
+    try {
+      // Extract first number from age range like "18-24" -> 18
+      int age = int.parse(ageRange.split('-').first);
+
+>>>>>>> origin/boris
       if (age >= 18 && age <= 24) {
         return '18-24';
       } else if (age >= 25 && age <= 34) {
@@ -263,9 +319,15 @@ class _EditInfoPageState extends State<EditInfoPage> {
             child: Stack(
               children: [
                 const StarsAnimation(
+<<<<<<< HEAD
                   starCount: 50,
                   topColor: Color(0xFF5799D6),
                   bottomColor: Color(0xFFA4C6EB),
+=======
+                  starCount: 20,
+                  topColor: const Color(0xFF3C6EAB),
+                  bottomColor: const Color(0xFFA4C6EB),
+>>>>>>> origin/boris
                 ),
                 SafeArea(
                   child: Column(
@@ -276,7 +338,11 @@ class _EditInfoPageState extends State<EditInfoPage> {
                         'Edit Info',
                         style: TextStyle(
                           color: const Color.fromARGB(255, 242, 239, 234),
+<<<<<<< HEAD
                           fontSize: 38.sp,
+=======
+                          fontSize: 36.sp,
+>>>>>>> origin/boris
                           fontFamily: 'Canela',
                           fontWeight: FontWeight.w300,
                         ),
@@ -324,4 +390,8 @@ class _EditInfoPageState extends State<EditInfoPage> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/boris

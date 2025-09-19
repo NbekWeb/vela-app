@@ -54,7 +54,6 @@ String? globalMeditationId;
 // Global variable to navigate to profile tab
 bool shouldNavigateToProfile = false;
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

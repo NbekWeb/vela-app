@@ -82,18 +82,20 @@ class _RitualStepState extends State<RitualStep> {
     // Apply default settings for the selected ritual
     // Ritual type ni List<String> dan String ga o'tkazish
     final ritualTypeList = ritual.defaultSettings['ritualType'] as List<String>;
-    final ritualTypeString = ritualTypeList.isNotEmpty ? ritualTypeList.first : '';
-    
+    final ritualTypeString = ritualTypeList.isNotEmpty
+        ? ritualTypeList.first
+        : '';
+
     // Boshqa field'larni ham List<String> dan String ga o'tkazish
     final toneList = ritual.defaultSettings['tone'] as List<String>;
     final toneString = toneList.isNotEmpty ? toneList.first : '';
-    
+
     final voiceList = ritual.defaultSettings['voice'] as List<String>;
     final voiceString = voiceList.isNotEmpty ? voiceList.first : '';
-    
+
     final durationList = ritual.defaultSettings['duration'] as List<String>;
     final durationString = durationList.isNotEmpty ? durationList.first : '';
-    
+
     final updatedProfileData = widget.profileData.copyWith(
       ritualType: [ritualTypeString], // String ni List<String> ga o'tkazish
       tone: [toneString],
@@ -101,16 +103,19 @@ class _RitualStepState extends State<RitualStep> {
       duration: [durationString],
       planType: ritual.id, // plan_type ni ritual ID siga teng qilamiz
     );
-    
+
     // Storage ga saqlash
-    final meditationStore = Provider.of<MeditationStore>(context, listen: false);
-    
+    final meditationStore = Provider.of<MeditationStore>(
+      context,
+      listen: false,
+    );
+
     // Save to meditation profile store
     meditationStore.setMeditationProfile(updatedProfileData);
-    
+
     // Avval eski ma'lumotlarni tozalash
     await meditationStore.clearRitualSettings();
-    
+
     // Yangi ma'lumotlarni saqlash
     await meditationStore.saveRitualSettings(
       ritualType: ritualTypeString,
@@ -118,15 +123,17 @@ class _RitualStepState extends State<RitualStep> {
       duration: durationString,
       planType: ritual.id,
     );
-    
-    
+
     widget.onProfileDataChanged(updatedProfileData);
 
     // Show customization modal with updated profile data
     _showCustomizationModal(ritual, updatedProfileData);
   }
 
-  void _showCustomizationModal(RitualData ritual, MeditationProfileData profileData) {
+  void _showCustomizationModal(
+    RitualData ritual,
+    MeditationProfileData profileData,
+  ) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -207,10 +214,10 @@ class RitualChooser extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 30),
         ...rituals.map(
           (ritual) => Padding(
-            padding: const EdgeInsets.only(bottom: 18),
+            padding: const EdgeInsets.only(bottom: 16),
             child: RitualCard(
               ritual: ritual,
               isSelected: selectedRitual?.id == ritual.id,

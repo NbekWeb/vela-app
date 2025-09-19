@@ -8,8 +8,8 @@ class LifeVisionCard extends StatelessWidget {
   final String? content;
 
   const LifeVisionCard({
-    super.key, 
-    this.height, 
+    super.key,
+    this.height,
     required this.onEdit,
     this.content,
   });
@@ -24,7 +24,7 @@ class LifeVisionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Title row
           Row(
@@ -48,7 +48,8 @@ class LifeVisionCard extends StatelessWidget {
           // Content
           Expanded(
             child: Text(
-              content ?? 'I feel most authentic when I embrace my true self. I am focused on pursuing my passions.',
+              content ??
+                  'I feel most authentic when I embrace my true self. I am focused on pursuing my passions.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.9),

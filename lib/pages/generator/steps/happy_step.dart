@@ -31,7 +31,6 @@ class HappyStep extends StatefulWidget {
 
 class _HappyStepState extends State<HappyStep> {
   final TextEditingController _controller = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
   bool _nextEnabled = false;
 
   @override
@@ -71,7 +70,6 @@ class _HappyStepState extends State<HappyStep> {
   @override
   void dispose() {
     _controller.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -107,7 +105,7 @@ class _HappyStepState extends State<HappyStep> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               const Text(
                 'What makes you feel the most "you"?',
                 style: TextStyle(
@@ -125,8 +123,6 @@ class _HappyStepState extends State<HappyStep> {
                 child: TextField(
                   textAlign: TextAlign.center,
                   controller: _controller,
-                  scrollController: _scrollController,
-                  scrollPhysics: const BouncingScrollPhysics(),
                   minLines: 5,
                   maxLines: 8,
                   style: const TextStyle(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../styles/pages/plan_page_styles.dart';
@@ -7,7 +6,7 @@ import 'components/plan_switch.dart';
 import 'components/plan_info_card.dart';
 import '../shared/widgets/auth.dart';
 import '../core/stores/auth_store.dart';
-import '../shared/widgets/exit_modal.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum PlanStep { choosePlan, dreamLifeIntro }
 
@@ -30,7 +29,6 @@ class _PlanPageState extends State<PlanPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     String title;
@@ -50,7 +48,7 @@ class _PlanPageState extends State<PlanPage> {
               style: PlanPageStyles.priceSub,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 60),
+            const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
@@ -68,27 +66,30 @@ class _PlanPageState extends State<PlanPage> {
           children: [
             const SizedBox(height: 10),
             PlanInfoCard(),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             // Timeline, matnlar, stepper va h.k.
             Padding(
               padding: const EdgeInsets.only(top: 0),
-              child: Center(
-                child: Text(
-                  _selectedPlan == PlanType.annual
-                      ? '\$49/year'
-                      : '\$9.99/month',
-                  style: PlanPageStyles.price,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _selectedPlan == PlanType.annual
+                        ? '\$49/year'
+                        : '\$9.99/month',
+                    style: PlanPageStyles.price,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    _selectedPlan == PlanType.annual
+                        ? '(\$4.08/month)'
+                        : '(\$120/year)',
+                    style: PlanPageStyles.priceSub,
+                  ),
+                ],
               ),
             ),
-            Center(
-              child: Text(
-                _selectedPlan == PlanType.annual
-                    ? '(\$4.08/month)*'
-                    : '(\$120/year)',
-                style: PlanPageStyles.priceSub,
-              ),
-            ),
+
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -122,13 +123,7 @@ class _PlanPageState extends State<PlanPage> {
             const SizedBox(height: 30),
           ],
         );
-        onBack = () {
-          ExitModal.show(
-            context,
-            title: 'Exit App?',
-            message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
-          );
-        };
+        onBack = null;
         break;
       case PlanStep.dreamLifeIntro:
         title = '';
@@ -136,11 +131,12 @@ class _PlanPageState extends State<PlanPage> {
         child = LayoutBuilder(
           builder: (context, constraints) {
             final screenHeight = MediaQuery.of(context).size.height;
-            final headerHeight = 120.0; // Header balandligi (logo + padding)
+            final headerHeight = 200.0; // Header balandligi (logo + padding)
             final bottomPadding = 40.0; // Pastki padding (Terms uchun)
             final contentHeight = screenHeight - headerHeight - bottomPadding;
-            final topPadding = contentHeight / 2 - 220; // Content balandligi taxminan 300px
-            
+            final topPadding =
+                contentHeight / 2 - 220; // Content balandligi taxminan 300px
+
             return Center(
               child: Container(
                 padding: EdgeInsets.fromLTRB(10, topPadding, 10, 0),
@@ -149,19 +145,22 @@ class _PlanPageState extends State<PlanPage> {
                   children: [
                     Text(
                       'Set sail to your dream life',
-                      style: PlanPageStyles.pageTitle,
+
+                      style: PlanPageStyles.pageTitle.copyWith(
+                        fontSize: 34.sp,
+                        color: Colors.white,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
                     Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: PlanPageStyles.cardBg,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
                       child: Text(
                         'We will set up your profile based on your answers to generate your customized manifesting meditation experience, grounded in neuroscience, and tailored to you.',
-                        style: PlanPageStyles.cardBody,
+
+                        style: PlanPageStyles.cardBody.copyWith(
+                          fontSize: 15.sp,
+                          color: Colors.white,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -205,35 +204,20 @@ class _PlanPageState extends State<PlanPage> {
           },
         );
         onBack = () {
-          ExitModal.show(
-            context,
-            title: 'Exit App?',
-            message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
-          );
+          setState(() {
+            _currentStep = PlanStep.choosePlan;
+          });
         };
         break;
     }
 
-    return PopScope(
-      canPop: false, // Prevent default back button behavior
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          // Handle system back button (Android/iOS)
-          ExitModal.show(
-            context,
-            title: 'Exit App?',
-            message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
-          );
-        }
-      },
-      child: AuthScaffold(
-        title: title,
-        subtitle: subtitle,
-        onBack: onBack,
-        showTerms: _currentStep == PlanStep.choosePlan,
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
-        child: child,
-      ),
+    return AuthScaffold(
+      title: title,
+      subtitle: subtitle,
+      onBack: onBack,
+      showTerms: _currentStep == PlanStep.choosePlan,
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+      child: child,
     );
   }
 }

@@ -63,12 +63,11 @@ class _LoginPageState extends State<LoginPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
 
-          if (mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
-          }
+          Navigator.pushReplacementNamed(context, '/dashboard');
         }
       },
       onNewUser: () async {
+        print('🍎 Profile incomplete - redirecting to appropriate step');
 
         if (mounted) {
           ToastService.showSuccessToast(
@@ -90,9 +89,7 @@ class _LoginPageState extends State<LoginPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          if (mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, redirectRoute, (route) => false);
-          }
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
     );
@@ -115,9 +112,7 @@ class _LoginPageState extends State<LoginPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
 
-          if (mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
-          }
+          Navigator.pushReplacementNamed(context, '/dashboard');
         }
       },
       onNewUser: () async {
@@ -143,9 +138,7 @@ class _LoginPageState extends State<LoginPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          if (mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, redirectRoute, (route) => false);
-          }
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
     );
@@ -176,9 +169,7 @@ class _LoginPageState extends State<LoginPage> {
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
 
-          if (mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
-          }
+          Navigator.pushReplacementNamed(context, '/dashboard');
         }
       },
       onNewUser: () async {
@@ -198,9 +189,7 @@ class _LoginPageState extends State<LoginPage> {
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          if (mounted) {
-            Navigator.pushNamedAndRemoveUntil(context, redirectRoute, (route) => false);
-          }
+          Navigator.pushReplacementNamed(context, redirectRoute);
         }
       },
     );

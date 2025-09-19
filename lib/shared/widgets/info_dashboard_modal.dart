@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../themes/app_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class InfoDashboardModal extends StatelessWidget {
   final VoidCallback? onClose;
@@ -39,7 +40,13 @@ class InfoDashboardModal extends StatelessWidget {
                       child: Text(
                         'Dashboard Info',
                         textAlign: TextAlign.center,
-                        style: AppStyles.headingMedium,
+                        style: TextStyle(
+                          fontFamily: 'Canela',
+                          fontSize: 34.sp,
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: -0.5,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     Opacity(
@@ -53,10 +60,10 @@ class InfoDashboardModal extends StatelessWidget {
                 ),
                 AppStyles.spacingMedium,
                 Text(
-                  'Welcome to your meditation dashboard! Here you can track your daily progress, access your personal meditations, and explore our library.\n\n'
-                  '• Daily Streaks: Monitor your weekly meditation consistency\n'
-                  '• My Meditations: Access your personalized meditation sessions\n'
-                  '• Meditation Library: Discover curated content for your journey\n\n'
+                  'Welcome to your meditation dashboard! \nHere you can track your daily progress, access your personal meditations, and explore our library.\n\n'
+                  'Daily Streaks: \nMonitor your weekly meditation consistency\n\n'
+                  'My Meditations: \nAccess your personalized meditation sessions\n\n'
+                  'Meditation Library: \nDiscover curated content for your journey\n\n'
                   'Start building your meditation habit today and watch your streaks grow!',
                   style: AppStyles.bodyMedium,
                   textAlign: TextAlign.center,

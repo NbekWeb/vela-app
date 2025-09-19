@@ -17,36 +17,36 @@ class SleepMeditationActionButtons extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 100, minHeight: 60),
-          child: ElevatedButton(
-            onPressed: onResetPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(48),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.refresh_rounded, color: Color(0xFF3B6EAA), size: 24),
-                const SizedBox(width: 8),
-                Text(
-                  'Reset',
-                  style: TextStyle(
-                    color: Color(0xFF3B6EAA),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        //ConstrainedBox(
+        //  constraints: const BoxConstraints(minWidth: 100, minHeight: 60),
+        //  child: ElevatedButton(
+        //    onPressed: onResetPressed,
+        //    style: ElevatedButton.styleFrom(
+        //      backgroundColor: Colors.white,
+        //      elevation: 0,
+        //      shape: RoundedRectangleBorder(
+        //        borderRadius: BorderRadius.circular(48),
+        //      ),
+        //      padding: const EdgeInsets.symmetric(horizontal: 30),
+        //    ),
+        //    child: Row(
+        //      mainAxisAlignment: MainAxisAlignment.center,
+        //      mainAxisSize: MainAxisSize.min,
+        //      children: [
+        //        Icon(Icons.refresh_rounded, color: Color(0xFF3B6EAA), size: 24),
+        //        const SizedBox(width: 8),
+        //        Text(
+        //          'Reset',
+        //          style: TextStyle(
+        //            color: Color(0xFF3B6EAA),
+        //            fontWeight: FontWeight.w600,
+        //            fontSize: 16,
+        //          ),
+        //        ),
+        //      ],
+        //    ),
+        //  ),
+        //),
         const SizedBox(width: 10),
         Expanded(
           child: SizedBox(

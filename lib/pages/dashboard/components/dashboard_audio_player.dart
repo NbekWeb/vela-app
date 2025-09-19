@@ -108,7 +108,7 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         } catch (e) {
           // Ignore stop errors
         }
-        
+
         try {
           await _audioPlayer!.dispose();
         } catch (e) {
@@ -222,7 +222,7 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
       } catch (e) {
         // Ignore stop errors
       }
-      
+
       try {
         _audioPlayer!.dispose();
       } catch (e) {
@@ -442,7 +442,7 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         }
       } catch (e) {
         if (!mounted) return;
-        
+
         Fluttertoast.showToast(
           msg: 'Error deleting meditation',
           toastLength: Toast.LENGTH_LONG,
@@ -564,9 +564,7 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
           // Navigate to DirectRitualPage
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const DirectRitualPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const DirectRitualPage()),
           );
         } else {
           Fluttertoast.showToast(
@@ -579,7 +577,7 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
         }
       } catch (e) {
         if (!mounted) return;
-        
+
         Fluttertoast.showToast(
           msg: 'Error deleting meditation',
           toastLength: Toast.LENGTH_LONG,
@@ -594,88 +592,68 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
   void _resetMeditation() {
     context.read<MeditationStore>().completeReset();
     // Clear navigation stack to prevent back navigation to auth pages
-    Navigator.pushNamedAndRemoveUntil(
-      context, 
-      '/generator',
-      (route) {
-        // Keep only generator and dashboard routes, remove auth pages
-        return route.settings.name == '/generator' || 
-               route.settings.name == '/dashboard' ||
-               route.settings.name == '/my-meditations' ||
-               route.settings.name == '/archive' ||
-               route.settings.name == '/vault';
-      }
-    );
+    Navigator.pushNamedAndRemoveUntil(context, '/generator', (route) {
+      // Keep only generator and dashboard routes, remove auth pages
+      return route.settings.name == '/generator' ||
+          route.settings.name == '/dashboard' ||
+          route.settings.name == '/my-meditations' ||
+          route.settings.name == '/archive' ||
+          route.settings.name == '/vault';
+    });
   }
 
   void _saveToVault() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final isFirst = prefs.getBool('first') ?? false;
-      
+
       if (isFirst) {
         // First time - go to vault and remove first flag
         await prefs.remove('first');
         // Clear navigation stack to prevent back navigation to auth pages
-        Navigator.pushNamedAndRemoveUntil(
-          context, 
-          '/vault',
-          (route) {
-            // Keep only vault and dashboard routes, remove auth pages
-            return route.settings.name == '/vault' || 
-                   route.settings.name == '/dashboard' ||
-                   route.settings.name == '/my-meditations' ||
-                   route.settings.name == '/archive' ||
-                   route.settings.name == '/generator';
-          }
-        );
+        Navigator.pushNamedAndRemoveUntil(context, '/vault', (route) {
+          // Keep only vault and dashboard routes, remove auth pages
+          return route.settings.name == '/vault' ||
+              route.settings.name == '/dashboard' ||
+              route.settings.name == '/my-meditations' ||
+              route.settings.name == '/archive' ||
+              route.settings.name == '/generator';
+        });
       } else {
         // Not first time - go to dashboard
         // Clear navigation stack to prevent back navigation to auth pages
-        Navigator.pushNamedAndRemoveUntil(
-          context, 
-          '/dashboard',
-          (route) {
-            // Keep only dashboard and its sub-routes, remove auth pages
-            return route.settings.name == '/dashboard' || 
-                   route.settings.name == '/my-meditations' ||
-                   route.settings.name == '/archive' ||
-                   route.settings.name == '/vault' ||
-                   route.settings.name == '/generator';
-          }
-        );
+        Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) {
+          // Keep only dashboard and its sub-routes, remove auth pages
+          return route.settings.name == '/dashboard' ||
+              route.settings.name == '/my-meditations' ||
+              route.settings.name == '/archive' ||
+              route.settings.name == '/vault' ||
+              route.settings.name == '/generator';
+        });
       }
     } catch (e) {
       // Error handling - default to dashboard with cleared stack
-      Navigator.pushNamedAndRemoveUntil(
-        context, 
-        '/dashboard',
-        (route) {
-          // Keep only dashboard and its sub-routes, remove auth pages
-          return route.settings.name == '/dashboard' || 
-                 route.settings.name == '/my-meditations' ||
-                 route.settings.name == '/archive' ||
-                 route.settings.name == '/vault' ||
-                 route.settings.name == '/generator';
-        }
-      );
+      Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) {
+        // Keep only dashboard and its sub-routes, remove auth pages
+        return route.settings.name == '/dashboard' ||
+            route.settings.name == '/my-meditations' ||
+            route.settings.name == '/archive' ||
+            route.settings.name == '/vault' ||
+            route.settings.name == '/generator';
+      });
     }
   }
 
   void _handleBack() {
     // Navigate to home page with cleared navigation stack
-    Navigator.pushNamedAndRemoveUntil(
-      context, 
-      '/dashboard',
-      (route) {
-        // Keep only dashboard and its sub-routes, remove auth pages
-        return route.settings.name == '/dashboard' || 
-               route.settings.name == '/my-meditations' ||
-               route.settings.name == '/archive' ||
-               route.settings.name == '/vault' ||
-               route.settings.name == '/generator';
-      }
-    );
+    Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) {
+      // Keep only dashboard and its sub-routes, remove auth pages
+      return route.settings.name == '/dashboard' ||
+          route.settings.name == '/my-meditations' ||
+          route.settings.name == '/archive' ||
+          route.settings.name == '/vault' ||
+          route.settings.name == '/generator';
+    });
   }
 
   void _showPersonalizedMeditationInfo() {
@@ -733,20 +711,30 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
                           Consumer<MeditationStore>(
                             builder: (context, meditationStore, child) {
                               // Check if this meditation is user's own meditation
-                              final myMeditations = meditationStore.myMeditations;
-                              final isUserMeditation = myMeditations?.any((meditation) => 
-                                meditation['id']?.toString() == widget.meditationId
-                              ) ?? false;
-                              
+                              final myMeditations =
+                                  meditationStore.myMeditations;
+                              final isUserMeditation =
+                                  myMeditations?.any(
+                                    (meditation) =>
+                                        meditation['id']?.toString() ==
+                                        widget.meditationId,
+                                  ) ??
+                                  false;
+
                               return MeditationActionBar(
                                 isMuted: _isMuted,
                                 isLiked: _isLiked,
                                 onMuteToggle: _toggleMute,
                                 onLikeToggle: _toggleLike,
-                                onDelete: isUserMeditation ? _deleteMeditation : null,
-                                onEdit: isUserMeditation ? _editMeditation : null,
+                                onDelete: isUserMeditation
+                                    ? _deleteMeditation
+                                    : null,
+                                onEdit: isUserMeditation
+                                    ? _editMeditation
+                                    : null,
                                 onShare: _shareMeditation,
-                                showLikeText: !isUserMeditation, // Show text only for library meditations
+                                showLikeText:
+                                    !isUserMeditation, // Show text only for library meditations
                               );
                             },
                           ),
@@ -757,9 +745,12 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
                               children: [
                                 // Time display
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         _formatDuration(_position),
@@ -786,42 +777,54 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
                                 // Improved Slider
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
                                   child: SliderTheme(
                                     data: SliderTheme.of(context).copyWith(
                                       trackHeight: 6,
                                       activeTrackColor: const Color(0xFFC9DFF4),
-                                      inactiveTrackColor: Colors.white.withOpacity(0.3),
-                                      thumbColor: _isDragging ? const Color(0xFFC9DFF4) : Colors.white,
-                                      overlayColor: Colors.white.withOpacity(0.2),
+                                      inactiveTrackColor: Colors.white
+                                          .withOpacity(0.3),
+                                      thumbColor: _isDragging
+                                          ? const Color(0xFFC9DFF4)
+                                          : Colors.white,
+                                      overlayColor: Colors.white.withOpacity(
+                                        0.2,
+                                      ),
                                       thumbShape: const RoundSliderThumbShape(
                                         enabledThumbRadius: 8,
                                         disabledThumbRadius: 8,
                                         elevation: 4,
                                       ),
-                                      overlayShape: const RoundSliderOverlayShape(
-                                        overlayRadius: 20,
-                                      ),
+                                      overlayShape:
+                                          const RoundSliderOverlayShape(
+                                            overlayRadius: 20,
+                                          ),
                                       trackShape: const AudioSliderTrackShape(),
                                     ),
                                     child: Slider(
-                                      value: _position.inSeconds.toDouble().clamp(
-                                        0,
-                                        _duration.inSeconds.toDouble(),
-                                      ),
+                                      value: _position.inSeconds
+                                          .toDouble()
+                                          .clamp(
+                                            0,
+                                            _duration.inSeconds.toDouble(),
+                                          ),
                                       min: 0,
                                       max: _duration.inSeconds.toDouble(),
                                       onChanged: (value) async {
                                         // If this is the first change during drag, pause audio
                                         if (!_isDragging && _isPlaying) {
-                                          print('DEBUG: First drag detected, pausing audio');
+                                          print(
+                                            'DEBUG: First drag detected, pausing audio',
+                                          );
                                           await _audioPlayer?.pause();
                                           setState(() {
                                             _isDragging = true;
                                             _wasPlayingBeforeDrag = true;
                                           });
                                         }
-                                        
+
                                         final newPosition = Duration(
                                           seconds: value.toInt(),
                                         );
@@ -831,25 +834,33 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
                                         });
                                       },
                                       onChangeStart: (value) {
-                                        print('DEBUG: Slider onChangeStart - isPlaying: $_isPlaying');
+                                        print(
+                                          'DEBUG: Slider onChangeStart - isPlaying: $_isPlaying',
+                                        );
                                         setState(() {
                                           _isDragging = true;
                                           _wasPlayingBeforeDrag = _isPlaying;
                                         });
                                         // Pause audio while seeking
                                         if (_isPlaying) {
-                                          print('DEBUG: Pausing audio during seek');
+                                          print(
+                                            'DEBUG: Pausing audio during seek',
+                                          );
                                           _audioPlayer?.pause();
                                         }
                                       },
                                       onChangeEnd: (value) async {
-                                        print('DEBUG: Slider onChangeEnd - wasPlayingBeforeDrag: $_wasPlayingBeforeDrag');
+                                        print(
+                                          'DEBUG: Slider onChangeEnd - wasPlayingBeforeDrag: $_wasPlayingBeforeDrag',
+                                        );
                                         setState(() {
                                           _isDragging = false;
                                         });
                                         // Resume audio after seeking if it was playing before drag
                                         if (_wasPlayingBeforeDrag) {
-                                          print('DEBUG: Resuming audio after seek');
+                                          print(
+                                            'DEBUG: Resuming audio after seek',
+                                          );
                                           await _audioPlayer?.play();
                                           // The audio player state listener will update _isPlaying automatically
                                         }
@@ -861,7 +872,10 @@ class _DashboardAudioPlayerState extends State<DashboardAudioPlayer> {
                                 // Progress indicator
                                 if (_isDragging)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 8,
+                                    ),
                                     child: Text(
                                       'Seeking to ${_formatDuration(_position)}',
                                       style: const TextStyle(

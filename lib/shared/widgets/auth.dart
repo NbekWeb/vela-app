@@ -67,11 +67,11 @@ class AuthScaffold extends StatelessWidget {
                 child: Column(
                   children: [
                     // HEADER
-                    const SizedBox(height: 0),
+                    const SizedBox(height: 20),
                     Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.only(left: 12),
                           child: IconButton(
                             icon: const Icon(
                               Icons.arrow_back,
@@ -79,7 +79,8 @@ class AuthScaffold extends StatelessWidget {
                               size: 30,
                             ),
                             onPressed:
-                                onBack ?? () => Navigator.of(context).maybePop(),
+                                onBack ??
+                                () => Navigator.of(context).maybePop(),
                           ),
                         ),
                         Expanded(
@@ -94,7 +95,7 @@ class AuthScaffold extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.only(right: 12),
                           child: IconButton(
                             icon: const Icon(
                               Icons.info_outline,
@@ -106,7 +107,7 @@ class AuthScaffold extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 40),
                     Center(
                       child: Text(
                         title,
@@ -143,9 +144,7 @@ class AuthScaffold extends StatelessWidget {
                   left: 0,
                   right: 0,
                   bottom: 40,
-                  child: Center(
-                    child: const TermsAgreement(),
-                  ),
+                  child: Center(child: const TermsAgreement()),
                 ),
             ],
           ),

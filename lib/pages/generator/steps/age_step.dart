@@ -3,6 +3,7 @@ import '../../../shared/models/meditation_profile_data.dart';
 import '../../../core/stores/meditation_store.dart';
 import '../step_scaffold.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AgeStep extends StatefulWidget {
   final MeditationProfileData profileData;
@@ -77,9 +78,9 @@ class _AgeStepState extends State<AgeStep> {
             children: [
               Text(
                 'How old are you?',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Canela',
-                  fontSize: 32,
+                  fontSize: 32.sp,
                   color: Colors.white,
                   fontWeight: FontWeight.w300,
                 ),
@@ -263,7 +264,7 @@ class _AgePill extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Satoshi',
               fontWeight: FontWeight.w600,
-              fontSize: 14,
+              fontSize: 14.sp,
               color: selected ? Colors.white : const Color(0xFFC9DFF4),
             ),
           ),

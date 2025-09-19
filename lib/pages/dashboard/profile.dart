@@ -50,9 +50,9 @@ class _DashboardProfilePageState extends State<DashboardProfilePage> {
               children: [
                 // Star animation background
                 const StarsAnimation(
-                  starCount: 50,
-                  topColor: Color(0xFF5799D6),
-                  bottomColor: Color(0xFFA4C6EB),
+                  starCount: 20,
+                  topColor: const Color(0xFF3C6EAB),
+                  bottomColor: const Color(0xFFA4C6EB),
                 ),
 
                 // Main content
@@ -87,7 +87,7 @@ class _DashboardProfilePageState extends State<DashboardProfilePage> {
                         const NeuroplasticityButton(),
 
                         const SizedBox(
-                          height: 100,
+                          height: 25,
                         ), // Space for bottom navigation
                       ],
                     ),

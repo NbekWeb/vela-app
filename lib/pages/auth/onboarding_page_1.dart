@@ -58,12 +58,10 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
 
   Future<void> _requestIOSNotificationPermission() async {
     try {
-     
       // Request permission using Firebase Messaging for iOS 15+
       NotificationSettings settings = await FirebaseMessaging.instance
           .requestPermission(alert: true, badge: true, sound: true);
 
-   
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {
         String? apnsToken;
@@ -76,14 +74,11 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
           try {
             await Future.delayed(Duration(seconds: 2));
             apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-          } catch (e) {
-          }
+          } catch (e) {}
         }
-
 
         // Now try to get FCM token only if APNS token is available
         if (apnsToken != null) {
-         
           String? deviceToken;
           int attempts = 0;
           const maxAttempts = 5;
@@ -159,7 +154,6 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
 
   Future<void> _requestAndroidNotificationPermission() async {
     try {
-
       PermissionStatus currentStatus = await Permission.notification.status;
 
       if (currentStatus == PermissionStatus.permanentlyDenied) {
@@ -168,7 +162,6 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
       } else {
         currentStatus = await Permission.notification.request();
       }
-
 
       if (currentStatus.isGranted || currentStatus.isLimited) {
         // Get real FCM token for Android
@@ -209,7 +202,6 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
         data: data,
         open: true,
       );
-
     } catch (e) {
       print('Error sending device token to API: $e');
       // Silent error handling
@@ -277,28 +269,37 @@ class _OnboardingPage1State extends State<OnboardingPage1> {
                       : Text('Next', style: ButtonStyles.primaryText),
                 ),
 
-                const SizedBox(height: 8),
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  style: ButtonStyles.text,
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Don't have an account?",
-                          style: BaseStyles.signInLinkText,
+                const SizedBox(height: 20),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Already have an account? ",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Color(0xFFF2EFEA),
+                          fontFamily: 'Satoshi',
                         ),
-                        TextSpan(
-                          text: ' Sign up',
-                          style: BaseStyles.signInUnderlinedText,
-                        ),
-                      ],
+                        children: [
+                          TextSpan(
+                            text: 'Sign in',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.white,
+                              fontFamily: 'Satoshi',
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

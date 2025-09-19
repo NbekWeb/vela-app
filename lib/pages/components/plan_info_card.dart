@@ -18,10 +18,7 @@ class PlanInfoCard extends StatelessWidget {
             left: 8,
             top: 0,
             bottom: 0,
-            child: Container(
-              width: 2,
-              color: PlanPageStyles.leftBorder,
-            ),
+            child: Container(width: 2, color: PlanPageStyles.leftBorder),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,15 +28,15 @@ class PlanInfoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Share your goals', style: PlanPageStyles.cardTitle),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 0),
                     Text(
-                      'We will set up your profile based on your answers to generate your customized manifesting meditation experience, grounded in neuroscience, and tailored to you.',
+                      'Custom meditation grounded in neuroscience, just for you.',
                       style: PlanPageStyles.cardBody,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               TimelineRow(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +49,7 @@ class PlanInfoCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               TimelineRow(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,4 +92,4 @@ class TimelineRow extends StatelessWidget {
       ],
     );
   }
-} 
+}

@@ -18,9 +18,9 @@ class SubscriptionBillingPage extends StatelessWidget {
         body: Stack(
           children: [
             const StarsAnimation(
-              starCount: 50,
-              topColor: Color(0xFF5799D6),
-              bottomColor: Color(0xFFA4C6EB),
+              starCount: 20,
+              topColor: const Color(0xFF3C6EAB),
+              bottomColor: const Color(0xFFA4C6EB),
             ),
             SafeArea(
               child: Column(
@@ -31,9 +31,10 @@ class SubscriptionBillingPage extends StatelessWidget {
                     'Subscription & Billing',
                     style: TextStyle(
                       color: const Color.fromARGB(255, 242, 239, 234),
-                      fontSize: 38.sp,
+                      fontSize: 36.sp,
                       fontFamily: 'Canela',
                       fontWeight: FontWeight.w300,
+                      letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -70,7 +71,12 @@ class SubscriptionBillingPage extends StatelessWidget {
                                 Text(
                                   'Free Plan',
                                   style: TextStyle(
-                                    color: const Color.fromARGB(255, 242, 239, 234),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      242,
+                                      239,
+                                      234,
+                                    ),
                                     fontSize: 20.sp,
                                     fontFamily: 'Satoshi',
                                     fontWeight: FontWeight.w600,
@@ -80,7 +86,12 @@ class SubscriptionBillingPage extends StatelessWidget {
                                 Text(
                                   'Access to basic meditation features',
                                   style: TextStyle(
-                                    color: const Color.fromARGB(255, 242, 239, 234),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      242,
+                                      239,
+                                      234,
+                                    ),
                                     fontSize: 14.sp,
                                     fontFamily: 'Satoshi',
                                     fontWeight: FontWeight.w400,
@@ -89,63 +100,73 @@ class SubscriptionBillingPage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 32),
-                          Text(
-                            'Upgrade Options',
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 242, 239, 234),
-                              fontSize: 24.sp,
-                              fontFamily: 'Canela',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(20.sp),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                width: 1,
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Premium Plan',
-                                  style: TextStyle(
-                                    color: const Color.fromARGB(255, 242, 239, 234),
-                                    fontSize: 20.sp,
-                                    fontFamily: 'Satoshi',
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Unlimited access to all features',
-                                  style: TextStyle(
-                                    color: const Color.fromARGB(255, 242, 239, 234),
-                                    fontSize: 14.sp,
-                                    fontFamily: 'Satoshi',
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  '\$9.99/month',
-                                  style: TextStyle(
-                                    color: const Color(0xFF3B6EAA),
-                                    fontSize: 18.sp,
-                                    fontFamily: 'Satoshi',
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          //  const SizedBox(height: 32),
+                          //  Text(
+                          //    'Upgrade Options',
+                          //    style: TextStyle(
+                          //      color: const Color.fromARGB(255, 242, 239, 234),
+                          //      fontSize: 24.sp,
+                          //      fontFamily: 'Canela',
+                          //      fontWeight: FontWeight.w300,
+                          //    ),
+                          //  ),
+                          //  const SizedBox(height: 16),
+                          //  Container(
+                          //    width: double.infinity,
+                          //    padding: EdgeInsets.all(20.sp),
+                          //    decoration: BoxDecoration(
+                          //      color: Colors.white.withValues(alpha: 0.1),
+                          //      borderRadius: BorderRadius.circular(16),
+                          //      border: Border.all(
+                          //        color: Colors.white.withValues(alpha: 0.2),
+                          //        width: 1,
+                          //      ),
+                          //    ),
+                          //    child: Column(
+                          //      crossAxisAlignment: CrossAxisAlignment.start,
+                          //      children: [
+                          //        Text(
+                          //          'Premium Plan',
+                          //          style: TextStyle(
+                          //            color: const Color.fromARGB(
+                          //              255,
+                          //              242,
+                          //              239,
+                          //              234,
+                          //            ),
+                          //            fontSize: 20.sp,
+                          //            fontFamily: 'Satoshi',
+                          //            fontWeight: FontWeight.w600,
+                          //          ),
+                          //        ),
+                          //        const SizedBox(height: 8),
+                          //        Text(
+                          //          'Unlimited access to all features',
+                          //          style: TextStyle(
+                          //            color: const Color.fromARGB(
+                          //              255,
+                          //              242,
+                          //              239,
+                          //              234,
+                          //            ),
+                          //            fontSize: 14.sp,
+                          //            fontFamily: 'Satoshi',
+                          //            fontWeight: FontWeight.w400,
+                          //          ),
+                          //        ),
+                          //        const SizedBox(height: 12),
+                          //        Text(
+                          //          '\$9.99/month',
+                          //          style: TextStyle(
+                          //            color: const Color(0xFF3B6EAA),
+                          //            fontSize: 18.sp,
+                          //            fontFamily: 'Satoshi',
+                          //            fontWeight: FontWeight.w700,
+                          //          ),
+                          //        ),
+                          //      ],
+                          //    ),
+                          //  ),
                         ],
                       ),
                     ),
@@ -172,7 +193,11 @@ class SubscriptionBillingPage extends StatelessWidget {
             decoration: const BoxDecoration(shape: BoxShape.circle),
             child: Center(
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 24,
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -186,7 +211,11 @@ class SubscriptionBillingPage extends StatelessWidget {
           Container(
             width: 36,
             height: 36,
-            child: const Icon(Icons.settings, color: Colors.transparent, size: 24),
+            child: const Icon(
+              Icons.settings,
+              color: Colors.transparent,
+              size: 24,
+            ),
           ),
         ],
       ),

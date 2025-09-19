@@ -271,8 +271,7 @@ class _RemindersPageState extends State<RemindersPage> {
                 data: {'is_active': false},
               );
             } else {}
-          } catch (firebaseError) {
-          }
+          } catch (firebaseError) {}
 
           // Update local user data
           final updatedUser = user.copyWith(userDeviceActive: false);
@@ -332,47 +331,47 @@ class _RemindersPageState extends State<RemindersPage> {
           statusBarBrightness: Brightness.dark,
         ),
         child: Scaffold(
-        body: Stack(
-          children: [
-            const StarsAnimation(
-              starCount: 50,
-              topColor: Color(0xFF5799D6),
-              bottomColor: Color(0xFFA4C6EB),
-            ),
-            SafeArea(
-              child: Column(
-                children: [
-                  _buildHeader(context),
-                  SizedBox(height: 30.h),
-                  Text(
-                    'Reminders',
-                    style: TextStyle(
-                      color: const Color.fromARGB(255, 242, 239, 234),
-                      fontSize: 38.sp,
-                      fontFamily: 'Canela',
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                  SizedBox(height: 30.h),
-                  Expanded(
-                    child: _isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
-                        : Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: _buildContent(),
-                          ),
-                  ),
-                ],
+          body: Stack(
+            children: [
+              const StarsAnimation(
+                starCount: 20,
+                topColor: const Color(0xFF3C6EAB),
+                bottomColor: const Color(0xFFA4C6EB),
               ),
-            ),
-          ],
+              SafeArea(
+                child: Column(
+                  children: [
+                    _buildHeader(context),
+                    SizedBox(height: 30.h),
+                    Text(
+                      'Reminders',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 242, 239, 234),
+                        fontSize: 36.sp,
+                        fontFamily: 'Canela',
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                    SizedBox(height: 30.h),
+                    Expanded(
+                      child: _isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
+                              child: _buildContent(),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 

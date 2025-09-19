@@ -5,42 +5,38 @@ class EditInfoButtons extends StatelessWidget {
   final bool isSaving;
   final VoidCallback? onSave;
 
-  const EditInfoButtons({
-    super.key,
-    required this.isSaving,
-    this.onSave,
-  });
+  const EditInfoButtons({super.key, required this.isSaving, this.onSave});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton(
-            onPressed: () {
-              // Empty handler - do nothing for now
-            },
-            style: OutlinedButton.styleFrom(
-              backgroundColor: Colors.white,
-              side: BorderSide.none,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 18.h),
-            ),
-            child: Text(
-              'Change Password',
-              style: TextStyle(
-                color: const Color(0xFF3B6EAA),
-                fontSize: 16.sp,
-                fontFamily: 'Satoshi',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 12.h),
+        //  SizedBox(
+        //    width: double.infinity,
+        //    child: OutlinedButton(
+        //      onPressed: () {
+        //        // Empty handler - do nothing for now
+        //      },
+        //      style: OutlinedButton.styleFrom(
+        //        backgroundColor: Colors.white,
+        //        side: BorderSide.none,
+        //        shape: RoundedRectangleBorder(
+        //          borderRadius: BorderRadius.circular(30),
+        //        ),
+        //        padding: EdgeInsets.symmetric(vertical: 18.h),
+        //      ),
+        //      child: Text(
+        //        'Change Password',
+        //        style: TextStyle(
+        //          color: const Color(0xFF3B6EAA),
+        //          fontSize: 16.sp,
+        //          fontFamily: 'Satoshi',
+        //          fontWeight: FontWeight.w600,
+        //        ),
+        //      ),
+        //    ),
+        //  ),
+        //  SizedBox(height: 12.h),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
@@ -76,4 +72,4 @@ class EditInfoButtons extends StatelessWidget {
       ],
     );
   }
-} 
+}

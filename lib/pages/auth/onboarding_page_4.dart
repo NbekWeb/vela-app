@@ -45,9 +45,7 @@ class _OnboardingPage4State extends State<OnboardingPage4> {
                 Text(
                   'Set sail to your dream life, with Vela',
                   textAlign: TextAlign.center,
-                  style: TextStyles.headingLarge.copyWith(
-                    fontSize: 46.sp,
-                  ),
+                  style: TextStyles.headingLarge.copyWith(fontSize: 46.sp),
                 ),
 
                 const SizedBox(height: 30),
@@ -65,34 +63,40 @@ class _OnboardingPage4State extends State<OnboardingPage4> {
                     Navigator.pushNamed(context, '/login');
                   },
                   style: ButtonStyles.primary,
-                  child: Text(
-                    'Get Started',
-                    style: ButtonStyles.primaryText,
-                  ),
+                  child: Text('Get Started', style: ButtonStyles.primaryText),
                 ),
 
-                const SizedBox(height: 8),
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  style: ButtonStyles.text,
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Don't have an account?",
-                          style: BaseStyles.signInLinkText,
+                const SizedBox(height: 20),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Already have an account? ",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Color(0xFFF2EFEA),
+                          fontFamily: 'Satoshi',
                         ),
-                        TextSpan(
-                          text: ' Sign up',
-                          style: BaseStyles.signInUnderlinedText,
-                        ),
-                      ],
+                        children: [
+                          TextSpan(
+                            text: 'Sign in',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.white,
+                              fontFamily: 'Satoshi',
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

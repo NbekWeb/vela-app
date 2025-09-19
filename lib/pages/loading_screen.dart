@@ -36,7 +36,7 @@ class _LoadingScreenState extends State<LoadingScreen>
   Future<void> _initializeApp() async {
     // Preload video in background
     VideoLoader.initializeVideos();
-    
+
     // Check if user is authenticated first
     final authStore = Provider.of<AuthStore>(context, listen: false);
     final isAuthenticated = await authStore.isAuthenticated();
@@ -55,25 +55,16 @@ class _LoadingScreenState extends State<LoadingScreen>
           const Duration(seconds: 10),
           onTimeout: () => '/dashboard', // Default to dashboard if timeout
         );
-        
+
         // Show splash screen for a short time
-        await Future.delayed(const Duration(milliseconds: 800));
-        
+        await Future.delayed(const Duration(seconds: 5));
+
         if (!mounted) return;
-        
-        // If redirecting to plan page, clear navigation stack to prevent back to login
-        if (redirectRoute == '/plan') {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            redirectRoute,
-            (route) => false,
-          );
-        } else {
-          Navigator.of(context).pushReplacementNamed(redirectRoute);
-        }
+        Navigator.of(context).pushReplacementNamed(redirectRoute);
         return;
       } catch (e) {
         // If there's an error, go to dashboard
-        await Future.delayed(const Duration(milliseconds: 800));
+        await Future.delayed(const Duration(seconds: 5));
         if (!mounted) return;
         Navigator.of(context).pushReplacementNamed('/dashboard');
         return;
@@ -102,10 +93,10 @@ class _LoadingScreenState extends State<LoadingScreen>
     // Breathe Out: circle shrinks from max to 0
     setState(() {
       _isIn = false;
-      _count = 1;
+      _count = 5;
     });
     _circleController.reverse(from: 1.0);
-    for (int i = 1; i <= 5; i++) {
+    for (int i = 5; i >= 1; i--) {
       setState(() => _count = i);
       await Future.delayed(const Duration(seconds: 1));
     }
@@ -128,11 +119,7 @@ class _LoadingScreenState extends State<LoadingScreen>
       return Scaffold(
         backgroundColor: const Color(0xFFDCE6F0), // Same as default splash
         body: Center(
-          child: Image.asset(
-            'assets/logo.png',
-            width: 120,
-            height: 120,
-          ),
+          child: Image.asset('assets/logo.png', width: 120, height: 120),
         ),
       );
     }
@@ -142,14 +129,11 @@ class _LoadingScreenState extends State<LoadingScreen>
       body: Stack(
         children: [
           const StarsAnimation(),
-          Center(
-            child: _buildBreathingAnimation(),
-          ),
+          Center(child: _buildBreathingAnimation()),
         ],
       ),
     );
   }
-
 
   Widget _buildBreathingAnimation() {
     return AnimatedBuilder(
@@ -160,14 +144,17 @@ class _LoadingScreenState extends State<LoadingScreen>
           children: [
             Opacity(
               opacity: 0.1,
-              child: Transform.scale(
-                scale: _circleScale.value,
-                child: Container(
-                  width: 250,
-                  height: 250,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+              child: Transform.translate(
+                offset: const Offset(0, 25), // смещение вниз на 20 px
+                child: Transform.scale(
+                  scale: _circleScale.value,
+                  child: Container(
+                    width: 250,
+                    height: 250,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
               ),
@@ -183,13 +170,14 @@ class _LoadingScreenState extends State<LoadingScreen>
                     fontFamily: 'Canela',
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 0),
                 Text(
                   '$_count',
                   style: TextStyle(
                     fontSize: 138,
                     color: Colors.white.withAlpha((0.3 * 255).toInt()),
                     fontFamily: 'Canela',
+                    height: 1,
                   ),
                 ),
               ],

@@ -3,6 +3,7 @@ import '../../../shared/models/meditation_profile_data.dart';
 import '../../../core/stores/meditation_store.dart';
 import '../step_scaffold.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VisionStep extends StatefulWidget {
   final MeditationProfileData profileData;
@@ -31,7 +32,6 @@ class VisionStep extends StatefulWidget {
 
 class _VisionStepState extends State<VisionStep> {
   final TextEditingController _controller = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -46,7 +46,6 @@ class _VisionStepState extends State<VisionStep> {
   @override
   void dispose() {
     _controller.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -94,13 +93,13 @@ class _VisionStepState extends State<VisionStep> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Tell me about your dream life',
                 style: TextStyle(
                   fontFamily: 'Canela',
                   height: 1.15, // это и есть line-height: 1.5 × fontSize
                   fontWeight: FontWeight.w300,
-                  fontSize: 34,
+                  fontSize: 30.sp,
                   color: Color(0xFFF2EFEA),
                 ),
                 textAlign: TextAlign.center,
@@ -122,8 +121,6 @@ class _VisionStepState extends State<VisionStep> {
                 width: double.infinity,
                 child: TextField(
                   controller: _controller,
-                  scrollController: _scrollController,
-                  scrollPhysics: const BouncingScrollPhysics(),
                   textAlign: TextAlign.center,
                   minLines: 3,
                   maxLines: 6,

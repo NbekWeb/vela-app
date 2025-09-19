@@ -18,9 +18,9 @@ class AboutVelaPage extends StatelessWidget {
         body: Stack(
           children: [
             const StarsAnimation(
-              starCount: 50,
-              topColor: Color(0xFF5799D6),
-              bottomColor: Color(0xFFA4C6EB),
+              starCount: 20,
+              topColor: const Color(0xFF3C6EAB),
+              bottomColor: const Color(0xFFA4C6EB),
             ),
             SafeArea(
               child: Column(
@@ -31,8 +31,9 @@ class AboutVelaPage extends StatelessWidget {
                     'About Vela',
                     style: TextStyle(
                       color: const Color.fromARGB(255, 242, 239, 234),
-                      fontSize: 38.sp,
+                      fontSize: 36.sp,
                       fontFamily: 'Canela',
+                      letterSpacing: -0.5,
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -66,6 +67,7 @@ class AboutVelaPage extends StatelessWidget {
                             ),
                             child: Text(
                               'Vela is dedicated to helping you create personalized meditation experiences that align with your unique vision and dreams. We believe everyone deserves access to transformative mindfulness practices.',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: const Color.fromARGB(255, 242, 239, 234),
                                 fontSize: 14.sp,
@@ -99,7 +101,9 @@ class AboutVelaPage extends StatelessWidget {
                             ),
                             child: Column(
                               children: [
-                                _buildFeatureItem('AI-Powered Meditation Generation'),
+                                _buildFeatureItem(
+                                  'AI-Powered Meditation Generation',
+                                ),
                                 const SizedBox(height: 12),
                                 _buildFeatureItem('Personalized Dream Vault'),
                                 const SizedBox(height: 12),
@@ -125,11 +129,7 @@ class AboutVelaPage extends StatelessWidget {
   Widget _buildFeatureItem(String feature) {
     return Row(
       children: [
-        Icon(
-          Icons.check_circle,
-          color: const Color(0xFFC9DFF4),
-          size: 20,
-        ),
+        Icon(Icons.check_circle, color: const Color(0xFFC9DFF4), size: 20),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -159,7 +159,11 @@ class AboutVelaPage extends StatelessWidget {
             decoration: const BoxDecoration(shape: BoxShape.circle),
             child: Center(
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 24,
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -173,7 +177,11 @@ class AboutVelaPage extends StatelessWidget {
           Container(
             width: 36,
             height: 36,
-            child: const Icon(Icons.settings, color: Colors.transparent, size: 24),
+            child: const Icon(
+              Icons.settings,
+              color: Colors.transparent,
+              size: 24,
+            ),
           ),
         ],
       ),

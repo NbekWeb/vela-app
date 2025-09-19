@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:provider/provider.dart';
 import '../../shared/models/meditation_profile_data.dart';
 import '../../core/stores/meditation_store.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SleepMeditationAudioPlayer extends StatefulWidget {
   final bool isPlaying;
@@ -103,12 +104,13 @@ class _SleepMeditationAudioPlayerState
         const SizedBox(height: 16),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Canela',
-            fontSize: 36,
+            fontSize: 36.sp,
             fontWeight: FontWeight.w300,
             color: Colors.white,
             decoration: TextDecoration.none,
+            letterSpacing: -0.5,
           ),
           textAlign: TextAlign.center,
         ),
@@ -124,7 +126,7 @@ class _SleepMeditationAudioPlayerState
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 10),
         Text(
           'This $duration min meditation weaves together your personal aspirations, gratitude, and authentic self with dreamy guidance to help manifest your dream life.',
           style: const TextStyle(
@@ -136,7 +138,7 @@ class _SleepMeditationAudioPlayerState
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 100),
+        const SizedBox(height: 30),
         Center(
           child: GestureDetector(
             onTap: widget.onPlayPausePressed,

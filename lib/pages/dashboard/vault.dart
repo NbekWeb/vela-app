@@ -73,17 +73,23 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                                 widget.onBackPressed!();
                               } else {
                                 // Check if there's a previous page to go back to
-                                final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+                                final dashboardState = context
+                                    .findAncestorStateOfType<
+                                      DashboardMainPageState
+                                    >();
                                 if (dashboardState != null) {
                                   // If previous index is the same as current (no previous page), go to home
-                                  if (dashboardState.previousIndex == dashboardState.selectedIndex) {
+                                  if (dashboardState.previousIndex ==
+                                      dashboardState.selectedIndex) {
                                     dashboardState.navigateToHome();
                                   } else {
                                     // Go back to previous page
                                     dashboardState.navigateBack();
                                   }
                                 } else {
-                                  Navigator.of(context).pushReplacementNamed('/dashboard');
+                                  Navigator.of(
+                                    context,
+                                  ).pushReplacementNamed('/dashboard');
                                 }
                               }
                             },
@@ -91,10 +97,7 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                         ),
                       ),
                       Transform.translate(
-                        offset: const Offset(
-                          3,
-                          0,
-                        ), 
+                        offset: const Offset(3, 0),
                         child: Image.asset(
                           'assets/img/logo.png',
                           width: 60,
@@ -115,7 +118,9 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                         child: Container(
                           width: 36,
                           height: 36,
-                          decoration: const BoxDecoration(shape: BoxShape.circle),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
                           child: const Center(
                             child: Icon(
                               Icons.info_outline,
@@ -235,10 +240,11 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                                           );
                                         },
                                         child: Text(
-                                          'Your Saved Rituals ($meditationCount)',
+                                          'My Meditations ($meditationCount)',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 30.sp,
+                                            fontSize: 36.sp,
+                                            letterSpacing: -0.5,
                                             fontWeight: FontWeight.w300,
                                             fontFamily: 'Canela',
                                           ),
@@ -277,7 +283,9 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                                               ?.toString();
 
                                           return Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                            ),
                                             child: VaultRitualCard(
                                               name: name,
                                               meditationId: meditationId,
@@ -320,10 +328,11 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                                           );
                                         },
                                         child: Text(
-                                          'The Archive ($libraryCount)',
+                                          'Meditation Library ($libraryCount)',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 30.sp,
+                                            fontSize: 36.sp,
+                                            letterSpacing: -0.5,
                                             fontWeight: FontWeight.w300,
                                             fontFamily: 'Canela',
                                           ),
@@ -370,7 +379,9 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                                               ?.toString();
 
                                           return Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                            ),
                                             child: VaultRitualCard(
                                               name: name,
                                               meditationId: meditationId,
@@ -383,12 +394,14 @@ class _DashboardVaultPageState extends State<DashboardVaultPage> {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
-                                                    builder: (context) => DashboardAudioPlayer(
-                                                      meditationId: id,
-                                                      title: title,
-                                                      description: description,
-                                                      imageUrl: imageUrl,
-                                                    ),
+                                                    builder: (context) =>
+                                                        DashboardAudioPlayer(
+                                                          meditationId: id,
+                                                          title: title,
+                                                          description:
+                                                              description,
+                                                          imageUrl: imageUrl,
+                                                        ),
                                                   ),
                                                 );
                                               },

@@ -161,7 +161,7 @@ class _CheckInFormWidgetState extends State<CheckInFormWidget> {
         ),
         const SizedBox(height: 20),
         Text(
-          'How can Vela  support you in this exact moment?',
+          'How can Vela support you in this exact moment?',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,

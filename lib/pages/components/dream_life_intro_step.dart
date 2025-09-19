@@ -1,26 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../styles/pages/plan_page_styles.dart';
 import '../../shared/widgets/auth.dart';
-import '../../shared/widgets/exit_modal.dart';
 
 class DreamLifeIntroStep extends StatelessWidget {
   const DreamLifeIntroStep({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false, // Prevent default back button behavior
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          // Handle system back button (Android/iOS)
-          ExitModal.show(
-            context,
-            title: 'Exit App?',
-            message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
-          );
-        }
-      },
-      child: AuthScaffold(
+    return AuthScaffold(
       title: 'Set sail to your dream life ',
       subtitle: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -38,11 +25,7 @@ class DreamLifeIntroStep extends StatelessWidget {
         ),
       ),
       onBack: () {
-        ExitModal.show(
-          context,
-          title: 'Exit App?',
-          message: 'Are you sure you want to exit the app? You can always come back to continue your journey.',
-        );
+        Navigator.of(context).pop();
       },
       child: Expanded(
         child: Column(
@@ -79,7 +62,6 @@ class DreamLifeIntroStep extends StatelessWidget {
             const SizedBox(height: 32),
           ],
         ),
-      ),
       ),
     );
   }

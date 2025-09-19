@@ -10,11 +10,16 @@ class RitualInfoModal extends StatelessWidget {
   final String title;
   final String body;
   final VoidCallback? onClose;
-  const RitualInfoModal({super.key, required this.title, required this.body, this.onClose});
+  const RitualInfoModal({
+    super.key,
+    required this.title,
+    required this.body,
+    this.onClose,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final double modalWidth = MediaQuery.of(context).size.width * 0.92;
+    final double modalWidth = MediaQuery.of(context).size.width * 0.95;
 
     return Center(
       child: ClipRRect(
@@ -34,8 +39,13 @@ class RitualInfoModal extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: AppStyles.white, size: 28),
-                          onPressed: onClose ?? () => Navigator.of(context).pop(),
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: AppStyles.white,
+                            size: 28,
+                          ),
+                          onPressed:
+                              onClose ?? () => Navigator.of(context).pop(),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
@@ -71,10 +81,7 @@ class RitualInfoModal extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onClose ?? () => Navigator.of(context).pop(),
                     style: AppStyles.modalButton,
-                    child: Text(
-                      'Continue',
-                      style: AppStyles.buttonTextSmall,
-                    ),
+                    child: Text('Continue', style: AppStyles.buttonTextSmall),
                   ),
                 ),
               ],
@@ -130,23 +137,23 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
   void initState() {
     super.initState();
     // Profile ma'lumotlaridan boshlang'ich qiymatlarni olish
-    ritualType = widget.profileData.ritualType?.isNotEmpty == true 
-        ? widget.profileData.ritualType!.first 
+    ritualType = widget.profileData.ritualType?.isNotEmpty == true
+        ? widget.profileData.ritualType!.first
         : 'guided';
-    tone = widget.profileData.tone?.isNotEmpty == true 
-        ? widget.profileData.tone!.first 
+    tone = widget.profileData.tone?.isNotEmpty == true
+        ? widget.profileData.tone!.first
         : 'dreamy';
-    voice = widget.profileData.voice?.isNotEmpty == true 
-        ? widget.profileData.voice!.first 
+    voice = widget.profileData.voice?.isNotEmpty == true
+        ? widget.profileData.voice!.first
         : 'male';
-    duration = widget.profileData.duration?.isNotEmpty == true 
+    duration = widget.profileData.duration?.isNotEmpty == true
         ? int.tryParse(widget.profileData.duration!.first) ?? 5
         : 5;
   }
 
   @override
   Widget build(BuildContext context) {
-    final double modalWidth = MediaQuery.of(context).size.width * 0.92;
+    final double modalWidth = MediaQuery.of(context).size.width * 0.95;
     return Center(
       child: ClipRRect(
         borderRadius: AppStyles.radiusMedium,
@@ -168,8 +175,14 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.arrow_back, color: AppStyles.white, size: 28),
-                              onPressed: widget.onClose ?? () => Navigator.of(context).pop(),
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: AppStyles.white,
+                                size: 28,
+                              ),
+                              onPressed:
+                                  widget.onClose ??
+                                  () => Navigator.of(context).pop(),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                             ),
@@ -177,7 +190,14 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                               child: Text(
                                 'Customize Ritual',
                                 textAlign: TextAlign.center,
-                                style: AppStyles.headingMedium,
+                                style: TextStyle(
+                                  fontFamily: 'Canela',
+                                  fontSize: 32,
+                                  color: Color.fromARGB(255, 242, 239, 234),
+                                  fontWeight: FontWeight.w300,
+                                  decoration: TextDecoration.none,
+                                  letterSpacing: -0.5,
+                                ),
                               ),
                             ),
                             Opacity(
@@ -205,11 +225,16 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                       itemLabels: ritualTypes.map((e) => e['label']!).toList(),
                       onChanged: (v) async {
                         setState(() => ritualType = v!);
-                        final updatedProfileData = widget.profileData.copyWith(ritualType: [v ?? '']);
+                        final updatedProfileData = widget.profileData.copyWith(
+                          ritualType: [v ?? ''],
+                        );
                         widget.onProfileDataChanged(updatedProfileData);
-                        
+
                         // Meditation store ga ritual type ni update qilish
-                        final meditationStore = Provider.of<MeditationStore>(context, listen: false);
+                        final meditationStore = Provider.of<MeditationStore>(
+                          context,
+                          listen: false,
+                        );
                         await meditationStore.saveRitualSettings(
                           ritualType: v ?? '',
                           tone: tone,
@@ -221,7 +246,10 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                     AppStyles.spacingSmall,
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Choose your tone', style: AppStyles.bodyMedium),
+                      child: Text(
+                        'Choose your tone',
+                        style: AppStyles.bodyMedium,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     _StyledDropdown<String>(
@@ -230,11 +258,16 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                       itemLabels: tones.map((e) => e['label']!).toList(),
                       onChanged: (v) async {
                         setState(() => tone = v!);
-                        final updatedProfileData = widget.profileData.copyWith(tone: [v ?? '']);
+                        final updatedProfileData = widget.profileData.copyWith(
+                          tone: [v ?? ''],
+                        );
                         widget.onProfileDataChanged(updatedProfileData);
-                        
+
                         // Meditation store ga tone ni update qilish
-                        final meditationStore = Provider.of<MeditationStore>(context, listen: false);
+                        final meditationStore = Provider.of<MeditationStore>(
+                          context,
+                          listen: false,
+                        );
                         await meditationStore.saveRitualSettings(
                           ritualType: ritualType,
                           tone: v ?? '',
@@ -246,7 +279,10 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                     AppStyles.spacingSmall,
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Choose your voice', style: AppStyles.bodyMedium),
+                      child: Text(
+                        'Choose your voice',
+                        style: AppStyles.bodyMedium,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     _StyledDropdown<String>(
@@ -268,49 +304,71 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: durations.map((d) => Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: duration == d ? AppStyles.primaryBlue : AppStyles.transparentWhite,
-                              foregroundColor: AppStyles.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                      children: durations
+                          .map(
+                            (d) => Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4.0,
+                                ),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: duration == d
+                                        ? AppStyles.primaryBlue
+                                        : AppStyles.transparentWhite,
+                                    foregroundColor: AppStyles.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(70),
+                                    ),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    setState(() => duration = d);
+                                    final updatedProfileData = widget
+                                        .profileData
+                                        .copyWith(duration: [d.toString()]);
+                                    widget.onProfileDataChanged(
+                                      updatedProfileData,
+                                    );
+
+                                    // Meditation store ga duration ni update qilish
+                                    final meditationStore =
+                                        Provider.of<MeditationStore>(
+                                          context,
+                                          listen: false,
+                                        );
+                                    await meditationStore.saveRitualSettings(
+                                      ritualType: ritualType,
+                                      tone: tone,
+                                      duration: d.toString(),
+                                      planType:
+                                          widget.profileData.planType ?? 1,
+                                    );
+                                  },
+                                  child: Text(
+                                    '$d min',
+                                    style: AppStyles.buttonTextSmall,
+                                  ),
+                                ),
                               ),
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            onPressed: () async {
-                              setState(() => duration = d);
-                              final updatedProfileData = widget.profileData.copyWith(duration: [d.toString()]);
-                              widget.onProfileDataChanged(updatedProfileData);
-                              
-                              // Meditation store ga duration ni update qilish
-                              final meditationStore = Provider.of<MeditationStore>(context, listen: false);
-                              await meditationStore.saveRitualSettings(
-                                ritualType: ritualType,
-                                tone: tone,
-                                duration: d.toString(),
-                                planType: widget.profileData.planType ?? 1,
-                              );
-                            },
-                            child: Text('$d min', style: AppStyles.buttonTextSmall),
-                          ),
-                        ),
-                      )).toList(),
+                          )
+                          .toList(),
                     ),
                     AppStyles.spacingLarge,
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => GeneratingMeditation(
-                                profileData: widget.profileData, // Profile ma'lumotlarini uzatamiz
+                                profileData: widget
+                                    .profileData, // Profile ma'lumotlarini uzatamiz
                                 isDirectRitual: widget.isDirectRitual,
                               ),
                             ),
@@ -321,11 +379,14 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('Generate My Meditation', style: AppStyles.buttonTextSmall),
+                            const Text(
+                              'Generate My Meditation',
+                              style: AppStyles.buttonTextSmall,
+                            ),
                             SizedBox(width: 12),
                             Image.asset(
                               'assets/img/star.png',
-                              width: 22, 
+                              width: 22,
                               height: 22,
                             ),
                           ],
@@ -372,12 +433,18 @@ class _StyledDropdown<T> extends StatelessWidget {
         dropdownColor: const Color(0xCC3B6EAA),
         style: AppStyles.buttonTextSmall,
         borderRadius: BorderRadius.circular(16),
-        items: List.generate(items.length, (i) => DropdownMenuItem<T>(
-          value: items[i],
-          child: Text(itemLabels != null ? itemLabels![i] : items[i].toString(), style: AppStyles.buttonTextSmall),
-        )),
+        items: List.generate(
+          items.length,
+          (i) => DropdownMenuItem<T>(
+            value: items[i],
+            child: Text(
+              itemLabels != null ? itemLabels![i] : items[i].toString(),
+              style: AppStyles.buttonTextSmall,
+            ),
+          ),
+        ),
         onChanged: onChanged,
       ),
     );
   }
-} 
+}

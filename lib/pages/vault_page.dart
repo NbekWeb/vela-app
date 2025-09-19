@@ -65,8 +65,8 @@ class _VaultPageState extends State<VaultPage> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const SleepStreamMeditationPage(
-                  isDirectRitual: false,
-                ),
+                                          isDirectRitual: false,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -183,7 +183,7 @@ class _VaultPageState extends State<VaultPage> {
                                       ).pushNamed('/my-meditations');
                                     },
                                     child: Text(
-                                      'Your Saved Rituals (${meditationStore.myMeditations?.length ?? 0})',
+                                      'My Meditations (${meditationStore.myMeditations?.length ?? 0})',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 36,
@@ -265,7 +265,9 @@ class _VaultPageState extends State<VaultPage> {
                                     final file = details?['file']?.toString();
 
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
                                       child: VaultRitualCard(
                                         name: name,
                                         meditationId: meditationId,
@@ -296,7 +298,7 @@ class _VaultPageState extends State<VaultPage> {
                                       ).pushNamed('/archive');
                                     },
                                     child: Text(
-                                      'The Archive (${meditationStore.libraryDatas?.length ?? 0})',
+                                      'Meditation Library (${meditationStore.libraryDatas?.length ?? 0})',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 36,
@@ -387,7 +389,9 @@ class _VaultPageState extends State<VaultPage> {
                                         ?.toString();
 
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
                                       child: VaultRitualCard(
                                         name: name,
                                         meditationId: meditationId,

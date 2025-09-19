@@ -38,30 +38,30 @@ class VaultButtons extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: OutlinedButton(
-            onPressed: onHome,
-            style: OutlinedButton.styleFrom(
-              backgroundColor: Colors.white,
-              side: BorderSide.none, // border yo'q
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32),
-              ),
-            ),
-            child: const Text(
-              'Go to Home',
-              style: TextStyle(
-                color: Color(0xFF3B6EAA),
-                fontSize: 16,
-                fontFamily: 'Satoshi',
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
+        // const SizedBox(height: 12),
+        // SizedBox(
+        //   width: double.infinity,
+        //   height: 56,
+        //   child: OutlinedButton(
+        //     onPressed: onHome,
+        //     style: OutlinedButton.styleFrom(
+        //       backgroundColor: Colors.white,
+        //       side: BorderSide.none, // border yo'q
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(32),
+        //       ),
+        //     ),
+        //     child: const Text(
+        //       'Go to Home',
+        //       style: TextStyle(
+        //         color: Color(0xFF3B6EAA),
+        //         fontSize: 16,
+        //         fontFamily: 'Satoshi',
+        //         fontWeight: FontWeight.bold,
+        //       ),
+        //     ),
+        //   ),
+        // ),
         const SizedBox(height: 8),
       ],
     );

@@ -13,7 +13,8 @@ class NeuroplasticityButton extends StatefulWidget {
 
 class _NeuroplasticityButtonState extends State<NeuroplasticityButton> {
   bool _showCard = false;
-  String _neuroplasticityContent = 'Each time you reflect, reframe, and affirm your goals, you strengthen synaptic connections in the prefrontal cortex and reinforce identity-based neural pathways.You\'re literally reshaping your brain toward your dream life.';
+  String _neuroplasticityContent =
+      'Each time you reflect, reframe, and affirm your goals, you strengthen synaptic connections in the prefrontal cortex and reinforce identity-based neural pathways.You\'re literally reshaping your brain toward your dream life.';
 
   @override
   void initState() {
@@ -26,7 +27,8 @@ class _NeuroplasticityButtonState extends State<NeuroplasticityButton> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _showCard = prefs.getBool('neuroplasticity_active') ?? false;
-      _neuroplasticityContent = prefs.getString('neuroplasticity_content') ?? _neuroplasticityContent;
+      _neuroplasticityContent =
+          prefs.getString('neuroplasticity_content') ?? _neuroplasticityContent;
     });
   }
 
@@ -53,8 +55,10 @@ class _NeuroplasticityButtonState extends State<NeuroplasticityButton> {
           backgroundColor: Colors.transparent,
           child: ProfileEditModal(
             title: 'Edit Neuroplasticity',
-            prompt: 'Describe how neuroplasticity is helping you transform your brain and achieve your goals.',
-            hintText: 'Each time you reflect, reframe, and affirm your goals, you strengthen synaptic connections in the prefrontal cortex and reinforce identity-based neural pathways. You\'re literally reshaping your brain toward your dream life.',
+            prompt:
+                'Describe how neuroplasticity is helping you transform your brain and achieve your goals.',
+            hintText:
+                'Each time you reflect, reframe, and affirm your goals, you strengthen synaptic connections in the prefrontal cortex and reinforce identity-based neural pathways. You\'re literally reshaping your brain toward your dream life.',
             initialValue: _neuroplasticityContent,
             onSave: (String newContent) async {
               setState(() {
@@ -73,7 +77,7 @@ class _NeuroplasticityButtonState extends State<NeuroplasticityButton> {
   Widget build(BuildContext context) {
     if (_showCard) {
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Title outside the card
           Row(

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class StarsAnimation extends StatefulWidget {
   final Color topColor;
@@ -11,7 +12,7 @@ class StarsAnimation extends StatefulWidget {
     super.key,
     this.topColor = const Color(0xFF3C6EAB),
     this.bottomColor = const Color(0xFFA4C6EB),
-    this.starCount = 55,
+    this.starCount = 20,
   });
 
   @override
@@ -32,15 +33,16 @@ class _StarsAnimationState extends State<StarsAnimation> {
 
   void _initializeStars() {
     if (!mounted) return;
-    
+
     final random = Random();
     screenSize = MediaQuery.of(context).size;
-    
+
     setState(() {
       stars = List.generate(widget.starCount, (index) {
         final top = random.nextDouble() * 100;
         final left = random.nextDouble() * 100;
         final delay = random.nextDouble() * 2;
+
         return Positioned(
           top: top * screenSize.height / 100,
           left: left * screenSize.width / 100,
@@ -69,7 +71,7 @@ class _StarsAnimationState extends State<StarsAnimation> {
     return SizedBox.expand(
       child: Stack(
         children: [
-          // Background gradient
+          // Фон: градиент
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -96,7 +98,9 @@ class TwinklingStar extends StatefulWidget {
 
 class _TwinklingStarState extends State<TwinklingStar>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late final AnimationController _controller;
+
+  static const _asset = 'assets/img/star.svg';
 
   @override
   void initState() {
@@ -121,26 +125,29 @@ class _TwinklingStarState extends State<TwinklingStar>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        double value = _controller.value;
+        final value = _controller.value;
         double scale, opacity;
+
         if (value <= 0.5) {
-          scale = 0.3 + (value * 2 * 0.2);
+          // плавное проявление и лёгкое “дыхание”
+          scale = 0.03;
           opacity = value * 2;
         } else {
-          scale = 0.5;
+          scale = 0.05;
           opacity = 1.0 - ((value - 0.5) * 2);
         }
+
         return Transform.scale(
           scale: scale,
           child: Opacity(
             opacity: opacity,
-            child: Container(
-              width: 10,
-              height: 10,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
+            child: SvgPicture.asset(
+              _asset,
+              width: 150,
+              height: 148,
+              // Если в самом SVG не белая заливка, раскомментируй:
+              // colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              // cacheColorFilter: true,
             ),
           ),
         );
@@ -164,9 +171,7 @@ class _StarsAnimationPageState extends State<StarsAnimationPage> {
         systemNavigationBarColor: Colors.white,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
-      child: Scaffold(
-        body: StarsAnimation(),
-      ),
+      child: Scaffold(body: const StarsAnimation()),
     );
   }
-} 
+}

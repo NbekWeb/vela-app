@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vela/shared/widgets/stars_animation.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ZeroGenerator extends StatefulWidget {
   final VoidCallback? onNext;
@@ -41,10 +42,10 @@ class _ZeroGeneratorState extends State<ZeroGenerator> {
                   child: Text(
                     'Take a quiet moment to connect with yourself',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Canela',
                       fontWeight: FontWeight.w300,
-                      fontSize: 36,
+                      fontSize: 36.sp,
                       height: 1.15,
                       letterSpacing: -0.5,
                       color: Color(0xFFF2EFEA),
@@ -57,10 +58,10 @@ class _ZeroGeneratorState extends State<ZeroGenerator> {
                   child: Text(
                     'These questions activate the parts of your brain responsible for vision, clarity, and motivation.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Satoshi',
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       height: 1.5,
                       color: Color(0xFFF2EFEA),
                     ),
@@ -72,10 +73,10 @@ class _ZeroGeneratorState extends State<ZeroGenerator> {
                   child: Text(
                     "You're about to build a blueprint for your dream life.",
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Satoshi',
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       height: 1.5,
                       color: Color(0xFFF2EFEA),
                     ),

@@ -101,9 +101,9 @@ class _CheckInFormState extends State<_CheckInForm> {
   final TextEditingController _descriptionController = TextEditingController();
 
   String _getMoodText(double value) {
-    if (value <= 0.30) {
+    if (value <= 0.20) {
       return 'Struggling';
-    } else if (value <= 0.70) {
+    } else if (value <= 0.80) {
       return 'Neutral';
     } else {
       return 'Excellent';
@@ -111,9 +111,9 @@ class _CheckInFormState extends State<_CheckInForm> {
   }
 
   String _getCheckInChoice(double value) {
-    if (value <= 0.30) {
+    if (value <= 0.20) {
       return 'struggling';
-    } else if (value <= 0.70) {
+    } else if (value <= 0.80) {
       return 'neutral';
     } else {
       return 'excellent';
@@ -121,9 +121,9 @@ class _CheckInFormState extends State<_CheckInForm> {
   }
 
   String _getMoodImage(double value) {
-    if (value <= 0.3) {
+    if (value <= 0.2) {
       return 'assets/img/struggling.png'; // Struggling mood image
-    } else if (value <= 0.7) {
+    } else if (value <= 0.8) {
       return 'assets/img/planet.png'; // Neutral mood image
     } else {
       return 'assets/img/excellent.png'; // Excellent mood image
@@ -386,9 +386,9 @@ class _CheckInButtonsState extends State<_CheckInButtons> {
   }
 
   String _getCheckInChoice(double value) {
-    if (value <= 0.30) {
+    if (value <= 0.20) {
       return 'struggling';
-    } else if (value <= 0.70) {
+    } else if (value <= 0.80) {
       return 'neutral';
     } else {
       return 'excellent';
@@ -436,43 +436,43 @@ class _CheckInButtonsState extends State<_CheckInButtons> {
                       ),
               ),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const DirectRitualPage(),
-                    ),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  side: BorderSide.none,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'Generate New Meditation',
-                      style: TextStyle(
-                        color: Color(0xFF3B6EAA),
-                        fontSize: 16,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.auto_awesome, color: Color(0xFF3B6EAA)),
-                  ],
-                ),
-              ),
-            ),
+            // const SizedBox(height: 12),
+            // SizedBox(
+            //   width: double.infinity,
+            //   height: 56,
+            //   child: OutlinedButton(
+            //     onPressed: () {
+            //       Navigator.of(context).pushReplacement(
+            //         MaterialPageRoute(
+            //           builder: (context) => const DirectRitualPage(),
+            //         ),
+            //       );
+            //     },
+            //     style: OutlinedButton.styleFrom(
+            //       backgroundColor: Colors.white,
+            //       side: BorderSide.none,
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(32),
+            //       ),
+            //     ),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: const [
+            //         Text(
+            //           'Generate New Meditation',
+            //           style: TextStyle(
+            //             color: Color(0xFF3B6EAA),
+            //             fontSize: 16,
+            //             fontFamily: 'Satoshi',
+            //             fontWeight: FontWeight.bold,
+            //           ),
+            //         ),
+            //         SizedBox(width: 8),
+            //         Icon(Icons.auto_awesome, color: Color(0xFF3B6EAA)),
+            //       ],
+            //     ),
+            //   ),
+            // ),
           ],
         );
       },

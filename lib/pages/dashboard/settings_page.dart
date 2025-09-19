@@ -23,7 +23,8 @@ class SettingsPage extends StatelessWidget {
       onPopInvoked: (didPop) {
         if (didPop) {
           // Navigate back to profile page using dashboard navigation
-          final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+          final dashboardState = context
+              .findAncestorStateOfType<DashboardMainPageState>();
           if (dashboardState != null) {
             dashboardState.navigateToProfile();
           }
@@ -40,9 +41,9 @@ class SettingsPage extends StatelessWidget {
             children: [
               // Star animation background
               const StarsAnimation(
-                starCount: 50,
-                topColor: Color(0xFF5799D6),
-                bottomColor: Color(0xFFA4C6EB),
+                starCount: 20,
+                topColor: const Color(0xFF3C6EAB),
+                bottomColor: const Color(0xFFA4C6EB),
               ),
 
               // Main content
@@ -51,22 +52,22 @@ class SettingsPage extends StatelessWidget {
                   children: [
                     // Header
                     _buildHeader(context),
-                    
+
                     const SizedBox(height: 30),
-                    
+
                     // Settings title
                     Text(
                       'Settings',
                       style: TextStyle(
                         color: const Color.fromARGB(255, 242, 239, 234),
-                        fontSize: 38.sp,
+                        fontSize: 36.sp,
                         fontFamily: 'Canela',
                         fontWeight: FontWeight.w300,
                       ),
                     ),
-                    
+
                     const SizedBox(height: 28),
-                    
+
                     // Settings list
                     Expanded(
                       child: Padding(
@@ -98,10 +99,15 @@ class SettingsPage extends StatelessWidget {
             decoration: const BoxDecoration(shape: BoxShape.circle),
             child: Center(
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 24,
+                ),
                 onPressed: () {
                   // Navigate back to profile page using dashboard navigation
-                  final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+                  final dashboardState = context
+                      .findAncestorStateOfType<DashboardMainPageState>();
                   if (dashboardState != null) {
                     dashboardState.navigateToProfile();
                   }
@@ -109,18 +115,22 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Logo
           Transform.translate(
             offset: const Offset(3, 0),
             child: Image.asset('assets/img/logo.png', width: 60, height: 39),
           ),
-          
+
           // Invisible placeholder to maintain spacing
           Container(
             width: 36,
             height: 36,
-            child: const Icon(Icons.settings, color: Colors.transparent, size: 24),
+            child: const Icon(
+              Icons.settings,
+              color: Colors.transparent,
+              size: 24,
+            ),
           ),
         ],
       ),
@@ -131,9 +141,18 @@ class SettingsPage extends StatelessWidget {
     final settingsItems = [
       {'title': 'Edit Info', 'onTap': () => _navigateToEditInfo(context)},
       {'title': 'Reminders', 'onTap': () => _navigateToReminders(context)},
-      {'title': 'Subscription & Billing', 'onTap': () => _navigateToSubscriptionBilling(context)},
-      {'title': 'Privacy & Security', 'onTap': () => _navigateToPrivacySecurity(context)},
-      {'title': 'Help & Support', 'onTap': () => _navigateToHelpSupport(context)},
+      {
+        'title': 'Subscription & Billing',
+        'onTap': () => _navigateToSubscriptionBilling(context),
+      },
+      {
+        'title': 'Privacy & Security',
+        'onTap': () => _navigateToPrivacySecurity(context),
+      },
+      {
+        'title': 'Help & Support',
+        'onTap': () => _navigateToHelpSupport(context),
+      },
       {'title': 'About Vela', 'onTap': () => _navigateToAboutVela(context)},
       {'title': 'Log out', 'onTap': () => _handleLogout(context)},
     ];
@@ -177,37 +196,38 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> _handleLogout(BuildContext context) async {
     final authStore = Provider.of<AuthStore>(context, listen: false);
-    
+
     // Clear access token from secure storage
     final storage = FlutterSecureStorage();
     await storage.delete(key: 'access_token');
     await storage.delete(key: 'refresh_token');
-    
+
     // Reset saved tab index to 0
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('selected_tab_index', 0);
-    
+
     // Call authStore logout to clear all auth data
     await authStore.logout();
-    
+
     if (context.mounted) {
       // Clear all routes and navigate to login
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        '/login',
-        (Route<dynamic> route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
     }
   }
 
   void _navigateToEditInfo(BuildContext context) {
-    final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+    final dashboardState = context
+        .findAncestorStateOfType<DashboardMainPageState>();
     if (dashboardState != null) {
       dashboardState.navigateToEditInfo();
     }
   }
 
   void _navigateToReminders(BuildContext context) {
-    final dashboardState = context.findAncestorStateOfType<DashboardMainPageState>();
+    final dashboardState = context
+        .findAncestorStateOfType<DashboardMainPageState>();
     if (dashboardState != null) {
       dashboardState.navigateToReminders();
     }
@@ -216,36 +236,28 @@ class SettingsPage extends StatelessWidget {
   void _navigateToSubscriptionBilling(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const SubscriptionBillingPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const SubscriptionBillingPage()),
     );
   }
 
   void _navigateToPrivacySecurity(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const PrivacySecurityPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const PrivacySecurityPage()),
     );
   }
 
   void _navigateToHelpSupport(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const HelpSupportPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const HelpSupportPage()),
     );
   }
 
   void _navigateToAboutVela(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AboutVelaPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const AboutVelaPage()),
     );
   }
-} 
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PlanPageStyles {
   static const Color pillBg = Color.fromRGBO(21, 43, 86, 0.1);
@@ -8,51 +9,52 @@ class PlanPageStyles {
   static const Color bullet = Color(0xFFB6D0F7);
   static const Color leftBorder = Color(0xFFC9DFF4);
 
-  static const TextStyle badge = TextStyle(
+  static TextStyle badge = TextStyle(
     color: Color(0xFFF2EFEA),
     fontFamily: 'Satoshi',
-    fontSize: 14,
+    fontSize: 14.sp,
     fontWeight: FontWeight.w700,
   );
 
-  static const TextStyle pill = TextStyle(
+  static TextStyle pill = TextStyle(
     fontFamily: 'Satoshi',
-    fontSize: 16,
+    fontSize: 16.sp,
     fontWeight: FontWeight.w700,
     color: Color(0xFFF2EFEA),
   );
 
-  static const TextStyle cardTitle = TextStyle(
+  static TextStyle cardTitle = TextStyle(
     color: Color(0xFFF2EFEA),
     fontFamily: 'Satoshi',
     fontWeight: FontWeight.bold,
-    fontSize: 16,
+    fontSize: 16.sp,
   );
 
-  static const TextStyle cardBody = TextStyle(
-    color: Color(0xFFF2EFEA),
-    fontSize: 16,
+  static TextStyle cardBody = TextStyle(
+    color: Color.fromARGB(148, 242, 239, 234),
+    fontSize: 14.sp,
     fontFamily: 'Satoshi',
     fontWeight: FontWeight.w700,
   );
 
-  static const TextStyle cardSection = TextStyle(
+  static TextStyle cardSection = TextStyle(
     color: Color(0xFFF2EFEA),
     fontFamily: 'Satoshi',
     fontWeight: FontWeight.bold,
-    fontSize: 16,
+    fontSize: 16.sp,
   );
 
-  static const TextStyle price = TextStyle(
+  static TextStyle price = TextStyle(
     color: Color(0xFFF2EFEA),
     fontFamily: 'Canela',
-    fontSize: 36,
+    fontSize: 36.sp,
+    letterSpacing: -0.5,
     fontWeight: FontWeight.w300,
   );
 
-  static const TextStyle priceSub = TextStyle(
+  static TextStyle priceSub = TextStyle(
     color: Color(0xFFF2EFEA),
-    fontSize: 16,
+    fontSize: 16.sp,
     fontFamily: 'Satoshi',
     fontWeight: FontWeight.w700,
   );
@@ -62,10 +64,11 @@ class PlanPageStyles {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
   );
 
-  static const TextStyle pageTitle = TextStyle(
+  static TextStyle pageTitle = TextStyle(
     color: Colors.white,
     fontFamily: 'Canela',
-    fontSize: 36,
+    fontSize: 36.sp,
+    letterSpacing: -0.5,
     fontWeight: FontWeight.w300,
   );
 

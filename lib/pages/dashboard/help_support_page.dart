@@ -26,9 +26,9 @@ class HelpSupportPage extends StatelessWidget {
         body: Stack(
           children: [
             const StarsAnimation(
-              starCount: 50,
-              topColor: Color(0xFF5799D6),
-              bottomColor: Color(0xFFA4C6EB),
+              starCount: 20,
+              topColor: const Color(0xFF3C6EAB),
+              bottomColor: const Color(0xFFA4C6EB),
             ),
             SafeArea(
               child: Column(
@@ -39,7 +39,8 @@ class HelpSupportPage extends StatelessWidget {
                     'Help & Support',
                     style: TextStyle(
                       color: const Color.fromARGB(255, 242, 239, 234),
-                      fontSize: 38.sp,
+                      fontSize: 36.sp,
+                      letterSpacing: -0.5,
                       fontFamily: 'Canela',
                       fontWeight: FontWeight.w300,
                     ),
@@ -51,16 +52,6 @@ class HelpSupportPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Get Help',
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 242, 239, 234),
-                              fontSize: 24.sp,
-                              fontFamily: 'Canela',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           _buildHelpOption(
                             context,
                             'FAQ',
@@ -87,9 +78,10 @@ class HelpSupportPage extends StatelessWidget {
                           const SizedBox(height: 32),
                           Text(
                             'App Information',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: const Color.fromARGB(255, 242, 239, 234),
-                              fontSize: 24.sp,
+                              fontSize: 26.sp,
                               fontFamily: 'Canela',
                               fontWeight: FontWeight.w300,
                             ),
@@ -129,7 +121,13 @@ class HelpSupportPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHelpOption(BuildContext context, String title, String description, IconData icon, VoidCallback onTap) {
+  Widget _buildHelpOption(
+    BuildContext context,
+    String title,
+    String description,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -146,11 +144,7 @@ class HelpSupportPage extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: const Color(0xFFC9DFF4),
-              size: 24,
-            ),
+            Icon(icon, color: const Color(0xFFC9DFF4), size: 24),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -177,11 +171,7 @@ class HelpSupportPage extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-              size: 16,
-            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
           ],
         ),
       ),
@@ -227,7 +217,11 @@ class HelpSupportPage extends StatelessWidget {
             decoration: const BoxDecoration(shape: BoxShape.circle),
             child: Center(
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 24,
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -241,7 +235,11 @@ class HelpSupportPage extends StatelessWidget {
           Container(
             width: 36,
             height: 36,
-            child: const Icon(Icons.settings, color: Colors.transparent, size: 24),
+            child: const Icon(
+              Icons.settings,
+              color: Colors.transparent,
+              size: 24,
+            ),
           ),
         ],
       ),

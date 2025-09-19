@@ -32,7 +32,6 @@ class GoalsStep extends StatefulWidget {
 
 class _GoalsStepState extends State<GoalsStep> {
   final TextEditingController _controller = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -47,7 +46,6 @@ class _GoalsStepState extends State<GoalsStep> {
   @override
   void dispose() {
     _controller.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -108,7 +106,7 @@ class _GoalsStepState extends State<GoalsStep> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
                   const Text(
                     'Are there specific goals you want to accomplish, experiences you want to have, or habits you want to form or change?',
                     style: TextStyle(
@@ -126,8 +124,6 @@ class _GoalsStepState extends State<GoalsStep> {
                     child: TextField(
                       textAlign: TextAlign.center,
                       controller: _controller,
-                      scrollController: _scrollController,
-                      scrollPhysics: const BouncingScrollPhysics(),
                       minLines: 3,
                       maxLines: isKeyboardVisible ? 4 : 6,
                       style: const TextStyle(

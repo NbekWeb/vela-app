@@ -9,7 +9,7 @@ class SvgIcon extends StatelessWidget {
   const SvgIcon({
     super.key,
     required this.assetName,
-    this.size = 28,
+    this.size = 30,
     this.color,
   });
 

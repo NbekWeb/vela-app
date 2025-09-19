@@ -18,9 +18,9 @@ class PrivacySecurityPage extends StatelessWidget {
         body: Stack(
           children: [
             const StarsAnimation(
-              starCount: 50,
-              topColor: Color(0xFF5799D6),
-              bottomColor: Color(0xFFA4C6EB),
+              starCount: 20,
+              topColor: const Color(0xFF3C6EAB),
+              bottomColor: const Color(0xFFA4C6EB),
             ),
             SafeArea(
               child: Column(
@@ -31,7 +31,8 @@ class PrivacySecurityPage extends StatelessWidget {
                     'Privacy & Security',
                     style: TextStyle(
                       color: const Color.fromARGB(255, 242, 239, 234),
-                      fontSize: 38.sp,
+                      fontSize: 36.sp,
+                      letterSpacing: -0.5,
                       fontFamily: 'Canela',
                       fontWeight: FontWeight.w300,
                     ),
@@ -43,16 +44,6 @@ class PrivacySecurityPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Data Protection',
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 242, 239, 234),
-                              fontSize: 24.sp,
-                              fontFamily: 'Canela',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.all(20.sp),
@@ -70,7 +61,12 @@ class PrivacySecurityPage extends StatelessWidget {
                                 Text(
                                   'Your data is secure',
                                   style: TextStyle(
-                                    color: const Color.fromARGB(255, 242, 239, 234),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      242,
+                                      239,
+                                      234,
+                                    ),
                                     fontSize: 20.sp,
                                     fontFamily: 'Satoshi',
                                     fontWeight: FontWeight.w600,
@@ -80,7 +76,12 @@ class PrivacySecurityPage extends StatelessWidget {
                                 Text(
                                   'We use industry-standard encryption to protect your personal information and meditation data.',
                                   style: TextStyle(
-                                    color: const Color.fromARGB(255, 242, 239, 234),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      242,
+                                      239,
+                                      234,
+                                    ),
                                     fontSize: 14.sp,
                                     fontFamily: 'Satoshi',
                                     fontWeight: FontWeight.w400,
@@ -115,7 +116,11 @@ class PrivacySecurityPage extends StatelessWidget {
             decoration: const BoxDecoration(shape: BoxShape.circle),
             child: Center(
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 24,
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -129,7 +134,11 @@ class PrivacySecurityPage extends StatelessWidget {
           Container(
             width: 36,
             height: 36,
-            child: const Icon(Icons.settings, color: Colors.transparent, size: 24),
+            child: const Icon(
+              Icons.settings,
+              color: Colors.transparent,
+              size: 24,
+            ),
           ),
         ],
       ),

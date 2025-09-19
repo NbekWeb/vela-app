@@ -52,8 +52,12 @@ class _ArchivePageState extends State<ArchivePage> {
                         onTap: () {
                           // Set global flag and navigate to dashboard
                           shouldNavigateToProfile = true;
-                          print('Archive: Setting shouldNavigateToProfile = true');
-                          Navigator.of(context).pushReplacementNamed('/dashboard');
+                          print(
+                            'Archive: Setting shouldNavigateToProfile = true',
+                          );
+                          Navigator.of(
+                            context,
+                          ).pushReplacementNamed('/dashboard');
                         },
                         child: Consumer<AuthStore>(
                           builder: (context, authStore, child) {
@@ -128,9 +132,7 @@ class _ArchivePageState extends State<ArchivePage> {
                       // Show loading indicator while fetching data
                       if (meditationStore.isLoading) {
                         return const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
+                          child: CircularProgressIndicator(color: Colors.white),
                         );
                       }
 
@@ -185,7 +187,7 @@ class _ArchivePageState extends State<ArchivePage> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: VaultRitualCard(
                               isEmpty: true,
-                              emptyText: 'Archive is empty  ',
+                              emptyText: 'Library is empty  ',
                               showButton: false,
                             ),
                           ),

@@ -89,7 +89,7 @@ class DashboardMainPageState extends State<DashboardMainPage> {
       final prefs = await SharedPreferences.getInstance();
       final savedIndex = prefs.getInt(_selectedTabKey);
       final savedPreviousIndex = prefs.getInt(_previousTabKey);
-      
+
       if (savedIndex != null && savedIndex >= 0 && savedIndex < _pages.length) {
         setState(() {
           _selectedIndex = savedIndex;
@@ -115,10 +115,12 @@ class DashboardMainPageState extends State<DashboardMainPage> {
   @override
   void initState() {
     super.initState();
-    
+
     // Check if should navigate to profile first
     if (shouldNavigateToProfile) {
-      print('Dashboard: shouldNavigateToProfile is true, navigating to profile');
+      print(
+        'Dashboard: shouldNavigateToProfile is true, navigating to profile',
+      );
       setState(() {
         _selectedIndex = 3; // Profile index
         _previousIndex = 0;
@@ -129,7 +131,7 @@ class DashboardMainPageState extends State<DashboardMainPage> {
       // Load saved selected index only if not navigating to profile
       _loadSelectedIndex();
     }
-    
+
     // Check if there's a global meditation ID to play
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (globalMeditationId != null) {
@@ -189,133 +191,149 @@ class DashboardMainPageState extends State<DashboardMainPage> {
             body: _pages[_selectedIndex],
             backgroundColor: _selectedIndex == 0
                 ? Color(0xFF5799D6)
-                : Colors.transparent, // Home page uchun rang, boshqalari uchun transparent
-            bottomNavigationBar: _selectedIndex == 7 ? null : Container(
-            margin: const EdgeInsets.only(bottom: 0),
-            padding:
-                !kIsWeb && (Theme.of(context).platform == TargetPlatform.iOS)
-                ? EdgeInsets.only(
-                    top: 10,
-                    bottom: 5 + MediaQuery.of(context).viewPadding.bottom,
-                    left: 20,
-                    right: 20,
-                  )
-                : const EdgeInsets.only(
-                    top: 10,
-                    bottom: 20,
-                    left: 20,
-                    right: 20,
-                  ),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF9F9F9),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(32.r),
-                topRight: Radius.circular(32.r),
-                bottomLeft: Radius.circular(0),
-                bottomRight: Radius.circular(0),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _NavItem(
-                  icon: HomeIcon(
-                    filled: _selectedIndex == 0,
-                    opacity: _selectedIndex == 0 ? 1.0 : 0.5,
-                  ),
-                  label: 'Home',
-                  selected: _selectedIndex == 0,
-                  onTap: () {
-                    setState(() {
-                      _previousIndex = _selectedIndex;
-                      _selectedIndex = 0;
-                    });
-                    _saveSelectedIndex();
-                  },
-                ),
-                _NavItem(
-                  icon: VaultIcon(
-                    filled: _selectedIndex == 1,
-                    opacity: _selectedIndex == 1 ? 1.0 : 0.5,
-                  ),
-                  label: 'Vault',
-                  selected: _selectedIndex == 1,
-                  onTap: () {
-                    setState(() {
-                      _previousIndex = _selectedIndex;
-                      _selectedIndex = 1;
-                    });
-                    _saveSelectedIndex();
-                  },
-                ),
-                // Center star button
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => DirectRitualPage()),
-                    );
-                  },
-                  child: Container(
-                    width: 64,
-                    height: 64,
+                : Colors
+                      .transparent, // Home page uchun rang, boshqalari uchun transparent
+            bottomNavigationBar: _selectedIndex == 7
+                ? null
+                : Container(
+                    margin: const EdgeInsets.only(bottom: 0),
+                    padding:
+                        !kIsWeb &&
+                            (Theme.of(context).platform == TargetPlatform.iOS)
+                        ? EdgeInsets.only(
+                            top: 10,
+                            bottom:
+                                5 + MediaQuery.of(context).viewPadding.bottom,
+                            left: 10,
+                            right: 10,
+                          )
+                        : const EdgeInsets.only(
+                            top: 10,
+                            bottom: 20,
+                            left: 10,
+                            right: 10,
+                          ),
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          Color.fromRGBO(60, 110, 171, 1),
-                          Color.fromRGBO(164, 198, 235, 1),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                      color: const Color(0xFFF9F9F9),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(32.r),
+                        topRight: Radius.circular(32.r),
+                        bottomLeft: Radius.circular(0),
+                        bottomRight: Radius.circular(0),
                       ),
                     ),
-                    child: Center(
-                      child: SvgIcon(
-                        assetName: 'assets/menu/star.svg',
-                        size: 32,
-                        color: Colors.white,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _NavItem(
+                          icon: HomeIcon(
+                            filled: _selectedIndex == 0,
+                            opacity: _selectedIndex == 0 ? 1.0 : 0.5,
+                          ),
+                          label: 'Home',
+                          selected: _selectedIndex == 0,
+                          onTap: () {
+                            setState(() {
+                              _previousIndex = _selectedIndex;
+                              _selectedIndex = 0;
+                            });
+                            _saveSelectedIndex();
+                          },
+                        ),
+                        _NavItem(
+                          icon: VaultIcon(
+                            filled: _selectedIndex == 1,
+                            opacity: _selectedIndex == 1 ? 1.0 : 0.5,
+                          ),
+                          label: 'Vault',
+                          selected: _selectedIndex == 1,
+                          onTap: () {
+                            setState(() {
+                              _previousIndex = _selectedIndex;
+                              _selectedIndex = 1;
+                            });
+                            _saveSelectedIndex();
+                          },
+                        ),
+                        // Center star button
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0,
+                          ), // ← 20px слева и справа
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DirectRitualPage(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color.fromRGBO(60, 110, 171, 1),
+                                    Color.fromRGBO(164, 198, 235, 1),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: Center(
+                                child: SvgIcon(
+                                  assetName: 'assets/menu/star.svg',
+                                  size: 32,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        _NavItem(
+                          icon: CheckIcon(
+                            filled: _selectedIndex == 2,
+                            opacity: _selectedIndex == 2 ? 1.0 : 0.5,
+                          ),
+                          label: 'Check-in',
+                          selected: _selectedIndex == 2,
+                          onTap: () {
+                            setState(() {
+                              _previousIndex = _selectedIndex;
+                              _selectedIndex = 2;
+                            });
+                            _saveSelectedIndex();
+                          },
+                        ),
+                        _NavItem(
+                          icon: ProfileIcon(
+                            filled: _selectedIndex == 3 || _selectedIndex == 4,
+                            opacity:
+                                (_selectedIndex == 3 || _selectedIndex == 4)
+                                ? 1.0
+                                : 0.5,
+                          ),
+                          label: 'Profile',
+                          selected: _selectedIndex == 3 || _selectedIndex == 4,
+                          onTap: () {
+                            setState(() {
+                              _previousIndex = _selectedIndex;
+                              _selectedIndex = 3;
+                            });
+                            _saveSelectedIndex();
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                _NavItem(
-                  icon: CheckIcon(
-                    filled: _selectedIndex == 2,
-                    opacity: _selectedIndex == 2 ? 1.0 : 0.5,
-                  ),
-                  label: 'Check-in',
-                  selected: _selectedIndex == 2,
-                  onTap: () {
-                    setState(() {
-                      _previousIndex = _selectedIndex;
-                      _selectedIndex = 2;
-                    });
-                    _saveSelectedIndex();
-                  },
-                ),
-                _NavItem(
-                  icon: ProfileIcon(
-                    filled: _selectedIndex == 3 || _selectedIndex == 4,
-                    opacity: (_selectedIndex == 3 || _selectedIndex == 4) ? 1.0 : 0.5,
-                  ),
-                  label: 'Profile',
-                  selected: _selectedIndex == 3 || _selectedIndex == 4,
-                  onTap: () {
-                    setState(() {
-                      _previousIndex = _selectedIndex;
-                      _selectedIndex = 3;
-                    });
-                    _saveSelectedIndex();
-                  },
-                ),
-              ],
-            ),
           ),
-        ),
-      ],
-    ),
+        ],
+      ),
     );
   }
 
@@ -359,29 +377,37 @@ class _NavItem extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 60, // Fixed width for nav items
-        margin: const EdgeInsets.only(top: 10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            icon,
-            const SizedBox(height: 4),
-            Text(
-              label.toUpperCase(),
-              style: TextStyle(
-                fontSize: 10.sp,
-                letterSpacing: -0.1.sp,
-                color: selected
-                    ? Color(0xFF3B6EAA)
-                    : Color(0xFF3B6EAA).withValues(alpha: 0.5),
-                fontWeight: selected ? FontWeight.bold : FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 5.0,
+      ), // ← Расширяем зону нажатия
+      child: GestureDetector(
+        behavior: HitTestBehavior
+            .translucent, // ← Улавливает касания даже в прозрачных зонах
+        onTap: onTap,
+        child: Container(
+          width:
+              60, // Можно оставить, это визуальный размер, не влияет на зону касания
+          margin: const EdgeInsets.only(top: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              icon,
+              const SizedBox(height: 2),
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  letterSpacing: -0.1.sp,
+                  color: selected
+                      ? const Color(0xFF3B6EAA)
+                      : const Color(0xFF3B6EAA).withAlpha(128), // 0.5 opacity
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center, // Center align text
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

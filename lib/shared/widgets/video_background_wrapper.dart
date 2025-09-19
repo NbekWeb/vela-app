@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import '../../core/utils/video_loader.dart';
@@ -46,13 +47,15 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
 
       // Wait for video initialization to complete
       await VideoLoader.waitForInitialization();
-      
+
       // Get the preloaded controller
       _controller = VideoLoader.starterController;
-      
+
       // If still not available, create a new controller
       if (_controller == null || !_controller!.value.isInitialized) {
-        _controller = VideoPlayerController.asset('assets/videos/starteropt.mp4');
+        _controller = VideoPlayerController.asset(
+          'assets/videos/starteropt.mp4',
+        );
         await _controller!.initialize();
         _controller!
           ..setLooping(true)
@@ -129,8 +132,8 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
                   if (widget.showControls)
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
+                        horizontal: 30,
+                        vertical: 28,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -142,10 +145,11 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
                                   ? 'assets/icons/mute.svg'
                                   : 'assets/icons/unmute.svg',
                               color: StarterPageStyles.iconColor,
+                              size: 30,
                             ),
                           ),
-                          Image.asset(
-                            'assets/img/logo.png',
+                          SvgPicture.asset(
+                            'assets/icons/logo.svg',
                             width: 60,
                             height: 40,
                           ),
@@ -156,6 +160,7 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
                             child: SvgIcon(
                               assetName: 'assets/icons/brain.svg',
                               color: StarterPageStyles.iconColor,
+                              size: 30,
                             ),
                           ),
                         ],
@@ -172,4 +177,4 @@ class _VideoBackgroundWrapperState extends State<VideoBackgroundWrapper> {
       ),
     );
   }
-} 
+}
