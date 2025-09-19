@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import '../../../shared/models/meditation_profile_data.dart';
 import '../../../core/stores/meditation_store.dart';
 import '../step_scaffold.dart';
@@ -73,14 +74,16 @@ class _VisionStepState extends State<VisionStep> {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(physics: const NeverScrollableScrollPhysics()),
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        behavior: HitTestBehavior.opaque,
-        child: StepScaffold(
+    return KeyboardVisibilityBuilder(
+      builder: (context, isKeyboardVisible) {
+        return ScrollConfiguration(
+          behavior: ScrollConfiguration.of(
+            context,
+          ).copyWith(physics: const NeverScrollableScrollPhysics()),
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            behavior: HitTestBehavior.opaque,
+            child: StepScaffold(
           title: '',
           onBack: widget.onBack,
           onNext: widget.onNext,
@@ -90,7 +93,7 @@ class _VisionStepState extends State<VisionStep> {
           stepperIndex: widget.stepperIndex,
           stepperCount: widget.stepperCount,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
@@ -123,7 +126,8 @@ class _VisionStepState extends State<VisionStep> {
                   controller: _controller,
                   textAlign: TextAlign.center,
                   minLines: 3,
-                  maxLines: 6,
+                  maxLines: isKeyboardVisible ? 4 : 6,
+                  scrollPhysics: const ClampingScrollPhysics(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontFamily: 'Satoshi',
@@ -159,6 +163,8 @@ class _VisionStepState extends State<VisionStep> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import '../../../shared/models/meditation_profile_data.dart';
 import '../../../core/stores/meditation_store.dart';
 import '../step_scaffold.dart';
@@ -75,14 +76,16 @@ class _HappyStepState extends State<HappyStep> {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(physics: const NeverScrollableScrollPhysics()),
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        behavior: HitTestBehavior.opaque,
-        child: StepScaffold(
+    return KeyboardVisibilityBuilder(
+      builder: (context, isKeyboardVisible) {
+        return ScrollConfiguration(
+          behavior: ScrollConfiguration.of(
+            context,
+          ).copyWith(physics: const NeverScrollableScrollPhysics()),
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            behavior: HitTestBehavior.opaque,
+            child: StepScaffold(
           title: '',
           onBack: widget.onBack,
           onNext: widget.onNext,
@@ -92,7 +95,7 @@ class _HappyStepState extends State<HappyStep> {
           stepperIndex: widget.stepperIndex,
           stepperCount: widget.stepperCount,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text(
@@ -123,8 +126,9 @@ class _HappyStepState extends State<HappyStep> {
                 child: TextField(
                   textAlign: TextAlign.center,
                   controller: _controller,
-                  minLines: 5,
-                  maxLines: 8,
+                  minLines: 3,
+                  maxLines: isKeyboardVisible ? 4 : 6,
+                  scrollPhysics: const ClampingScrollPhysics(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontFamily: 'Satoshi',
@@ -160,6 +164,8 @@ class _HappyStepState extends State<HappyStep> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

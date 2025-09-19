@@ -204,8 +204,8 @@ class DashboardMainPageState extends State<DashboardMainPage> {
                             top: 10,
                             bottom:
                                 5 + MediaQuery.of(context).viewPadding.bottom,
-                            left: 10,
-                            right: 10,
+                            left: 8,
+                            right: 8,
                           )
                         : const EdgeInsets.only(
                             top: 10,
@@ -259,7 +259,7 @@ class DashboardMainPageState extends State<DashboardMainPage> {
                         // Center star button
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0,
+                            horizontal: 15.0,
                           ), // ← 20px слева и справа
                           child: GestureDetector(
                             onTap: () {

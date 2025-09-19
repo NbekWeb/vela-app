@@ -5,6 +5,7 @@ import '../styles/pages/plan_page_styles.dart';
 import 'components/plan_switch.dart';
 import 'components/plan_info_card.dart';
 import '../shared/widgets/auth.dart';
+import '../shared/widgets/exit_confirmation_dialog.dart';
 import '../core/stores/auth_store.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -27,6 +28,14 @@ class _PlanPageState extends State<PlanPage> {
     setState(() {
       _currentStep = PlanStep.dreamLifeIntro;
     });
+  }
+
+  void _showExitDialog() {
+    ExitConfirmationDialog.show(
+      context,
+      title: 'Exit Plan Selection?',
+      message: 'Are you sure you want to exit? You can always come back to select your plan later.',
+    );
   }
 
   @override
@@ -123,7 +132,7 @@ class _PlanPageState extends State<PlanPage> {
             const SizedBox(height: 30),
           ],
         );
-        onBack = null;
+        onBack = _showExitDialog;
         break;
       case PlanStep.dreamLifeIntro:
         title = '';
@@ -177,7 +186,7 @@ class _PlanPageState extends State<PlanPage> {
                           elevation: 0,
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, '/generator');
+                          Navigator.pushReplacementNamed(context, '/generator');
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -203,21 +212,25 @@ class _PlanPageState extends State<PlanPage> {
             );
           },
         );
-        onBack = () {
-          setState(() {
-            _currentStep = PlanStep.choosePlan;
-          });
-        };
+        onBack = _showExitDialog;
         break;
     }
 
-    return AuthScaffold(
-      title: title,
-      subtitle: subtitle,
-      onBack: onBack,
-      showTerms: _currentStep == PlanStep.choosePlan,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
-      child: child,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          _showExitDialog();
+        }
+      },
+      child: AuthScaffold(
+        title: title,
+        subtitle: subtitle,
+        onBack: onBack,
+        showTerms: _currentStep == PlanStep.choosePlan,
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 50),
+        child: child,
+      ),
     );
   }
 }

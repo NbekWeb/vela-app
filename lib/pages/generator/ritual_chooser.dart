@@ -64,7 +64,7 @@ class RitualChooser extends StatelessWidget {
     ];
 
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const Text(
@@ -81,7 +81,7 @@ class RitualChooser extends StatelessWidget {
         const SizedBox(height: 32),
         ...rituals.map(
           (ritual) => Padding(
-            padding: const EdgeInsets.only(bottom: 18),
+            padding: const EdgeInsets.only(bottom: 12),
             child: _RitualCard(
               ritual: ritual,
               onTap: () {

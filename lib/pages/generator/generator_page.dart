@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vela/shared/widgets/stars_animation.dart';
+import 'package:vela/shared/widgets/exit_confirmation_dialog.dart';
 import 'steps/age_step.dart';
 import 'steps/gender_step.dart';
 import 'steps/goals_step.dart';
@@ -178,19 +179,35 @@ class _GeneratorPageState extends State<GeneratorPage> {
   // Helper method to build step widgets (for future extensibility)
   Widget _buildStep(Widget step) => step;
 
+  void _showExitDialog() {
+    ExitConfirmationDialog.show(
+      context,
+      title: 'Exit Dream Life Intake?',
+      message: 'Are you sure you want to exit? Your progress will be lost.',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          const StarsAnimation(),
-          Center(
-            child: _steps[_currentStep],
-          ),
-        ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _showExitDialog();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            const StarsAnimation(),
+            Center(
+              child: _steps[_currentStep],
+            ),
+          ],
+        ),
+        // floatingActionButton removed
       ),
-      // floatingActionButton removed
     );
   }
 }

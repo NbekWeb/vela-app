@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vela/shared/widgets/stars_animation.dart';
+import 'package:vela/shared/widgets/exit_confirmation_dialog.dart';
 import 'steps/ritual_step.dart';
 import '../../shared/models/meditation_profile_data.dart';
 
@@ -27,25 +28,24 @@ class _DirectRitualPageState extends State<DirectRitualPage> {
     }
   }
 
+  void _showExitDialog() {
+    ExitConfirmationDialog.show(
+      context,
+      title: 'Exit Ritual Creation?',
+      message: 'Are you sure you want to exit? Your progress will be lost.',
+      onExit: () {
+        _goBackToHome();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvoked: (didPop) {
         if (!didPop) {
-          // Clear navigation stack to prevent back navigation to auth pages
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            '/dashboard',
-            (route) {
-              // Keep only dashboard and its sub-routes, remove auth pages
-              return route.settings.name == '/dashboard' || 
-                     route.settings.name == '/my-meditations' ||
-                     route.settings.name == '/archive' ||
-                     route.settings.name == '/vault' ||
-                     route.settings.name == '/generator';
-            }
-          );
+          _showExitDialog();
         }
       },
       child: Scaffold(

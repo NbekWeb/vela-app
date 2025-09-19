@@ -149,30 +149,32 @@ class StepScaffold extends StatelessWidget {
                   ),
                   // Content area
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Center(
-                        child: Transform.translate(
-                          offset: const Offset(
-                            0,
-                            -30,
-                          ), // ← аналог margin-top: -20px
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(
+                        bottom: isKeyboardVisible ? 100 : 0, // Keyboard ochilganda padding qo'shamiz
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: SizedBox(
+                          height: isKeyboardVisible 
+                            ? null // Keyboard ochilganda natural height
+                            : MediaQuery.of(context).size.height - 200, // Keyboard yo'q bo'lganda fixed height
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                title,
-                                style: const TextStyle(
-                                  fontFamily: 'Canela',
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 36,
-                                  color: Color(0xFFF2EFEA),
+                              if (title.isNotEmpty) ...[
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    fontFamily: 'Canela',
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 36,
+                                    color: Color(0xFFF2EFEA),
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 10),
+                                const SizedBox(height: 10),
+                              ],
                               child,
                             ],
                           ),
@@ -183,100 +185,91 @@ class StepScaffold extends StatelessWidget {
 
                   // Bottom button area
                   if (onNext != null)
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      height: isKeyboardVisible ? 0 : null,
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
-                        opacity: isKeyboardVisible ? 0.0 : 1.0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 40,
-                            left: 16,
-                            right: 16,
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 40,
+                        left: 16,
+                        right: 16,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'The Universe responds to specifics. The more detail you share, the more powerful and personalized your Vela journey becomes.',
+                            style: TextStyle(
+                              color: Color(0xFFDCE6F0),
+                              fontFamily: 'Satoshi',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13.sp,
+                              letterSpacing: -0.5,
+                              height: 1.25,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          child: Column(
-                            children: [
-                              Text(
-                                'The Universe responds to specifics. The more detail you share, the more powerful and personalized your Vela journey becomes.',
-                                style: TextStyle(
-                                  color: Color(0xFFDCE6F0),
-                                  fontFamily: 'Satoshi',
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13.sp,
-                                  letterSpacing: -0.5,
-                                  height: 1.25,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: nextEnabled ? onNext : null,
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        WidgetStateProperty.resolveWith<Color>((
-                                          Set<WidgetState> states,
-                                        ) {
-                                          if (states.contains(
-                                            WidgetState.disabled,
-                                          )) {
-                                            return const Color(
-                                              0xFF3B6EAA,
-                                            ).withOpacity(0.5);
-                                          }
-                                          return const Color(0xFF3B6EAA);
-                                        }),
-                                    foregroundColor:
-                                        WidgetStateProperty.resolveWith<Color>((
-                                          Set<WidgetState> states,
-                                        ) {
-                                          if (states.contains(
-                                            WidgetState.disabled,
-                                          )) {
-                                            return Colors.white.withOpacity(
-                                              0.7,
-                                            );
-                                          }
-                                          return Colors.white;
-                                        }),
-                                    shape: WidgetStateProperty.all(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(32),
-                                      ),
-                                    ),
-                                    padding: WidgetStateProperty.all(
-                                      const EdgeInsets.symmetric(vertical: 20),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text(
-                                        nextLabel ?? 'Next',
-                                        style: const TextStyle(
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                          color: Color(0xFFF2EFEA),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Icon(Icons.arrow_forward),
-                                    ],
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: nextEnabled ? onNext : null,
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    WidgetStateProperty.resolveWith<Color>((
+                                      Set<WidgetState> states,
+                                    ) {
+                                      if (states.contains(
+                                        WidgetState.disabled,
+                                      )) {
+                                        return const Color(
+                                          0xFF3B6EAA,
+                                        ).withOpacity(0.5);
+                                      }
+                                      return const Color(0xFF3B6EAA);
+                                    }),
+                                foregroundColor:
+                                    WidgetStateProperty.resolveWith<Color>((
+                                      Set<WidgetState> states,
+                                    ) {
+                                      if (states.contains(
+                                        WidgetState.disabled,
+                                      )) {
+                                        return Colors.white.withOpacity(
+                                          0.7,
+                                        );
+                                      }
+                                      return Colors.white;
+                                    }),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(32),
                                   ),
                                 ),
+                                padding: WidgetStateProperty.all(
+                                  const EdgeInsets.symmetric(vertical: 20),
+                                ),
                               ),
-                            ],
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text(
+                                    nextLabel ?? 'Next',
+                                    style: const TextStyle(
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: Color(0xFFF2EFEA),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_forward),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         );

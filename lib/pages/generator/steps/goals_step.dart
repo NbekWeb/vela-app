@@ -94,7 +94,7 @@ class _GoalsStepState extends State<GoalsStep> {
               stepperCount: widget.stepperCount,
               showTitles: true,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
                     'Specific goals',
@@ -126,6 +126,7 @@ class _GoalsStepState extends State<GoalsStep> {
                       controller: _controller,
                       minLines: 3,
                       maxLines: isKeyboardVisible ? 4 : 6,
+                      scrollPhysics: const ClampingScrollPhysics(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontFamily: 'Satoshi',

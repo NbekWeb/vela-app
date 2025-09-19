@@ -229,12 +229,12 @@ class _GeneratingMeditationState extends State<GeneratingMeditation>
         });
 
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => SleepStreamMeditationPage(
-                isDirectRitual: widget.isDirectRitual,
-              ),
-            ),
+          // Generator tugagach qayta generator page'ga o'tmasin
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/sleep-stream-meditation',
+            (route) => route.settings.name == '/dashboard', // Faqat dashboard'ni qoldirish
+            arguments: {'isDirectRitual': widget.isDirectRitual},
           );
         }
       }

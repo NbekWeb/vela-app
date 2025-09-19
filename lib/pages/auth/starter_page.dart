@@ -155,7 +155,7 @@ class _StarterPageState extends State<StarterPage> {
                             Navigator.pushNamed(context, '/login');
                           },
                           style: ButtonStyles.primary,
-                          child: Text('Next', style: ButtonStyles.primaryText),
+                          child: Text('Next ', style: ButtonStyles.primaryText),
                         ),
 
                         const SizedBox(height: 8),

@@ -199,33 +199,35 @@ class RitualChooser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Text(
-          'Select the perfect meditation\nexperience for this moment',
-          style: TextStyle(
-            fontFamily: 'Satoshi',
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-            color: Color(0xFFF2EFEA),
-            letterSpacing: 0.2,
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'Select the perfect meditation\nexperience for this moment',
+            style: TextStyle(
+              fontFamily: 'Satoshi',
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              color: Color(0xFFF2EFEA),
+              letterSpacing: 0.2,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 30),
-        ...rituals.map(
-          (ritual) => Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: RitualCard(
-              ritual: ritual,
-              isSelected: selectedRitual?.id == ritual.id,
-              onTap: () => onRitualSelected(ritual),
+          const SizedBox(height: 60),
+          ...rituals.map(
+            (ritual) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: RitualCard(
+                ritual: ritual,
+                isSelected: selectedRitual?.id == ritual.id,
+                onTap: () => onRitualSelected(ritual),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

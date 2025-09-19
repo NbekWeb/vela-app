@@ -53,40 +53,30 @@ class _GenderStepState extends State<GenderStep> {
       nextEnabled: selectedIndex != null,
       stepperIndex: widget.stepperIndex,
       stepperCount: widget.stepperCount,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 24,
-            bottom: 140,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Gender?',
+            style: const TextStyle(
+              fontFamily: 'Canela',
+              fontSize: 32,
+              color: Colors.white,
+              fontWeight: FontWeight.w300,
+            ),
+            textAlign: TextAlign.center,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          const SizedBox(height: 40),
+          Row(
             children: [
-              Text(
-                'Gender?',
-                style: const TextStyle(
-                  fontFamily: 'Canela',
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-              Row(
-                children: [
-                  Expanded(child: _genderButton(0, 'Female')),
-                  const SizedBox(width: 15),
-                  Expanded(child: _genderButton(1, 'Male')),
-                ],
-              ),
-              const SizedBox(height: 15),
-              _genderButton(2, 'Non-binary/Other', isFullWidth: true),
+              Expanded(child: _genderButton(0, 'Female')),
+              const SizedBox(width: 15),
+              Expanded(child: _genderButton(1, 'Male')),
             ],
           ),
-        ),
+          const SizedBox(height: 15),
+          _genderButton(2, 'Non-binary/Other', isFullWidth: true),
+        ],
       ),
     );
   }
