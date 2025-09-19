@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushNamedAndRemoveUntil(
             context, 
             '/dashboard',
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
+            (route) => false, 
           );
         }
       },
