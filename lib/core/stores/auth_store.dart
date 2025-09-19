@@ -150,7 +150,11 @@ class AuthStore extends ChangeNotifier {
 
         await getUserDetails();
       }
-    } catch (e) {}
+    } catch (e) {
+      developer.log('❌ AuthStore initialization error: $e');
+      // Don't throw the error, just log it to prevent app crash
+      // The app can still function without pre-loaded user data
+    }
   }
 
   // Login action with API call
@@ -376,48 +380,35 @@ class AuthStore extends ChangeNotifier {
     VoidCallback? onSuccess,
     VoidCallback? onNewUser, // Yangi user uchun callback
   }) async {
+    developer.log('🍎 Starting Apple Sign-In process...');
     setLoading(true);
     setError(null);
 
     try {
-      
-      // Check if Apple Sign-In is available
-      final isAvailable = await SignInWithApple.isAvailable();
-      
-      if (!isAvailable) {
-        setError('Apple Sign-In is not available on this device');
-        return;
-      }
-      
-      
-      
+      // Apple Sign In
+      developer.log('🍎 Requesting Apple ID credential...');
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
         ],
       );
 
-  
-
+      developer.log('🍎 Apple credential received: ${credential.userIdentifier}');
+      
       if (credential.identityToken == null) {
+        developer.log('❌ Apple Sign-In failed: No identity token');
         setError('Apple Sign-In failed: No identity token');
         return;
       }
 
       // Firebase Authentication bilan sign-in qilish
       try {
-      
-        // Check if tokens are valid
-        if (credential.identityToken == null || credential.identityToken!.isEmpty) {
-          setError('Apple Sign-In failed: Invalid identity token');
-          return;
-        }
-        
-        if (credential.authorizationCode.isEmpty) {
-          setError('Apple Sign-In failed: Invalid authorization code');
-          return;
-        }
-        
+        developer.log(
+          '🔍 Firebase Authentication bilan Apple sign-in qilish...',
+        );
+
+        // Firebase credential yaratish
         final firebaseCredential = OAuthProvider("apple.com").credential(
           idToken: credential.identityToken,
           accessToken: credential.authorizationCode,
@@ -453,18 +444,18 @@ class AuthStore extends ChangeNotifier {
               );
               setTokens(accessToken: response.data['access_token']);
 
-            
+              // User details'ni olish
               await getUserDetails();
 
-             
+              // Check plan status and profile completion, then redirect accordingly
               final redirectRoute = await getRedirectRoute();
               if (redirectRoute == '/dashboard') {
+                // Profile is complete and has active plan - go to dashboard
                 onSuccess?.call();
               } else {
+                // Either no active plan or profile incomplete - go to appropriate step
                 onNewUser?.call();
               }
-            } else {
-              setError('No access token received from backend');
             }
           } catch (e) {
             setError('Firebase authentication failed. Please try again.');
@@ -473,10 +464,11 @@ class AuthStore extends ChangeNotifier {
           setError('Firebase Authentication failed. User is null.');
         }
       } catch (firebaseError) {
+        developer.log('❌ Firebase Authentication error: $firebaseError');
         setError('Firebase Authentication failed: $firebaseError');
       }
     } catch (e) {
-      
+      developer.log('❌ Apple Sign-In error: $e');
       String errorMessage = 'Apple Sign-In failed. Please try again.';
 
       if (e.toString().contains('SignInWithAppleAuthorizationException')) {
@@ -491,12 +483,12 @@ class AuthStore extends ChangeNotifier {
         } else if (e.toString().contains('unknown')) {
           errorMessage = 'Unknown Apple Sign-In error.';
         }
-      } else {
-        print('❌ Non-SignInWithAppleAuthorizationException error');
       }
 
+      developer.log('❌ Setting error message: $errorMessage');
       setError(errorMessage);
     } finally {
+      developer.log('🍎 Apple Sign-In process completed, setting loading to false');
       setLoading(false);
     }
   }
@@ -734,6 +726,7 @@ class AuthStore extends ChangeNotifier {
   // Get Firebase ID Token (faqat mobile platformalar uchun)
   Future<String?> getFirebaseIdToken() async {
     if (kIsWeb) {
+      print('🔍 Firebase ID Token not available on web platform');
       return null;
     }
 
@@ -743,9 +736,11 @@ class AuthStore extends ChangeNotifier {
         final idToken = await currentUser.getIdToken();
         return idToken;
       } else {
+        print('🔍 No Firebase user logged in');
         return null;
       }
     } catch (e) {
+      print('🔍 Error getting Firebase ID Token: $e');
       return null;
     }
   }
@@ -760,6 +755,9 @@ class AuthStore extends ChangeNotifier {
         url: 'auth/assign-free-trial/',
         method: 'POST',
       );
+      // print('🔍 Assign free trial response: $response');
+      // final planStatus = await checkPlanStatus();
+      // print('🔍 Plan status: $planStatus');
       if (response.data != null) {
         return response.data;
       }
@@ -779,6 +777,7 @@ class AuthStore extends ChangeNotifier {
         method: 'GET',
       );
 
+      print('🔍 Check plan status response: $response');
       if (response.data != null) {
         return response.data;
       }
@@ -1025,6 +1024,8 @@ class AuthStore extends ChangeNotifier {
       if (!['north_star', 'goal', 'dream'].contains(visionType)) {
         throw Exception('Invalid visionType');
       }
+
+      print('🌐 CALLING POST API: auth/life-vision/create/');
       final response = await ApiService.request(
         url: 'auth/life-vision/create/',
         method: 'POST',

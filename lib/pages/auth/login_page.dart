@@ -17,6 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -45,43 +46,36 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-
+  // Apple Sign-In handler
   Future<void> _handleAppleSignIn() async {
     print('🍎 Apple Sign-In button pressed!');
-    
+
     final authStore = context.read<AuthStore>();
     print('🍎 AuthStore loaded: ${authStore.isLoading}');
-    print('🍎 Current error: ${authStore.error}');
-    
+
     await authStore.loginWithApple(
       onSuccess: () async {
         print('🍎 Existing user - redirecting to dashboard');
-        
+
         if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome back!'
-          );
-          
+          ToastService.showSuccessToast(context, message: 'Welcome back!');
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            '/dashboard',
-            (route) => false, 
-          );
+
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+          }
         }
       },
       onNewUser: () async {
-        print('🍎 Profile incomplete - redirecting to appropriate step');
-        
+
         if (mounted) {
           ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome! Let\'s complete your profile'
+            context,
+            message: 'Welcome! Let\'s complete your profile',
           );
-          
+
           // Save "first" variable to localStorage as true for new users
           try {
             final prefs = await SharedPreferences.getInstance();
@@ -89,67 +83,52 @@ class _LoginPageState extends State<LoginPage> {
           } catch (e) {
             // Error saving first variable
           }
-          
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
+
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            redirectRoute,
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(context, redirectRoute, (route) => false);
+          }
         }
       },
     );
-
-    print('🍎 Apple Sign-In completed, error: ${authStore.error}');
-    
-    // Handle error if success callback wasn't called
-    if (authStore.error != null && mounted) {
-      print('🍎 Showing error toast: ${authStore.error}');
-      ToastService.showWarningToast(context, message: authStore.error!);
-    }
   }
 
   // Google Sign-In handler
   Future<void> _handleGoogleSignIn() async {
     print('🔍 Google Sign-In button pressed!');
-    
+
     final authStore = context.read<AuthStore>();
     print('🔍 AuthStore loaded: ${authStore.isLoading}');
-    
+
     await authStore.loginWithGoogle(
       onSuccess: () async {
         print('🔍 Existing user - redirecting to dashboard');
-        
+
         if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome back!'
-          );
-          
+          ToastService.showSuccessToast(context, message: 'Welcome back!');
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            '/dashboard',
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+          }
         }
       },
       onNewUser: () async {
         print('🔍 Profile incomplete - redirecting to appropriate step');
-        
+
         if (mounted) {
           ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome! Let\'s complete your profile'
+            context,
+            message: 'Welcome! Let\'s complete your profile',
           );
-          
+
           // Save "first" variable to localStorage as true for new users
           try {
             final prefs = await SharedPreferences.getInstance();
@@ -157,24 +136,22 @@ class _LoginPageState extends State<LoginPage> {
           } catch (e) {
             // Error saving first variable
           }
-          
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
+
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            redirectRoute,
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(context, redirectRoute, (route) => false);
+          }
         }
       },
     );
 
     print('🔍 Google Sign-In completed, error: ${authStore.error}');
-    
+
     // Handle error if success callback wasn't called
     if (authStore.error != null && mounted) {
       ToastService.showWarningToast(context, message: authStore.error!);
@@ -192,43 +169,38 @@ class _LoginPageState extends State<LoginPage> {
       password: _passwordController.text,
       onSuccess: () async {
         print('🔍 Existing user - redirecting to dashboard');
-        
+
         if (mounted) {
-          ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome back!'
-          );
-          
+          ToastService.showSuccessToast(context, message: 'Welcome back!');
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            '/dashboard',
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+          }
         }
       },
       onNewUser: () async {
-        print('🔍 Profile incomplete or no active plan - redirecting to appropriate step');
-        
+        print(
+          '🔍 Profile incomplete or no active plan - redirecting to appropriate step',
+        );
+
         if (mounted) {
           ToastService.showSuccessToast(
-            context, 
-            message: 'Welcome! Let\'s complete your profile'
+            context,
+            message: 'Welcome! Let\'s complete your profile',
           );
-          
+
           // Request notification permission and send device token
           await NotificationHandler.requestNotificationPermission();
-          
+
           // Get the appropriate redirect route based on profile completion
           final authStore = context.read<AuthStore>();
           final redirectRoute = await authStore.getRedirectRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context, 
-            redirectRoute,
-            (route) => false, // Barcha oldingi sahifalarni o'chirish
-          );
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(context, redirectRoute, (route) => false);
+          }
         }
       },
     );
@@ -317,7 +289,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthStore>(
@@ -330,235 +301,117 @@ class _LoginPageState extends State<LoginPage> {
               systemNavigationBarIconBrightness: Brightness.dark,
             ),
             child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: KeyboardVisibilityBuilder(
-              controller: _keyboardVisibilityController,
-              builder: (context, isKeyboardVisible) {
-                return GestureDetector(
-                  onTap: () => FocusScope.of(context).unfocus(),
-                  behavior: HitTestBehavior.opaque,
-                  child: Stack(
-                    children: [
-                      const Positioned.fill(child: StarsAnimation()),
-                      SafeArea(
-                        bottom: false,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            left: 20,
-                            right: 20,
-                            bottom: isKeyboardVisible ? 0 : 0,
-                          ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: EdgeInsets.only(
-                                    bottom: isKeyboardVisible ? 20 : 0,
-                                  ),
-                                  child: Form(
-                                    key: _formKey,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            const SizedBox(height: 24),
-                                            Row(
-                                              children: [
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.arrow_back,
-                                                    color: BaseStyles.white,
-                                                    size: 30,
-                                                  ),
-                                                  onPressed: () {
-                                                    // Check if there's a previous route
-                                                    if (Navigator.of(
-                                                      context,
-                                                    ).canPop()) {
-                                                      Navigator.of(context).pop();
-                                                    } else {
-                                                      // If no previous route, navigate to onboarding
-                                                      Navigator.of(
-                                                        context,
-                                                      ).pushReplacementNamed(
-                                                        '/onboarding-1',
-                                                      );
-                                                    }
-                                                  },
-                                                ),
-                                                Expanded(
-                                                  child: Center(
-                                                    child: SvgPicture.asset(
-                                                      'assets/icons/logo.svg',
-                                                      width: 60,
-                                                      height: 40,
-                                                    ),
-                                                  ),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.info_outline,
-                                                    color: BaseStyles.white,
-                                                    size: 30,
-                                                  ),
-                                                  onPressed: () {
-                                                    openPopupFromTop(
-                                                      context,
-                                                      const HowWorkModal(),
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: MediaQuery.of(context).size.height * 0.18),
-                                            Center(
-                                              child: Text(
-                                                'Continue to sign in',
-                                                style: LoginPageStyles
-                                                    .titleStyle
-                                                    .copyWith(
-                                                      fontSize: 36,
-                                                      color: Colors.white,
-                                                    ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Center(
-                                              child: Text(
-                                                "If you already have an account, we'll log you in.",
-                                                style: LoginPageStyles
-                                                    .subtitleStyle
-                                                    .copyWith(
-                                                      color: Color(0xFFF2EFEA),
-                                                    ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 36),
-                                            _buildTextField(
-                                              label: 'Email address',
-                                              controller: _emailController,
-                                              validator:
-                                                  Validators.validateEmail,
-                                            ),
-                                            _buildTextField(
-                                              label: 'Password',
-                                              controller: _passwordController,
-                                              obscure: _obscurePassword,
-                                              validator:
-                                                  Validators.validatePassword,
-                                              suffixIcon: Icon(
-                                                _obscurePassword
-                                                    ? Icons.visibility
-                                                    : Icons.visibility_off,
-                                                color: Color(0xFFF2EFEA),
-                                              ),
-                                              onSuffixTap: () {
-                                                setState(() {
-                                                  _obscurePassword =
-                                                      !_obscurePassword;
-                                                });
-                                              },
-                                            ),
-                                            const SizedBox(height: 20),
-                                            SizedBox(
-                                              height: 60,
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: const Color(
-                                                    0xFF3C6EAB,
-                                                  ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          30,
-                                                        ),
-                                                  ),
-                                                  elevation: 0,
-                                                ),
-                                                onPressed: authStore.isLoading
-                                                    ? null
-                                                    : _handleEmailLogin,
-                                                child: authStore.isLoading
-                                                    ? const SizedBox(
-                                                        width: 20,
-                                                        height: 20,
-                                                        child: CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                          valueColor:
-                                                              AlwaysStoppedAnimation<
-                                                                Color
-                                                              >(Colors.white),
-                                                        ),
-                                                      )
-                                                    : const Text(
-                                                        'Login',
-                                                        style: LoginPageStyles
-                                                            .orContinueStyle,
-                                                      ),
-                                              ),
-                                            ),
-                                            // Social Sign-In Buttons faqat mobile platformalar uchun
-                                            if (!kIsWeb) ...[
-                                              const SizedBox(height: 20),
-                                              // Divider with "or continue with" text
-                                              Center(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 16,
-                                                      ),
-                                                  child: Text(
-                                                    '- or continue with -',
-                                                    style: TextStyle(
-                                                      color: const Color(
-                                                        0xFFF2EFEA,
-                                                      ),
-                                                      fontSize: 16,
-                                                      fontFamily: 'Satoshi',
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 20),
-                                              // Social Sign-In Buttons in a row
+              resizeToAvoidBottomInset: false,
+              body: KeyboardVisibilityBuilder(
+                controller: _keyboardVisibilityController,
+                builder: (context, isKeyboardVisible) {
+                  return GestureDetector(
+                    onTap: () => FocusScope.of(context).unfocus(),
+                    behavior: HitTestBehavior.opaque,
+                    child: Stack(
+                      children: [
+                        const Positioned.fill(child: StarsAnimation()),
+                        SafeArea(
+                          bottom: false,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              bottom: isKeyboardVisible ? 0 : 0,
+                            ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    physics: const BouncingScrollPhysics(),
+                                    padding: EdgeInsets.only(
+                                      bottom: isKeyboardVisible ? 20 : 0,
+                                    ),
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              const SizedBox(height: 24),
                                               Row(
                                                 children: [
-                                                  // Google Sign-In Button
-                                                  Expanded(
-                                                    child: GoogleSignInButton(
-                                                      onPressed: _handleGoogleSignIn,
-                                                      isLoading: authStore.isLoading,
+                                                  IconButton(
+                                                    icon: const Icon(
+                                                      Icons.arrow_back,
+                                                      color: BaseStyles.white,
+                                                      size: 30,
                                                     ),
+                                                    onPressed: () {
+                                                      // Check if there's a previous route
+                                                      if (Navigator.of(
+                                                        context,
+                                                      ).canPop()) {
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pushReplacementNamed(
+                                                          '/onboarding-4',
+                                                        );
+                                                        // Navigator.of(context).pop();
+                                                      } else {
+                                                        // If no previous route, navigate to onboarding
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pushReplacementNamed(
+                                                          '/onboarding-4',
+                                                        );
+                                                      }
+                                                    },
                                                   ),
-                                                  if (Platform.isIOS) ...[
-                                                    const SizedBox(width: 16),
-                                                    // Apple Sign-In Button (iOS only)
-                                                    Expanded(
-                                                      child: AppleSignInButton(
-                                                        onPressed: _handleAppleSignIn,
-                                                        isLoading: authStore.isLoading,
-                                                        text: '', // Icon only
+                                                  Expanded(
+                                                    child: Center(
+                                                      child: SvgPicture.asset(
+                                                        'assets/icons/logo.svg',
+                                                        width: 60,
+                                                        height: 40,
                                                       ),
                                                     ),
-                                                  ],
+                                                  ),
+                                                  IconButton(
+                                                    icon: const Icon(
+                                                      Icons.info_outline,
+                                                      color: BaseStyles.white,
+                                                      size: 30,
+                                                    ),
+                                                    onPressed: () {
+                                                      openPopupFromTop(
+                                                        context,
+                                                        const HowWorkModal(),
+                                                      );
+                                                    },
+                                                  ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 16),
-                                            ],
-                                            const SizedBox(height: 20),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 20,
+                                              SizedBox(
+                                                height:
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).size.height *
+                                                    0.10,
                                               ),
-                                              child: Center(
+                                              Center(
+                                                child: Text(
+                                                  'Continue to sign in',
+                                                  style: LoginPageStyles
+                                                      .titleStyle
+                                                      .copyWith(
+                                                        fontSize: 36.sp,
+                                                        color: Colors.white,
+                                                      ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Center(
                                                 child: GestureDetector(
                                                   onTap: () {
                                                     Navigator.pushNamed(
@@ -570,70 +423,186 @@ class _LoginPageState extends State<LoginPage> {
                                                     text: TextSpan(
                                                       text:
                                                           "Don't have an account? ",
-                                                      style: LoginPageStyles
-                                                          .subtitleStyle
-                                                          .copyWith(
-                                                            color: Color(
-                                                              0xFFDCE6F0,
-                                                            ),
-                                                          ),
+                                                      style: TextStyle(
+                                                        fontSize: 16.sp,
+                                                        color: Color(
+                                                          0xFFF2EFEA,
+                                                        ),
+                                                        fontFamily: 'Satoshi',
+                                                      ),
                                                       children: [
                                                         TextSpan(
                                                           text: 'Sign up',
-                                                          style: LoginPageStyles
-                                                              .orContinueStyle
-                                                              .copyWith(
-                                                                color: Color(
-                                                                  0xFFDCE6F0,
-                                                                ),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                decoration:
-                                                                    TextDecoration
-                                                                        .underline,
-                                                              ),
+                                                          style: TextStyle(
+                                                            fontSize: 16.sp,
+                                                            color: Colors.white,
+                                                            fontFamily:
+                                                                'Satoshi',
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .underline,
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: isKeyboardVisible
-                                              ? 20
-                                              : MediaQuery.of(
-                                                      context,
-                                                    ).size.height *
-                                                    0.2,
-                                        ),
-                                      ],
+                                              const SizedBox(height: 36),
+                                              _buildTextField(
+                                                label: 'Email address',
+                                                controller: _emailController,
+                                                validator:
+                                                    Validators.validateEmail,
+                                              ),
+                                              _buildTextField(
+                                                label: 'Password',
+                                                controller: _passwordController,
+                                                obscure: _obscurePassword,
+                                                validator:
+                                                    Validators.validatePassword,
+                                                suffixIcon: Icon(
+                                                  _obscurePassword
+                                                      ? Icons.visibility
+                                                      : Icons.visibility_off,
+                                                  color: Color(0xFFF2EFEA),
+                                                ),
+                                                onSuffixTap: () {
+                                                  setState(() {
+                                                    _obscurePassword =
+                                                        !_obscurePassword;
+                                                  });
+                                                },
+                                              ),
+                                              const SizedBox(height: 20),
+                                              SizedBox(
+                                                height: 60,
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color(0xFF3C6EAB),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            30,
+                                                          ),
+                                                    ),
+                                                    elevation: 0,
+                                                  ),
+                                                  onPressed: authStore.isLoading
+                                                      ? null
+                                                      : _handleEmailLogin,
+                                                  child: authStore.isLoading
+                                                      ? const SizedBox(
+                                                          width: 20,
+                                                          height: 20,
+                                                          child: CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation<
+                                                                  Color
+                                                                >(Colors.white),
+                                                          ),
+                                                        )
+                                                      : const Text(
+                                                          'Login',
+                                                          style: LoginPageStyles
+                                                              .orContinueStyle,
+                                                        ),
+                                                ),
+                                              ),
+                                              // Social Sign-In Buttons faqat mobile platformalar uchun
+                                              if (!kIsWeb) ...[
+                                                const SizedBox(height: 20),
+                                                // Divider with "or continue with" text
+                                                Center(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 16,
+                                                        ),
+                                                    child: Text(
+                                                      '- or continue with -',
+                                                      style: TextStyle(
+                                                        color: const Color(
+                                                          0xFFF2EFEA,
+                                                        ),
+                                                        fontSize: 16,
+                                                        fontFamily: 'Satoshi',
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 20),
+                                                // Social Sign-In Buttons in a row
+                                                Row(
+                                                  children: [
+                                                    // Google Sign-In Button
+                                                    Expanded(
+                                                      child: GoogleSignInButton(
+                                                        onPressed:
+                                                            _handleGoogleSignIn,
+                                                        isLoading:
+                                                            authStore.isLoading,
+                                                      ),
+                                                    ),
+                                                    if (Platform.isIOS) ...[
+                                                      const SizedBox(width: 16),
+                                                      // Apple Sign-In Button (iOS only)
+                                                      Expanded(
+                                                        child: AppleSignInButton(
+                                                          onPressed:
+                                                              _handleAppleSignIn,
+                                                          isLoading: authStore
+                                                              .isLoading,
+                                                          text: '', // Icon only
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 16),
+                                              ],
+
+                                              const SizedBox(height: 8),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: isKeyboardVisible
+                                                ? 20
+                                                : MediaQuery.of(
+                                                        context,
+                                                      ).size.height *
+                                                      0.2,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      if (!isKeyboardVisible)
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 40,
-                          child: Center(child: const TermsAgreement()),
-                        ),
-                    ],
-                  ),
-                );
-              },
+                        if (!isKeyboardVisible)
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 40,
+                            child: Center(child: const TermsAgreement()),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-        ));
+        );
       },
     );
   }

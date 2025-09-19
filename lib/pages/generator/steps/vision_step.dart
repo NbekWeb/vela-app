@@ -31,6 +31,7 @@ class VisionStep extends StatefulWidget {
 
 class _VisionStepState extends State<VisionStep> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ class _VisionStepState extends State<VisionStep> {
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -120,6 +122,8 @@ class _VisionStepState extends State<VisionStep> {
                 width: double.infinity,
                 child: TextField(
                   controller: _controller,
+                  scrollController: _scrollController,
+                  scrollPhysics: const BouncingScrollPhysics(),
                   textAlign: TextAlign.center,
                   minLines: 3,
                   maxLines: 6,

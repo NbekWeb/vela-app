@@ -32,6 +32,7 @@ class GoalsStep extends StatefulWidget {
 
 class _GoalsStepState extends State<GoalsStep> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _GoalsStepState extends State<GoalsStep> {
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -124,6 +126,8 @@ class _GoalsStepState extends State<GoalsStep> {
                     child: TextField(
                       textAlign: TextAlign.center,
                       controller: _controller,
+                      scrollController: _scrollController,
+                      scrollPhysics: const BouncingScrollPhysics(),
                       minLines: 3,
                       maxLines: isKeyboardVisible ? 4 : 6,
                       style: const TextStyle(

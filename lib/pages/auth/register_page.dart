@@ -476,23 +476,32 @@ class _RegisterPageState extends State<RegisterPage> {
                                               ),
                                             ),
                                             const SizedBox(height: 36),
-                                            _buildTextField(
-                                              label: 'First name',
-                                              controller: _firstNameController,
-                                              validator: (value) =>
-                                                  Validators.validateRequired(
-                                                    value,
-                                                    'First name',
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: _buildTextField(
+                                                    label: 'First name',
+                                                    controller: _firstNameController,
+                                                    validator: (value) =>
+                                                        Validators.validateRequired(
+                                                          value,
+                                                          'First name',
+                                                        ),
                                                   ),
-                                            ),
-                                            _buildTextField(
-                                              label: 'Last name',
-                                              controller: _lastNameController,
-                                              validator: (value) =>
-                                                  Validators.validateRequired(
-                                                    value,
-                                                    'Last name',
+                                                ),
+                                                const SizedBox(width: 12), // небольшой отступ между полями
+                                                Expanded(
+                                                  child: _buildTextField(
+                                                    label: 'Last name',
+                                                    controller: _lastNameController,
+                                                    validator: (value) =>
+                                                        Validators.validateRequired(
+                                                          value,
+                                                          'Last name',
+                                                        ),
                                                   ),
+                                                ),
+                                              ],
                                             ),
                                             _buildTextField(
                                               label: 'Email address',
