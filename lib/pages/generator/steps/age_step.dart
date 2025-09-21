@@ -44,6 +44,7 @@ class _AgeStepState extends State<AgeStep> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -64,147 +65,155 @@ class _AgeStepState extends State<AgeStep> {
       nextEnabled: selectedIndex != null,
       stepperIndex: widget.stepperIndex,
       stepperCount: widget.stepperCount,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'How old are you?',
-            style: TextStyle(
-              fontFamily: 'Canela',
-              fontSize: 32.sp,
-              color: Colors.white,
-              fontWeight: FontWeight.w300,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 40),
-          Column(
-            children: [
-              // First row: 3 pills
-              Row(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: _AgePill(
-                      label: ages[0],
-                      selected: selectedIndex == 0,
-                      onTap: () {
-                        setState(() => selectedIndex = 0);
-                        final updatedProfile = widget.profileData.copyWith(
-                          ageRange: ages[0],
-                        );
-                        widget.onProfileDataChanged(updatedProfile);
-                        final meditationStore =
-                            Provider.of<MeditationStore>(
-                              context,
-                              listen: false,
-                            );
-                        meditationStore.setMeditationProfile(
-                          updatedProfile,
-                        );
-                      },
-                      width: 0,
+                  Text(
+                    'How old are you?',
+                    style: TextStyle(
+                      fontFamily: 'Canela',
+                      fontSize: 32.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: _AgePill(
-                      label: ages[1],
-                      selected: selectedIndex == 1,
-                      onTap: () {
-                        setState(() => selectedIndex = 1);
-                        final updatedProfile = widget.profileData.copyWith(
-                          ageRange: ages[1],
-                        );
-                        widget.onProfileDataChanged(updatedProfile);
-                        final meditationStore =
-                            Provider.of<MeditationStore>(
-                              context,
-                              listen: false,
-                            );
-                        meditationStore.setMeditationProfile(
-                          updatedProfile,
-                        );
-                      },
-                      width: 0,
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: _AgePill(
-                      label: ages[2],
-                      selected: selectedIndex == 2,
-                      onTap: () {
-                        setState(() => selectedIndex = 2);
-                        final updatedProfile = widget.profileData.copyWith(
-                          ageRange: ages[2],
-                        );
-                        widget.onProfileDataChanged(updatedProfile);
-                        final meditationStore =
-                            Provider.of<MeditationStore>(
-                              context,
-                              listen: false,
-                            );
-                        meditationStore.setMeditationProfile(
-                          updatedProfile,
-                        );
-                      },
-                      width: 0,
-                    ),
+                  const SizedBox(height: 40),
+                  Column(
+                    children: [
+                      // First row: 3 pills
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _AgePill(
+                              label: ages[0],
+                              selected: selectedIndex == 0,
+                              onTap: () {
+                                setState(() => selectedIndex = 0);
+                                final updatedProfile = widget.profileData.copyWith(
+                                  ageRange: ages[0],
+                                );
+                                widget.onProfileDataChanged(updatedProfile);
+                                final meditationStore =
+                                    Provider.of<MeditationStore>(
+                                      context,
+                                      listen: false,
+                                    );
+                                meditationStore.setMeditationProfile(
+                                  updatedProfile,
+                                );
+                              },
+                              width: 0,
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: _AgePill(
+                              label: ages[1],
+                              selected: selectedIndex == 1,
+                              onTap: () {
+                                setState(() => selectedIndex = 1);
+                                final updatedProfile = widget.profileData.copyWith(
+                                  ageRange: ages[1],
+                                );
+                                widget.onProfileDataChanged(updatedProfile);
+                                final meditationStore =
+                                    Provider.of<MeditationStore>(
+                                      context,
+                                      listen: false,
+                                    );
+                                meditationStore.setMeditationProfile(
+                                  updatedProfile,
+                                );
+                              },
+                              width: 0,
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: _AgePill(
+                              label: ages[2],
+                              selected: selectedIndex == 2,
+                              onTap: () {
+                                setState(() => selectedIndex = 2);
+                                final updatedProfile = widget.profileData.copyWith(
+                                  ageRange: ages[2],
+                                );
+                                widget.onProfileDataChanged(updatedProfile);
+                                final meditationStore =
+                                    Provider.of<MeditationStore>(
+                                      context,
+                                      listen: false,
+                                    );
+                                meditationStore.setMeditationProfile(
+                                  updatedProfile,
+                                );
+                              },
+                              width: 0,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      // Second row: 2 pills centered
+                      Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _AgePill(
+                              label: ages[3],
+                              selected: selectedIndex == 3,
+                              onTap: () {
+                                setState(() => selectedIndex = 3);
+                                final updatedProfile = widget.profileData.copyWith(
+                                  ageRange: ages[3],
+                                );
+                                widget.onProfileDataChanged(updatedProfile);
+                                final meditationStore =
+                                    Provider.of<MeditationStore>(
+                                      context,
+                                      listen: false,
+                                    );
+                                meditationStore.setMeditationProfile(
+                                  updatedProfile,
+                                );
+                              },
+                              width: 100,
+                            ),
+                            const SizedBox(width: 15),
+                            _AgePill(
+                              label: ages[4],
+                              selected: selectedIndex == 4,
+                              onTap: () {
+                                setState(() => selectedIndex = 4);
+                                final updatedProfile = widget.profileData.copyWith(
+                                  ageRange: ages[4],
+                                );
+                                widget.onProfileDataChanged(updatedProfile);
+                                final meditationStore =
+                                    Provider.of<MeditationStore>(
+                                      context,
+                                      listen: false,
+                                    );
+                                meditationStore.setMeditationProfile(
+                                  updatedProfile,
+                                );
+                              },
+                              width: 100,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
-              // Second row: 2 pills centered
-              Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _AgePill(
-                      label: ages[3],
-                      selected: selectedIndex == 3,
-                      onTap: () {
-                        setState(() => selectedIndex = 3);
-                        final updatedProfile = widget.profileData.copyWith(
-                          ageRange: ages[3],
-                        );
-                        widget.onProfileDataChanged(updatedProfile);
-                        final meditationStore =
-                            Provider.of<MeditationStore>(
-                              context,
-                              listen: false,
-                            );
-                        meditationStore.setMeditationProfile(
-                          updatedProfile,
-                        );
-                      },
-                      width: 100,
-                    ),
-                    const SizedBox(width: 15),
-                    _AgePill(
-                      label: ages[4],
-                      selected: selectedIndex == 4,
-                      onTap: () {
-                        setState(() => selectedIndex = 4);
-                        final updatedProfile = widget.profileData.copyWith(
-                          ageRange: ages[4],
-                        );
-                        widget.onProfileDataChanged(updatedProfile);
-                        final meditationStore =
-                            Provider.of<MeditationStore>(
-                              context,
-                              listen: false,
-                            );
-                        meditationStore.setMeditationProfile(
-                          updatedProfile,
-                        );
-                      },
-                      width: 100,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
         ],
       ),
     );

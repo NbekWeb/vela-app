@@ -149,16 +149,36 @@ class StepScaffold extends StatelessWidget {
                   ),
                   // Content area
                   Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.only(
-                        bottom: isKeyboardVisible ? 100 : 0, // Keyboard ochilganda padding qo'shamiz
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: SizedBox(
-                          height: isKeyboardVisible 
-                            ? null // Keyboard ochilganda natural height
-                            : MediaQuery.of(context).size.height - 200, // Keyboard yo'q bo'lganda fixed height
+                    child: isKeyboardVisible 
+                      ? SingleChildScrollView(
+                          padding: EdgeInsets.only(
+                            bottom: 100, // Keyboard ochilganda padding
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (title.isNotEmpty) ...[
+                                  Text(
+                                    title,
+                                    style: const TextStyle(
+                                      fontFamily: 'Canela',
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 36,
+                                      color: Color(0xFFF2EFEA),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 10),
+                                ],
+                                child,
+                              ],
+                            ),
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -179,8 +199,6 @@ class StepScaffold extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ),
-                    ),
                   ),
 
                   // Bottom button area

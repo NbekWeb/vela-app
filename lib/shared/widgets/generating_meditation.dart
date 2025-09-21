@@ -19,7 +19,7 @@ class GeneratingMeditation extends StatefulWidget {
 
   const GeneratingMeditation({
     super.key,
-    this.title = 'Generating meditation',
+    this.title = 'Generating Meditation',
     this.subtitle = 'We\'re shaping your vision\ninto a meditative journey...',
     this.videoAsset = 'assets/videos/moon.mp4',
     this.bottomPadding = 80,
