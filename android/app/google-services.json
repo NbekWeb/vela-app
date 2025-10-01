@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "354237870385",
+    "project_id": "vela-31f91",
+    "storage_bucket": "vela-31f91.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354237870385:android:c878a3d93db8e2bc97c010",
+        "android_client_info": {
+          "package_name": "com.nbekdev.vela"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354237870385-u79i4r9edeto84ghdgv5ka48ahpd52i0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nbekdev.vela",
+            "certificate_hash": "d57037115eddd8272dda94c90388e8cff85b656c"
+          }
+        },
+        {
+          "client_id": "354237870385-vjm9880kbjje9gc9ptrisl30ih80qivk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7KGBVVYe0RexQOvKmlTvaAPMu5_bNNps"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354237870385-vjm9880kbjje9gc9ptrisl30ih80qivk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "354237870385-fh2mnbv6phird2bm0f7q20o0o9hom1ri.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nbekdev.vela"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

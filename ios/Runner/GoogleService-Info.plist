@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>354237870385-fh2mnbv6phird2bm0f7q20o0o9hom1ri.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.354237870385-fh2mnbv6phird2bm0f7q20o0o9hom1ri</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>354237870385-u79i4r9edeto84ghdgv5ka48ahpd52i0.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBxKfmk_p67pCqiDKiWubQdL8OjzslKvLs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>354237870385</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.nbekdev.vela</string>
+	<key>PROJECT_ID</key>
+	<string>vela-31f91</string>
+	<key>STORAGE_BUCKET</key>
+	<string>vela-31f91.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:354237870385:ios:d56c12efd517234897c010</string>
+</dict>
+</plist>
