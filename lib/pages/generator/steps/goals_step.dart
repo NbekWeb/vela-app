@@ -36,6 +36,7 @@ class _GoalsStepState extends State<GoalsStep> {
   @override
   void initState() {
     super.initState();
+    
     // Avvalgi qiymatni ko'rsatish uchun
     if (widget.profileData.goals != null &&
         widget.profileData.goals!.isNotEmpty) {
@@ -74,7 +75,6 @@ class _GoalsStepState extends State<GoalsStep> {
   @override
   Widget build(BuildContext context) {
     return KeyboardVisibilityBuilder(
-      controller: KeyboardVisibilityController(),
       builder: (context, isKeyboardVisible) {
         return ScrollConfiguration(
           behavior: ScrollConfiguration.of(
@@ -92,9 +92,9 @@ class _GoalsStepState extends State<GoalsStep> {
               nextEnabled: _controller.text.trim().isNotEmpty,
               stepperIndex: widget.stepperIndex,
               stepperCount: widget.stepperCount,
-              showTitles: true,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
                     'Specific goals',
@@ -106,7 +106,7 @@ class _GoalsStepState extends State<GoalsStep> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 20),
                   const Text(
                     'Are there specific goals you want to accomplish, experiences you want to have, or habits you want to form or change?',
                     style: TextStyle(
@@ -118,12 +118,12 @@ class _GoalsStepState extends State<GoalsStep> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
                     child: TextField(
-                      textAlign: TextAlign.center,
                       controller: _controller,
+                      textAlign: TextAlign.center,
                       minLines: 3,
                       maxLines: isKeyboardVisible ? 4 : 6,
                       scrollPhysics: const ClampingScrollPhysics(),
@@ -131,12 +131,10 @@ class _GoalsStepState extends State<GoalsStep> {
                         color: Colors.white,
                         fontFamily: 'Satoshi',
                         fontSize: 15,
-                        decoration: TextDecoration.none,
                       ),
                       decoration: InputDecoration(
-                        hintText:
-                            'Start a morning routine, feel less anxious, travel more.',
-                        hintStyle: const TextStyle(color: Color(0xFFffffff)),
+                        hintText: 'Start a morning routine, feel less anxious, travel more.',
+                        hintStyle: const TextStyle(color: Color(0xFFeeeeee)),
                         filled: true,
                         fillColor: Color(0xFF5882B6),
                         enabledBorder: OutlineInputBorder(
@@ -158,7 +156,7 @@ class _GoalsStepState extends State<GoalsStep> {
                       onChanged: _onGoalsChanged,
                     ),
                   ),
-                  SizedBox(height: isKeyboardVisible ? 10 : 30),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

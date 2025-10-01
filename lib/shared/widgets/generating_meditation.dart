@@ -219,9 +219,6 @@ class _GeneratingMeditationState extends State<GeneratingMeditation>
         },
       );
 
-      // Qisqa kutish va keyin xatolik tekshirish
-      await Future.delayed(const Duration(seconds: 3));
-
       // Faqat xatolik bo'lmagan taqdirda success navigation qilish
       if (!hasError && mounted) {
         setState(() {
@@ -229,12 +226,14 @@ class _GeneratingMeditationState extends State<GeneratingMeditation>
         });
 
         if (mounted) {
-          // Generator tugagach qayta generator page'ga o'tmasin
-          Navigator.pushNamedAndRemoveUntil(
+          // Navigate to sleep meditation page using MaterialPageRoute
+          Navigator.pushReplacement(
             context,
-            '/sleep-stream-meditation',
-            (route) => route.settings.name == '/dashboard', // Faqat dashboard'ni qoldirish
-            arguments: {'isDirectRitual': widget.isDirectRitual},
+            MaterialPageRoute(
+              builder: (context) => SleepStreamMeditationPage(
+                isDirectRitual: widget.isDirectRitual,
+              ),
+            ),
           );
         }
       }

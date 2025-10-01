@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import '../../shared/widgets/starter_modal.dart';
 import '../../shared/widgets/stars_animation.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StepScaffold extends StatelessWidget {
   final String title;
@@ -149,88 +148,68 @@ class StepScaffold extends StatelessWidget {
                   ),
                   // Content area
                   Expanded(
-                    child: isKeyboardVisible 
-                      ? SingleChildScrollView(
-                          padding: EdgeInsets.only(
-                            bottom: 100, // Keyboard ochilganda padding
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                if (title.isNotEmpty) ...[
-                                  Text(
-                                    title,
-                                    style: const TextStyle(
-                                      fontFamily: 'Canela',
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: 36,
-                                      color: Color(0xFFF2EFEA),
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 10),
-                                ],
-                                child,
-                              ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontFamily: 'Canela',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 36,
+                                color: Color(0xFFF2EFEA),
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (title.isNotEmpty) ...[
-                                Text(
-                                  title,
-                                  style: const TextStyle(
-                                    fontFamily: 'Canela',
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 36,
-                                    color: Color(0xFFF2EFEA),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 10),
-                              ],
-                              child,
-                            ],
-                          ),
+                            const SizedBox(height: 20),
+                            child,
+                          ],
                         ),
+                      ),
+                    ),
                   ),
-
                   // Bottom button area
                   if (onNext != null)
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: 40,
-                        left: 16,
-                        right: 16,
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            'The Universe responds to specifics. The more detail you share, the more powerful and personalized your Vela journey becomes.',
-                            style: TextStyle(
-                              color: Color(0xFFDCE6F0),
-                              fontFamily: 'Satoshi',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13.sp,
-                              letterSpacing: -0.5,
-                              height: 1.25,
-                            ),
-                            textAlign: TextAlign.center,
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      height: isKeyboardVisible ? 0 : null,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 300),
+                        opacity: isKeyboardVisible ? 0.0 : 1.0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: 40,
+                            left: 16,
+                            right: 16,
                           ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: nextEnabled ? onNext : null,
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    WidgetStateProperty.resolveWith<Color>((
+                          child: Column(
+                            children: [
+                              const Text(
+                                'The Universe responds to specifics. The more detail you share, the more powerful and personalized your Vela journey becomes.',
+                                style: TextStyle(
+                                  color: Color(0xFFDCE6F0),
+                                  fontFamily: 'Satoshi',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  letterSpacing: -0.5,
+                                  height: 1.25,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: nextEnabled ? onNext : null,
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStateProperty.resolveWith<Color>((
                                       Set<WidgetState> states,
                                     ) {
                                       if (states.contains(
@@ -242,52 +221,52 @@ class StepScaffold extends StatelessWidget {
                                       }
                                       return const Color(0xFF3B6EAA);
                                     }),
-                                foregroundColor:
-                                    WidgetStateProperty.resolveWith<Color>((
+                                    foregroundColor:
+                                        WidgetStateProperty.resolveWith<Color>((
                                       Set<WidgetState> states,
                                     ) {
                                       if (states.contains(
                                         WidgetState.disabled,
                                       )) {
-                                        return Colors.white.withOpacity(
-                                          0.7,
-                                        );
+                                        return Colors.white.withOpacity(0.7);
                                       }
                                       return Colors.white;
                                     }),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(32),
-                                  ),
-                                ),
-                                padding: WidgetStateProperty.all(
-                                  const EdgeInsets.symmetric(vertical: 20),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Text(
-                                    nextLabel ?? 'Next',
-                                    style: const TextStyle(
-                                      fontFamily: 'Satoshi',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Color(0xFFF2EFEA),
+                                    shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(32),
+                                      ),
+                                    ),
+                                    padding: WidgetStateProperty.all(
+                                      const EdgeInsets.symmetric(vertical: 20),
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_forward),
-                                ],
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Text(
+                                        nextLabel ?? 'Next',
+                                        style: const TextStyle(
+                                          fontFamily: 'Satoshi',
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          color: Color(0xFFF2EFEA),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Icon(Icons.arrow_forward),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                ],
+              ),
             ],
           ),
         );

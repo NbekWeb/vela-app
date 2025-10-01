@@ -105,17 +105,32 @@ class ApiService {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
   }) async {
+    print('🔍 API Request: $method $url');
+    print('🔍 API Data: $data');
+    print('🔍 API Open: $open');
+    
     final options = Options(
       method: method,
       headers: headers,
       extra: {'open': open},
     );
-    return _dio.request<T>(
-      url,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-    );
+    
+    try {
+      final response = await _dio.request<T>(
+        url,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      
+      print('🔍 API Response Status: ${response.statusCode}');
+      print('🔍 API Response Data: ${response.data}');
+      
+      return response;
+    } catch (e) {
+      print('❌ API Error: $e');
+      rethrow;
+    }
   }
 
   // Method for file uploads

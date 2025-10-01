@@ -136,13 +136,9 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
   @override
   void initState() {
     super.initState();
-    // Profile ma'lumotlaridan boshlang'ich qiymatlarni olish
-    ritualType = widget.profileData.ritualType?.isNotEmpty == true
-        ? widget.profileData.ritualType!.first
-        : 'guided';
-    tone = widget.profileData.tone?.isNotEmpty == true
-        ? widget.profileData.tone!.first
-        : 'dreamy';
+    // Set default values
+    ritualType = 'guided';
+    tone = 'dreamy';
     voice = widget.profileData.voice?.isNotEmpty == true
         ? widget.profileData.voice!.first
         : 'male';
@@ -214,68 +210,68 @@ class _CustomizeRitualModalState extends State<CustomizeRitualModal> {
                       ],
                     ),
                     AppStyles.spacingMedium,
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Ritual Type', style: AppStyles.bodyMedium),
-                    ),
-                    const SizedBox(height: 8),
-                    _StyledDropdown<String>(
-                      value: ritualType,
-                      items: ritualTypes.map((e) => e['value']!).toList(),
-                      itemLabels: ritualTypes.map((e) => e['label']!).toList(),
-                      onChanged: (v) async {
-                        setState(() => ritualType = v!);
-                        final updatedProfileData = widget.profileData.copyWith(
-                          ritualType: [v ?? ''],
-                        );
-                        widget.onProfileDataChanged(updatedProfileData);
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Text('Ritual Type', style: AppStyles.bodyMedium),
+                    // ),
+                    // const SizedBox(height: 8),
+                    // _StyledDropdown<String>(
+                    //   value: ritualType,
+                    //   items: ritualTypes.map((e) => e['value']!).toList(),
+                    //   itemLabels: ritualTypes.map((e) => e['label']!).toList(),
+                    //   onChanged: (v) async {
+                    //     setState(() => ritualType = v!);
+                    //     final updatedProfileData = widget.profileData.copyWith(
+                    //       ritualType: [v ?? ''],
+                    //     );
+                    //     widget.onProfileDataChanged(updatedProfileData);
 
-                        // Meditation store ga ritual type ni update qilish
-                        final meditationStore = Provider.of<MeditationStore>(
-                          context,
-                          listen: false,
-                        );
-                        await meditationStore.saveRitualSettings(
-                          ritualType: v ?? '',
-                          tone: tone,
-                          duration: duration.toString(),
-                          planType: widget.profileData.planType ?? 1,
-                        );
-                      },
-                    ),
-                    AppStyles.spacingSmall,
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Choose your tone',
-                        style: AppStyles.bodyMedium,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _StyledDropdown<String>(
-                      value: tone,
-                      items: tones.map((e) => e['value']!).toList(),
-                      itemLabels: tones.map((e) => e['label']!).toList(),
-                      onChanged: (v) async {
-                        setState(() => tone = v!);
-                        final updatedProfileData = widget.profileData.copyWith(
-                          tone: [v ?? ''],
-                        );
-                        widget.onProfileDataChanged(updatedProfileData);
+                    //     // Meditation store ga ritual type ni update qilish
+                    //     final meditationStore = Provider.of<MeditationStore>(
+                    //       context,
+                    //       listen: false,
+                    //     );
+                    //     await meditationStore.saveRitualSettings(
+                    //       ritualType: v ?? '',
+                    //       tone: tone,
+                    //       duration: duration.toString(),
+                    //       planType: widget.profileData.planType ?? 1,
+                    //     );
+                    //   },
+                    // ),
+                    // AppStyles.spacingSmall,
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Text(
+                    //     'Choose your tone',
+                    //     style: AppStyles.bodyMedium,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 8),
+                    // _StyledDropdown<String>(
+                    //   value: tone,
+                    //   items: tones.map((e) => e['value']!).toList(),
+                    //   itemLabels: tones.map((e) => e['label']!).toList(),
+                    //   onChanged: (v) async {
+                    //     setState(() => tone = v!);
+                    //     final updatedProfileData = widget.profileData.copyWith(
+                    //       tone: [v ?? ''],
+                    //     );
+                    //     widget.onProfileDataChanged(updatedProfileData);
 
-                        // Meditation store ga tone ni update qilish
-                        final meditationStore = Provider.of<MeditationStore>(
-                          context,
-                          listen: false,
-                        );
-                        await meditationStore.saveRitualSettings(
-                          ritualType: ritualType,
-                          tone: v ?? '',
-                          duration: duration.toString(),
-                          planType: widget.profileData.planType ?? 1,
-                        );
-                      },
-                    ),
+                    //     // Meditation store ga tone ni update qilish
+                    //     final meditationStore = Provider.of<MeditationStore>(
+                    //       context,
+                    //       listen: false,
+                    //     );
+                    //     await meditationStore.saveRitualSettings(
+                    //       ritualType: ritualType,
+                    //       tone: v ?? '',
+                    //       duration: duration.toString(),
+                    //       planType: widget.profileData.planType ?? 1,
+                    //     );
+                    //   },
+                    // ),
                     AppStyles.spacingSmall,
                     Align(
                       alignment: Alignment.centerLeft,

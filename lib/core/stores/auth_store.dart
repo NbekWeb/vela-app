@@ -283,17 +283,25 @@ class AuthStore extends ChangeNotifier {
             // ID token'ni global variable'ga saqlash
             _lastIdToken = auth.idToken;
 
-            // Firebase ID token'ni olish
-            final firebaseIdToken = await firebaseUser.getIdToken();
+            // Google ID token'ni olish (Firebase emas, Google'dan to'g'ridan-to'g'ri)
+            final googleIdToken = auth.idToken;
 
             // Firebase login API ga so'rov yuborish
             try {
+              developer.log('🔍 Sending Google ID token to backend: ${googleIdToken?.length != null && googleIdToken!.length > 20 ? googleIdToken.substring(0, 20) : googleIdToken}...');
+              
               final response = await ApiService.request(
                 url: 'auth/firebase/login/',
                 method: 'POST',
-                data: {'firebase_id_token': firebaseIdToken},
+                data: {'firebase_id_token': googleIdToken},
                 open: true, // Bu endpoint uchun token kerak emas
               );
+
+              developer.log('🔍 Backend response: ${response.data}');
+            developer.log('🔍 Response status: ${response.statusCode}');
+            developer.log('🔍 Response headers: ${response.headers}');
+              developer.log('🔍 Response status: ${response.statusCode}');
+              developer.log('🔍 Response headers: ${response.headers}');
 
               // Backend token'ni saqlash
               if (response.data['access_token'] != null) {
@@ -315,9 +323,23 @@ class AuthStore extends ChangeNotifier {
                   // Either no active plan or profile incomplete - go to appropriate step
                   onNewUser?.call();
                 }
+              } else {
+                developer.log('❌ No access token in response: ${response.data}');
+                setError('Backend authentication failed. No access token received.');
               }
             } catch (e) {
-              setError('Firebase authentication failed. Please try again.');
+              developer.log('❌ Backend API error: $e');
+              
+              // Check if it's a 401 error specifically
+              if (e.toString().contains('401')) {
+                setError('Server authentication failed. Please check backend configuration.');
+              } else if (e.toString().contains('400')) {
+                setError('Invalid token format. Please try again.');
+              } else if (e.toString().contains('500')) {
+                setError('Server error. Please try again later.');
+              } else {
+                setError('Backend authentication failed: ${e.toString()}');
+              }
             }
           } else {
             setError('Firebase Authentication failed. User is null.');
@@ -416,17 +438,23 @@ class AuthStore extends ChangeNotifier {
           // ID token'ni global variable'ga saqlash
           _lastIdToken = credential.identityToken;
 
-          // Firebase ID token'ni olish
-          final firebaseIdToken = await firebaseUser.getIdToken();
+          // Apple ID token'ni olish (Firebase emas, Apple'dan to'g'ridan-to'g'ri)
+          final appleIdToken = credential.identityToken;
 
           // Firebase login API ga so'rov yuborish
           try {
+              developer.log('🔍 Sending Apple ID token to backend: ${appleIdToken?.length != null && appleIdToken!.length > 20 ? appleIdToken.substring(0, 20) : appleIdToken}...');
+            
             final response = await ApiService.request(
               url: 'auth/firebase/login/',
               method: 'POST',
-              data: {'firebase_id_token': firebaseIdToken},
+              data: {'firebase_id_token': appleIdToken},
               open: true, // Bu endpoint uchun token kerak emas
             );
+
+            developer.log('🔍 Backend response: ${response.data}');
+            developer.log('🔍 Response status: ${response.statusCode}');
+            developer.log('🔍 Response headers: ${response.headers}');
 
             // Backend token'ni saqlash
             if (response.data['access_token'] != null) {
@@ -448,9 +476,23 @@ class AuthStore extends ChangeNotifier {
                 // Either no active plan or profile incomplete - go to appropriate step
                 onNewUser?.call();
               }
+            } else {
+              developer.log('❌ No access token in response: ${response.data}');
+              setError('Backend authentication failed. No access token received.');
             }
           } catch (e) {
-            setError('Firebase authentication failed. Please try again.');
+            developer.log('❌ Backend API error: $e');
+            
+            // Check if it's a 401 error specifically
+            if (e.toString().contains('401')) {
+              setError('Server authentication failed. Please check backend configuration.');
+            } else if (e.toString().contains('400')) {
+              setError('Invalid token format. Please try again.');
+            } else if (e.toString().contains('500')) {
+              setError('Server error. Please try again later.');
+            } else {
+              setError('Backend authentication failed: ${e.toString()}');
+            }
           }
         } else {
           setError('Firebase Authentication failed. User is null.');

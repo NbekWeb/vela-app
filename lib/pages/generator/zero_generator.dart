@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:vela/shared/widgets/stars_animation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/stores/auth_store.dart';
 
 class ZeroGenerator extends StatefulWidget {
   final VoidCallback? onNext;
@@ -14,6 +18,29 @@ class _ZeroGeneratorState extends State<ZeroGenerator> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final authStore = Provider.of<AuthStore>(context, listen: false);
+
+    // Clear access token from secure storage
+    final storage = FlutterSecureStorage();
+    await storage.delete(key: 'access_token');
+    await storage.delete(key: 'refresh_token');
+
+    // Reset saved tab index to 0
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('selected_tab_index', 0);
+
+    // Call authStore logout to clear all auth data
+    await authStore.logout();
+
+    if (context.mounted) {
+      // Clear all routes and navigate to login
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+    }
   }
 
   //  void initState() {
@@ -135,6 +162,42 @@ class _ZeroGeneratorState extends State<ZeroGenerator> {
                   ),
                 ),
               ],
+            ),
+          ),
+          // Logout button at the very bottom
+          Positioned(
+            bottom: 60,
+            left: 24,
+            right: 24,
+            child: SizedBox(
+              height: 60,
+              width: double.infinity,
+              child: ElevatedButton(
+                 onPressed: () {
+                   _handleLogout(context);
+                 },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(const Color.fromRGBO(59, 110, 170, .2)),
+                  foregroundColor: WidgetStateProperty.all(Colors.white),
+                  shape: WidgetStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                  ),
+                  padding: WidgetStateProperty.all(
+                    const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+                child: const Text(
+                  'Log Out',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Satoshi',
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
